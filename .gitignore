@@ -1,0 +1,4 @@
+#py compiled files
+*.pyc
+#temporary files
+.*.swp
