@@ -19,7 +19,13 @@ def get_cutout(
          + '{0},{1}/'.format(x0, xl)
          + '{0},{1}/'.format(y0, yl)
          + '{0},{1}/'.format(z0, zl))
-    print 'Retrieving h5 file, size {0} MB = {1} MiB.'.format(xl*yl*zl*12. / 10**6, xl*yl*zl*12. / 2**20)
+    if data_type in ['u', 'b', 'a']:
+        ncomponents = 3
+    elif data_type in ['p']:
+        ncomponents = 1
+    print 'Retrieving h5 file, size {0} MB = {1} MiB.'.format(
+            xl*yl*zl*ncomponents * 4. / 10**6,
+            xl*yl*zl*ncomponents * 4. / 2**20)
     urllib.urlretrieve(url, filename + '.h5')
     print 'Data downloaded and ' + filename + '.h5 written successfuly.'
     return None
@@ -36,10 +42,14 @@ def get_big_cutout(
     if cube_dim % chunk_dim != 0:
         print 'in get_big_cutout, cube_dim must be a multiple of chunk_dim'
         return None
+    if data_type in ['u', 'b', 'a']:
+        ncomponents = 3
+    elif data_type in ['p']:
+        ncomponents = 1
     big_data_file = h5py.File(filename + '.h5', mode='w')
     big_cube = big_data_file.create_dataset(
             data_type + '{0:0>5}'.format(time*10),
-            (cube_dim, cube_dim, cube_dim, 3),
+            (cube_dim, cube_dim, cube_dim, ncomponents),
             np.float32,
             compression = 'lzf') ### is compression a good idea?
     for cz in range(cube_dim/chunk_dim):
