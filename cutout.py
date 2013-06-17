@@ -1,3 +1,4 @@
+import os
 import urllib
 import numpy as np
 import h5py
@@ -55,15 +56,16 @@ def get_big_cutout(
     for cz in range(cube_dim/chunk_dim):
         for cy in range(cube_dim/chunk_dim):
             for cx in range(cube_dim/chunk_dim):
-                get_cutout(
-                        filename + '_{0:0>2x}{1:0>2x}{2:0>2x}'.format(cz, cy, cx),
-                        t0 = time, tl = 1,
-                        x0 = cx*chunk_dim, y0 = cy*chunk_dim, z0 = cz*chunk_dim,
-                        xl = chunk_dim, yl = chunk_dim, zl = chunk_dim,
-                        data_set = data_set,
-                        data_type = data_type,
-                        auth_token = auth_token,
-                        base_website = base_website)
+                if not os.path.exists(filename + '_{0:0>2x}{1:0>2x}{2:0>2x}.h5'.format(cz, cy, cx)):
+                    get_cutout(
+                            filename + '_{0:0>2x}{1:0>2x}{2:0>2x}'.format(cz, cy, cx),
+                            t0 = time, tl = 1,
+                            x0 = cx*chunk_dim, y0 = cy*chunk_dim, z0 = cz*chunk_dim,
+                            xl = chunk_dim, yl = chunk_dim, zl = chunk_dim,
+                            data_set = data_set,
+                            data_type = data_type,
+                            auth_token = auth_token,
+                            base_website = base_website)
                 new_file = h5py.File(filename + '_{0:0>2x}{1:0>2x}{2:0>2x}.h5'.format(cz, cy, cx), mode='r')
                 new_data = new_file[data_type + '{0:0>5}'.format(time*10)]
                 big_cube[cz*chunk_dim:(cz+1)*chunk_dim,
