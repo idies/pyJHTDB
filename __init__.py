@@ -4,6 +4,7 @@
 """
 
 import numpy
+import ctypes
 
 class libTDB:
     def __init__(self,
