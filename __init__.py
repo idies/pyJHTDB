@@ -3,6 +3,8 @@
     Also, for cutout downloads over http.
 """
 
+import numpy
+
 class libTDB:
     def __init__(self,
             libname = 'libTDB',
