@@ -3,6 +3,7 @@
     Also, for cutout downloads over http.
 """
 
+import sys
 import numpy
 import ctypes
 
