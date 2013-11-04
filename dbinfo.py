@@ -10,9 +10,9 @@ isotropic1024coarse = {'name'   : 'isotropic1024coarse',
                        'dx'     : np.pi/512,
                        'dy'     : np.pi/512,
                        'dz'     : np.pi/512,
-                       'xnodes' : (np.pi/512)*np.array(range(1024)),
-                       'ynodes' : (np.pi/512)*np.array(range(1024)),
-                       'znodes' : (np.pi/512)*np.array(range(1024))}
+                       'xnodes' : (np.pi/512)*np.array(range(1024), dtype = np.float32),
+                       'ynodes' : (np.pi/512)*np.array(range(1024), dtype = np.float32),
+                       'znodes' : (np.pi/512)*np.array(range(1024), dtype = np.float32)}
 
 channel = {'name'   : 'channel',
            'nx'     : 2048,
@@ -24,7 +24,7 @@ channel = {'name'   : 'channel',
            'dx'     : np.pi/256,
            'dy'     :    1./256,                         ## WRONG, FIXME
            'dz'     : np.pi/256,
-           'xnodes' : (np.pi/256)*np.array(range(2048)),
-           'ynodes' : (   1./256)*np.array(range( 512)), ## WRONG, FIXME
-           'znodes' : (np.pi/256)*np.array(range(1536))}
+           'xnodes' : (np.pi/256)*np.array(range(2048), dtype = np.float32),
+           'ynodes' : (   1./256)*np.array(range( 512), dtype = np.float32) - 1, ## WRONG, FIXME
+           'znodes' : (np.pi/256)*np.array(range(1536), dtype = np.float32)}
 
