@@ -1,4 +1,7 @@
 import numpy as np
+import os
+
+package_dir, package_filename = os.path.split(__file__)
 
 isotropic1024coarse = {'name'   : 'isotropic1024coarse',
                        'nx'     : 1024,
@@ -15,16 +18,14 @@ isotropic1024coarse = {'name'   : 'isotropic1024coarse',
                        'znodes' : (np.pi/512)*np.array(range(1024), dtype = np.float32)}
 
 channel = {'name'   : 'channel',
-           'nx'     : 2048,
-           'ny'     : 512,
-           'nz'     : 1536,
-           'lx'     : 8*np.pi,
-           'ly'     : 2.0,
-           'lz'     : 6*np.pi,
-           'dx'     : np.pi/256,
-           'dy'     :    1./256,                         ## WRONG, FIXME
-           'dz'     : np.pi/256,
-           'xnodes' : (np.pi/256)*np.array(range(2048), dtype = np.float32),
-           'ynodes' : (   1./256)*np.array(range( 512), dtype = np.float32) - 1, ## WRONG, FIXME
-           'znodes' : (np.pi/256)*np.array(range(1536), dtype = np.float32)}
+           'xnodes' : np.load(os.path.join(package_dir, 'data/channel_xgrid.npy')),
+           'ynodes' : np.load(os.path.join(package_dir, 'data/channel_ygrid.npy')),
+           'znodes' : np.load(os.path.join(package_dir, 'data/channel_zgrid.npy'))}
 
+for coord in ['x', 'y', 'z']:
+    channel['n' + coord] = channel[coord + 'nodes'].shape[0]
+    channel['d' + coord] = np.zeros(channel['n' + coord], dtype = channel[coord + 'nodes'].dtype)
+    channel['d' + coord][:channel['n' + coord] - 1] = (channel[coord + 'nodes'][1:]
+                                                     - channel[coord + 'nodes'][:channel['n' + coord] - 1])
+    channel['d' + coord][channel['n' + coord] - 1] = channel['d' + coord][0]
+    channel['l' + coord] = np.sum(channel['d' + coord])
