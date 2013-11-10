@@ -2,7 +2,10 @@ import numpy as np
 import sympy as sp
 import copy
 
-import matplotlib.pyplot as plt
+try:
+    import matplotlib.pyplot as plt
+except ImportError:
+    plt = None
 
 def get_fornberg_coeffs(
         x = None,
@@ -107,6 +110,7 @@ class uniform_spline_1D:
             x = np.remainder(x, self.period)
             ix = np.searchsorted(self.tmpx, x) - 1
             xi = (x - self.tmpx[ix]) / self.dx
+            #print x, ix, len(self.beta)
             return (sum(self.beta[k]*self.tmpy[(ix -self.n+ k)%self.tmpy.shape[0]]
                     for k in range(self.N))).subs(sp.Symbol('xi'), xi)
     def compute(self, x):
@@ -296,6 +300,28 @@ def plot_generic_weight_functions(
 def main0():
     plot_generic_weight_functions(n = 4, m = 2)
     return None
+
+def generate_data_interpolator(
+        info, n = 1, m = 1):
+    func = []
+    for coord in ['x', 'y', 'z']:
+        if info[coord + 'uniform']:
+            func.append(uniform_spline_1D(
+                    info[coord + 'nodes'],
+                    max_deriv = m,
+                    neighbours = n,
+                    periodic = info[coord + 'periodic']))
+        else:
+            func.append(generic_spline_1D(
+                    info[coord + 'nodes'],
+                    max_deriv = m,
+                    neighbours = n,
+                    periodic = info[coord + 'periodic']))
+        func[-1].compute_derivs()
+        func[-1].compute_beta()
+    return {'x': func[0],
+            'y': func[1],
+            'z': func[2]}
 
 if __name__ == '__main__':
     main0()
