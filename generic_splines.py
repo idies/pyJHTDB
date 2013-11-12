@@ -214,10 +214,13 @@ class generic_spline_1D:
             result[tindices] = self.y[0]
             tindices = np.where(ix >= self.x.shape[0] - 1)
             result[tindices] = self.y[self.x.shape[0] - 1]
-            tindices = np.where((ix >= 0) & (ix < self.x.shape[0] - 1))
-            for i in tindices[0]:
-                xi = (x[i] - self.x[ix[i]]) / self.dx[ix[i]]
-                result[i] = sum(self.fast_beta[ix[i]][k](xi)*self.tmpy[ix[i]+k]
+            tindices = np.array(np.where((ix >= 0) & (ix < self.x.shape[0] - 1)))
+            print tindices.shape
+            print x.shape
+            for i in range(tindices.shape[1]):
+                ii = tuple(tindices[:, i])
+                xi = (x[ii] - self.x[ix[ii]]) / self.dx[ix[ii]]
+                result[ii] = sum(self.fast_beta[ix[ii]][k](xi)*self.tmpy[ix[ii]+k]
                                 for k in range(self.N))
             return result
         else:
@@ -271,6 +274,7 @@ class generic_spline_1D:
             self.beta.append(sp.Matrix(btmp))
             self.fast_beta.append([sp.utilities.lambdify((self.xi), self.beta[-1][k], np)
                                    for k in range(self.N)])
+        #self.fast_beta = np.array(self.fast_beta)
         return None
 
 def plot_uniform_weight_functions(
