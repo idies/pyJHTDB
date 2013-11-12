@@ -120,6 +120,8 @@ class generic_spline_1D:
             return sum(self.fast_beta[(ix-self.n)%len(self.fast_beta)][order][k](xi)
                       *self.tmpy[(ix-self.n+k)%self.tmpy.shape[0]]
                        for k in range(self.N))
+    def beta_values(self, xfrac = 0, xgrid = 0, order = 0):
+        return np.array([self.fast_beta[xgrid][order][k](xfrac) for k in range(self.N)])
     def compute_derivs(self):
         x0 = sp.Symbol('cd_temp_x0')
         a = [sp.Symbol('cd_temp_alpha_{0}'.format(k)) for k in range(self.N-1)]
@@ -190,33 +192,6 @@ def plot_generic_weight_functions(
 def main0():
     plot_generic_weight_functions(n = 4, m = 2)
     return None
-
-def generate_data_interpolator(
-        info, n = 1, m = 1):
-    if os.path.exists(info['name'] + '_spline_interpolator_n{0}_m{1}.p'.format(n, m)):
-        return pickle.load(open(info['name'] + '_spline_interpolator_n{0}_m{1}.p'.format(n, m), 'r'))
-    func = []
-    for coord in ['x', 'y', 'z']:
-        if info[coord + 'uniform']:
-            func.append(uniform_spline_1D(
-                    info[coord + 'nodes'],
-                    max_deriv = m,
-                    neighbours = n,
-                    periodic = info[coord + 'periodic']))
-        else:
-            func.append(generic_spline_1D(
-                    info[coord + 'nodes'],
-                    max_deriv = m,
-                    neighbours = n,
-                    periodic = info[coord + 'periodic']))
-        func[-1].compute_derivs()
-        func[-1].compute_beta()
-    interpolator = {'x': func[0],
-                    'y': func[1],
-                    'z': func[2]}
-    pickle.dump(interpolator,
-                open(info['name'] + '_spline_interpolator_n{0}_m{1}.p'.format(n, m), 'w'))
-    return interpolator
 
 if __name__ == '__main__':
     main0()
