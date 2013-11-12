@@ -1,6 +1,8 @@
 import numpy as np
 import sympy as sp
 import copy
+import pickle
+import os
 
 try:
     import matplotlib.pyplot as plt
@@ -135,6 +137,7 @@ class uniform_spline_1D:
         btmp.append(sum(self.deriv_coeff[l, self.N-2]*self.alpha0[l].subs(self.xi, 1 - self.xi)*(-self.dx)**l
                         for l in range(self.m + 1)))
         self.beta = sp.Matrix(btmp)
+        self.fast_beta = sp.utilities.lambdify((self.xi), self.beta, np)
         return None
 
 class generic_spline_1D:
@@ -203,6 +206,26 @@ class generic_spline_1D:
                     for k in range(self.N))).subs(sp.Symbol('xi'), xi)
     def compute(self, x):
         return np.array([self.__call__(x[i]) for i in range(x.shape[0])])
+    def alt_compute(self, x):
+        result = np.zeros(x.shape, x.dtype)
+        if not self.periodic:
+            ix = np.searchsorted(self.x, x) - 1
+            tindices = np.where(ix < 0)
+            result[tindices] = self.y[0]
+            tindices = np.where(ix >= self.x.shape[0] - 1)
+            result[tindices] = self.y[self.x.shape[0] - 1]
+            tindices = np.where((ix >= 0) & (ix < self.x.shape[0] - 1))
+            for i in tindices[0]:
+                xi = (x[i] - self.x[ix[i]]) / self.dx[ix[i]]
+                result[i] = sum(self.fast_beta[ix[i]][k](xi)*self.tmpy[ix[i]+k]
+                                for k in range(self.N))
+            return result
+        else:
+            x = np.remainder(x, self.period)
+            ix = np.searchsorted(self.tmpx, x) - 1
+            xi = (x - self.tmpx[ix]) / self.dx[(ix-self.n)%self.dx.shape[0]]
+            return (sum(self.beta[(ix-self.n)%len(self.beta)][k]*self.tmpy[(ix -self.n+ k)%self.tmpy.shape[0]]
+                    for k in range(self.N))).subs(sp.Symbol('xi'), xi)
     def compute_derivs(self):
         x0 = sp.Symbol('cd_temp_x0')
         a = [sp.Symbol('cd_temp_alpha_{0}'.format(k)) for k in range(self.N-1)]
@@ -222,6 +245,7 @@ class generic_spline_1D:
             self.deriv_coeff.append(ctmp)
         return None
     def compute_beta(self):
+        self.fast_beta = []
         for i in range(self.x.shape[0]-1):
             btmp = [sum(self.deriv_coeff[i][l, 0]*self.alpha0[l]*self.dx[i]**l
                         for l in range(self.m + 1))]
@@ -232,6 +256,8 @@ class generic_spline_1D:
             btmp.append(sum(self.deriv_coeff[i+1][l, self.N-2]*self.alpha0[l].subs(self.xi, 1 - self.xi)*(-self.dx[i])**l
                             for l in range(self.m + 1)))
             self.beta.append(sp.Matrix(btmp))
+            self.fast_beta.append([sp.utilities.lambdify((self.xi), self.beta[-1][k], np)
+                                   for k in range(self.N)])
         if self.periodic:
             i = self.x.shape[0] - 1
             btmp = [sum(self.deriv_coeff[i][l, 0]*self.alpha0[l]*self.dx[i]**l
@@ -243,6 +269,8 @@ class generic_spline_1D:
             btmp.append(sum(self.deriv_coeff[i+1][l, self.N-2]*self.alpha0[l].subs(self.xi, 1 - self.xi)*(-self.dx[i])**l
                             for l in range(self.m + 1)))
             self.beta.append(sp.Matrix(btmp))
+            self.fast_beta.append([sp.utilities.lambdify((self.xi), self.beta[-1][k], np)
+                                   for k in range(self.N)])
         return None
 
 def plot_uniform_weight_functions(
@@ -303,6 +331,8 @@ def main0():
 
 def generate_data_interpolator(
         info, n = 1, m = 1):
+    if os.path.exists(info['name'] + '_spline_interpolator_n{0}_m{1}.p'.format(n, m)):
+        return pickle.load(open(info['name'] + '_spline_interpolator_n{0}_m{1}.p'.format(n, m), 'r'))
     func = []
     for coord in ['x', 'y', 'z']:
         if info[coord + 'uniform']:
@@ -319,9 +349,12 @@ def generate_data_interpolator(
                     periodic = info[coord + 'periodic']))
         func[-1].compute_derivs()
         func[-1].compute_beta()
-    return {'x': func[0],
-            'y': func[1],
-            'z': func[2]}
+    interpolator = {'x': func[0],
+                    'y': func[1],
+                    'z': func[2]}
+    pickle.dump(interpolator,
+                open(info['name'] + '_spline_interpolator_n{0}_m{1}.p'.format(n, m), 'w'))
+    return interpolator
 
 if __name__ == '__main__':
     main0()
