@@ -103,7 +103,7 @@ class generic_spline_1D:
         self.tmpy[self.n:self.n + self.y.shape[0]] = self.y[:]
         self.tmpy[self.n + self.y.shape[0]:] = post_y[:]
         return None
-    def __call__(self, x):
+    def __call__(self, x, order = 0):
         if not self.periodic:
             ix = np.searchsorted(self.x, x) - 1
             if ix < 0:
@@ -111,14 +111,15 @@ class generic_spline_1D:
             elif ix >=  self.x.shape[0] - 1:
                 return self.y[self.x.shape[0] - 1]
             xi = (x - self.x[ix]) / self.dx[ix]
-            return (sum(self.fast_beta[ix][k](xi)*self.tmpy[ix + k]
+            return (sum(self.fast_beta[ix][order][k](xi)*self.tmpy[ix + k]
                     for k in range(self.N)))
         else:
             x = np.remainder(x, self.period)
             ix = np.searchsorted(self.tmpx, x) - 1
             xi = (x - self.tmpx[ix]) / self.dx[(ix-self.n)%self.dx.shape[0]]
-            return (sum(self.fast_beta[(ix-self.n)%len(self.fast_beta)][k](xi)*self.tmpy[(ix -self.n+ k)%self.tmpy.shape[0]]
-                    for k in range(self.N)))
+            return sum(self.fast_beta[(ix-self.n)%len(self.fast_beta)][order][k](xi)
+                      *self.tmpy[(ix-self.n+k)%self.tmpy.shape[0]]
+                       for k in range(self.N))
     def compute_derivs(self):
         x0 = sp.Symbol('cd_temp_x0')
         a = [sp.Symbol('cd_temp_alpha_{0}'.format(k)) for k in range(self.N-1)]
@@ -152,32 +153,10 @@ class generic_spline_1D:
             btmp.append(sum(self.deriv_coeff[i+1][l, self.N-2]*self.alpha0[l].subs(self.xi, 1 - self.xi)*(-self.dx[i])**l
                             for l in range(self.m + 1)))
             self.beta.append(sp.Matrix(btmp))
-            self.fast_beta.append([sp.utilities.lambdify((self.xi), self.beta[-1][k], np)
-                                   for k in range(self.N)])
+            self.fast_beta.append([[sp.utilities.lambdify((self.xi), self.beta[-1][k].diff(self.xi, j)*self.dx[i]**(-j), np)
+                                    for k in range(self.N)]
+                                   for j in range(self.m + 1)])
         return None
-
-def plot_uniform_weight_functions(
-        n = 4,
-        m = 2):
-    x = np.arange(-n, n+1, 1)
-    tst0 = uniform_spline_1D(
-            x,
-            max_deriv = m,
-            neighbours = n)
-    tst0.compute_derivs()
-    tst0.compute_beta()
-    xval = np.arange(x[0], x[-1], .05)
-    fig = plt.figure(figsize=(12, 6))
-    ax = fig.add_axes([.1, .1, .8, .8])
-    ax.set_title('Weight functions for {0} neighbours and {1} continuous derivatives'.format(n, m))
-    for i in range(n+1):
-        y = np.zeros(x.shape, x.dtype)
-        y[i] = 1
-        tst0.put_yvals(y)
-        f = tst0.compute(xval)
-        ax.plot(xval, f)
-    fig.savefig('test.pdf', format = 'pdf')
-    return None
 
 def plot_generic_weight_functions(
         n = 4,
