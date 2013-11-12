@@ -93,7 +93,11 @@ class uniform_spline_1D:
         else:
             prev_y = self.y[-self.n:] 
             post_y = self.y[: self.n+1]
-        self.tmpy = np.zeros((self.y.shape[0] + self.n + post_y.shape[0]), dtype = self.y.dtype)
+        shape_list = [self.y.shape[0] + self.n + post_y.shape[0]]
+        for i in range(len(self.y.shape)-1):
+            shape_list.append(self.y.shape[i])
+        self.tmpy = np.zeros(tuple(shape_list), dtype = self.y.dtype)
+        print prev_y.shape
         self.tmpy[:self.n] = prev_y[:]
         self.tmpy[self.n:self.n + self.y.shape[0]] = self.y[:]
         self.tmpy[self.n + self.y.shape[0]:] = post_y[:]
@@ -183,7 +187,11 @@ class generic_spline_1D:
         else:
             prev_y = self.y[-self.n:] 
             post_y = self.y[: self.n+1]
-        self.tmpy = np.zeros((self.y.shape[0] + self.n + post_y.shape[0]), dtype = self.y.dtype)
+        shape_list = [self.y.shape[0] + self.n + post_y.shape[0]]
+        for i in range(1, len(self.y.shape)):
+            shape_list.append(self.y.shape[i])
+        self.yshape = tuple(shape_list[1:])
+        self.tmpy = np.zeros(tuple(shape_list), dtype = self.y.dtype)
         self.tmpy[:self.n] = prev_y[:]
         self.tmpy[self.n:self.n + self.y.shape[0]] = self.y[:]
         self.tmpy[self.n + self.y.shape[0]:] = post_y[:]
@@ -196,39 +204,14 @@ class generic_spline_1D:
             elif ix >=  self.x.shape[0] - 1:
                 return self.y[self.x.shape[0] - 1]
             xi = (x - self.x[ix]) / self.dx[ix]
-            return (sum(self.beta[ix][k]*self.tmpy[ix + k]
-                    for k in range(self.N))).subs(sp.Symbol('xi'), xi)
+            return (sum(self.fast_beta[ix][k](xi)*self.tmpy[ix + k]
+                    for k in range(self.N)))
         else:
             x = np.remainder(x, self.period)
             ix = np.searchsorted(self.tmpx, x) - 1
             xi = (x - self.tmpx[ix]) / self.dx[(ix-self.n)%self.dx.shape[0]]
-            return (sum(self.beta[(ix-self.n)%len(self.beta)][k]*self.tmpy[(ix -self.n+ k)%self.tmpy.shape[0]]
-                    for k in range(self.N))).subs(sp.Symbol('xi'), xi)
-    def compute(self, x):
-        return np.array([self.__call__(x[i]) for i in range(x.shape[0])])
-    def alt_compute(self, x):
-        result = np.zeros(x.shape, x.dtype)
-        if not self.periodic:
-            ix = np.searchsorted(self.x, x) - 1
-            tindices = np.where(ix < 0)
-            result[tindices] = self.y[0]
-            tindices = np.where(ix >= self.x.shape[0] - 1)
-            result[tindices] = self.y[self.x.shape[0] - 1]
-            tindices = np.array(np.where((ix >= 0) & (ix < self.x.shape[0] - 1)))
-            print tindices.shape
-            print x.shape
-            for i in range(tindices.shape[1]):
-                ii = tuple(tindices[:, i])
-                xi = (x[ii] - self.x[ix[ii]]) / self.dx[ix[ii]]
-                result[ii] = sum(self.fast_beta[ix[ii]][k](xi)*self.tmpy[ix[ii]+k]
-                                for k in range(self.N))
-            return result
-        else:
-            x = np.remainder(x, self.period)
-            ix = np.searchsorted(self.tmpx, x) - 1
-            xi = (x - self.tmpx[ix]) / self.dx[(ix-self.n)%self.dx.shape[0]]
-            return (sum(self.beta[(ix-self.n)%len(self.beta)][k]*self.tmpy[(ix -self.n+ k)%self.tmpy.shape[0]]
-                    for k in range(self.N))).subs(sp.Symbol('xi'), xi)
+            return (sum(self.fast_beta[(ix-self.n)%len(self.fast_beta)][k](xi)*self.tmpy[(ix -self.n+ k)%self.tmpy.shape[0]]
+                    for k in range(self.N)))
     def compute_derivs(self):
         x0 = sp.Symbol('cd_temp_x0')
         a = [sp.Symbol('cd_temp_alpha_{0}'.format(k)) for k in range(self.N-1)]
@@ -249,20 +232,10 @@ class generic_spline_1D:
         return None
     def compute_beta(self):
         self.fast_beta = []
-        for i in range(self.x.shape[0]-1):
-            btmp = [sum(self.deriv_coeff[i][l, 0]*self.alpha0[l]*self.dx[i]**l
-                        for l in range(self.m + 1))]
-            for k in range(1, self.N-1):
-                btmp.append(sum(self.deriv_coeff[i  ][l, k  ]*self.alpha0[l]*self.dx[i]**l
-                              + self.deriv_coeff[i+1][l, k-1]*self.alpha0[l].subs(self.xi, 1 - self.xi)*(-self.dx[i])**l
-                                for l in range(self.m + 1)))
-            btmp.append(sum(self.deriv_coeff[i+1][l, self.N-2]*self.alpha0[l].subs(self.xi, 1 - self.xi)*(-self.dx[i])**l
-                            for l in range(self.m + 1)))
-            self.beta.append(sp.Matrix(btmp))
-            self.fast_beta.append([sp.utilities.lambdify((self.xi), self.beta[-1][k], np)
-                                   for k in range(self.N)])
+        topi = self.x.shape[0] - 1
         if self.periodic:
-            i = self.x.shape[0] - 1
+            topi += 1
+        for i in range(topi):
             btmp = [sum(self.deriv_coeff[i][l, 0]*self.alpha0[l]*self.dx[i]**l
                         for l in range(self.m + 1))]
             for k in range(1, self.N-1):
@@ -274,8 +247,32 @@ class generic_spline_1D:
             self.beta.append(sp.Matrix(btmp))
             self.fast_beta.append([sp.utilities.lambdify((self.xi), self.beta[-1][k], np)
                                    for k in range(self.N)])
-        #self.fast_beta = np.array(self.fast_beta)
         return None
+    #def compute(self, x):
+    #    return np.array([self.__call__(x[i]) for i in range(x.shape[0])])
+    #def alt_compute(self, x):
+    #    result = np.zeros(x.shape + self.yshape, self.y.dtype)
+    #    if not self.periodic:
+    #        ix = np.searchsorted(self.x, x) - 1
+    #        tindices = np.where(ix < 0)
+    #        result[tindices] = self.y[0]
+    #        tindices = np.where(ix >= self.x.shape[0] - 1)
+    #        result[tindices] = self.y[self.x.shape[0] - 1]
+    #        tindices = np.array(np.where((ix >= 0) & (ix < self.x.shape[0] - 1)))
+    #        print tindices.shape
+    #        print x.shape
+    #        for i in range(tindices.shape[1]):
+    #            ii = tuple(tindices[:, i])
+    #            xi = (x[ii] - self.x[ix[ii]]) / self.dx[ix[ii]]
+    #            result[ii] = sum(self.fast_beta[ix[ii]][k](xi)*self.tmpy[ix[ii]+k]
+    #                            for k in range(self.N))
+    #        return result
+    #    else:
+    #        x = np.remainder(x, self.period)
+    #        ix = np.searchsorted(self.tmpx, x) - 1
+    #        xi = (x - self.tmpx[ix]) / self.dx[(ix-self.n)%self.dx.shape[0]]
+    #        return (sum(self.beta[(ix-self.n)%len(self.beta)][k]*self.tmpy[(ix -self.n+ k)%self.tmpy.shape[0]]
+    #                for k in range(self.N))).subs(sp.Symbol('xi'), xi)
 
 def plot_uniform_weight_functions(
         n = 4,
