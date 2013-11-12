@@ -71,11 +71,13 @@ class spline_interpolator:
             field_points[p, :, :, :, 0] = self.info['xnodes'][np.newaxis, np.newaxis, xgrid[p]-self.n:xgrid[p]+self.n+2]
             field_points[p, :, :, :, 1] = self.info['ynodes'][np.newaxis, ygrid[p]-self.n:ygrid[p]+self.n+2, np.newaxis]
             field_points[p, :, :, :, 2] = self.info['znodes'][zgrid[p]-self.n:zgrid[p]+self.n+2, np.newaxis, np.newaxis]
+        print 'computed points where field is needed, now getting values from DB'
         field_values = lTDB.getData(
                 time, field_points,
                 sinterp = 0, tinterp = 0,
                 data_set = self.info['name'],
                 getFunction = getFunction)
+        print 'got values from DB, now interpolating'
         result = np.zeros((points.shape[0], field_values.shape[-1]), dtype = np.float32)
         for p in range(points.shape[0]):
             xb[p] = np.array([self.spline['x'].fast_beta[0][dorder[0]][k](xfrac[p])

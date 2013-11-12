@@ -153,7 +153,8 @@ class generic_spline_1D:
                                 for l in range(self.m + 1)))
             btmp.append(sum(self.deriv_coeff[i+1][l, self.N-2]*self.alpha0[l].subs(self.xi, 1 - self.xi)*(-self.dx[i])**l
                             for l in range(self.m + 1)))
-            self.beta.append(sp.Matrix(btmp))
+            self.beta.append([sp.Matrix(btmp).diff(self.xi, j)*self.dx[i]**(-j)
+                              for j in range(self.m + 1)])
         return None
     def compute_fast_beta(self):
         self.fast_beta = []
@@ -161,7 +162,7 @@ class generic_spline_1D:
         if self.periodic:
             topi += 1
         for i in range(topi):
-            self.fast_beta.append([[sp.utilities.lambdify((self.xi), self.beta[-1][k].diff(self.xi, j)*self.dx[i]**(-j), np)
+            self.fast_beta.append([[sp.utilities.lambdify((self.xi), sp.horner(self.beta[i][j][k]), np)
                                     for k in range(self.N)]
                                    for j in range(self.m + 1)])
         return None
