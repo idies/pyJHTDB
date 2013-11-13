@@ -78,7 +78,7 @@ class generic_spline_1D:
             self.tmpx[self.n + self.x.shape[0]:] = post_x[:]
         else:
             self.period = period
-            self.tmpx = np.arange(-self.n, self.n+2, 1)*self.dx[0]
+            self.tmpx = np.arange(-self.n, self.n+3, 1)*self.dx[0]
             self.dx = np.array([self.dx[0], self.dx[0]])
         return None
     def put_yvals(self, yvals):
@@ -122,11 +122,11 @@ class generic_spline_1D:
     def beta_values(self, xfrac = 0, xgrid = 0, order = 0):
         return np.array([self.fast_beta[xgrid][order][k](xfrac) for k in range(self.N)])
     def compute_derivs(self):
-        topi = self.x.shape[0]
-        if self.periodic:
-            topi += 1
-        for i in range(topi):
+        for i in range(self.x.shape[0]):
             self.deriv_coeff.append(get_fornberg_coeffs(self.x[i], self.tmpx[i:i+self.N-1]))
+        if self.periodic:
+            i = self.x.shape[0]
+            self.deriv_coeff.append(get_fornberg_coeffs(self.tmpx[i], self.tmpx[i:i+self.N-1]))
         return None
     def compute_beta(self):
         topi = self.x.shape[0] - 1
