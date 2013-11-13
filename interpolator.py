@@ -21,18 +21,17 @@ class spline_interpolator:
         else:
             func = []
             for coord in ['x', 'y', 'z']:
-                if info[coord + 'uniform']:
+                if info[coord + 'uniform'] and info[coord + 'periodic']:
                     func.append(gs.generic_spline_1D(
                             info[coord + 'nodes'][:2],
                             max_deriv = m,
                             neighbours = n,
-                            periodic = info[coord + 'periodic']))
+                            period = info['l' + coord]))
                 else:
                     func.append(gs.generic_spline_1D(
                             info[coord + 'nodes'],
                             max_deriv = m,
-                            neighbours = n,
-                            periodic = info[coord + 'periodic']))
+                            neighbours = n))
                 func[-1].compute_derivs()
                 func[-1].compute_beta()
             self.spline = {'x': func[0],
@@ -61,8 +60,8 @@ class spline_interpolator:
         ygrid = np.searchsorted(self.info['ynodes'], points[:, 1]) - 1
         zgrid = np.searchsorted(self.info['znodes'], points[:, 2]) - 1
         xfrac = (points[:, 0] - self.info['xnodes'][xgrid])/self.dx[xgrid]
-        yfrac = (points[:, 0] - self.info['ynodes'][ygrid])/self.dy[ygrid]
-        zfrac = (points[:, 0] - self.info['znodes'][zgrid])/self.dz[zgrid]
+        yfrac = (points[:, 1] - self.info['ynodes'][ygrid])/self.dy[ygrid]
+        zfrac = (points[:, 2] - self.info['znodes'][zgrid])/self.dz[zgrid]
         field_points = np.zeros((points.shape[0], 2*self.n+2, 2*self.n+2, 2*self.n+2, 3), dtype = np.float32)
         xb = np.zeros((points.shape[0], 2*self.n+2), dtype = np.float32)
         yb = np.zeros((points.shape[0], 2*self.n+2), dtype = np.float32)

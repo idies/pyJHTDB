@@ -55,7 +55,7 @@ class generic_spline_1D:
     def __init__(
             self,
             xvals,
-            periodic = False,
+            period = None,
             max_deriv = 1,
             neighbours = 1):
         self.x = xvals.copy()
@@ -63,7 +63,7 @@ class generic_spline_1D:
         self.m = max_deriv
         self.n = neighbours
         self.N = 2*neighbours + 2
-        self.periodic = periodic
+        self.periodic = (not period == None)
         self.deriv_coeff = []
         self.beta = []
         self.xi, self.alpha0 = get_alpha_polynomials(max_deriv = self.m)
@@ -72,15 +72,14 @@ class generic_spline_1D:
                                for k in range(self.n)])[::-1]
             post_x = np.array([self.x[self.x.shape[0] - 1] + (k + 1)*self.dx[self.dx.shape[0] - 1]
                                for k in range(self.n)])
+            self.tmpx = np.zeros((self.x.shape[0] + self.n + post_x.shape[0]), dtype = self.x.dtype)
+            self.tmpx[:self.n] = prev_x[:]
+            self.tmpx[self.n:self.n + self.x.shape[0]] = self.x[:]
+            self.tmpx[self.n + self.x.shape[0]:] = post_x[:]
         else:
-            self.dx = np.append(self.dx, [self.dx[0]])
-            self.period = self.x[-1] - self.x[0] + self.dx[0]
-            prev_x = self.x[-self.n:] - self.period
-            post_x = self.x[:self.n+1] + self.period
-        self.tmpx = np.zeros((self.x.shape[0] + self.n + post_x.shape[0]), dtype = self.x.dtype)
-        self.tmpx[:self.n] = prev_x[:]
-        self.tmpx[self.n:self.n + self.x.shape[0]] = self.x[:]
-        self.tmpx[self.n + self.x.shape[0]:] = post_x[:]
+            self.period = period
+            self.tmpx = np.arange(-self.n, self.n+2, 1)*self.dx[0]
+            self.dx = np.array([self.dx[0], self.dx[0]])
         return None
     def put_yvals(self, yvals):
         self.y = yvals.copy()
@@ -137,7 +136,7 @@ class generic_spline_1D:
             ctmp = copy.deepcopy(c0)
             ctmp = ctmp.subs(x0, self.tmpx[i+self.n])
             for k in range(self.N - 1):
-                ctmp = ctmp.subs(a[k], self.tmpx[i+k])
+                ctmp = ctmp.subs(a[k], k*self.dx[0])
             self.deriv_coeff.append(ctmp)
         return None
     def compute_beta(self):
