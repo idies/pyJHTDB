@@ -122,22 +122,11 @@ class generic_spline_1D:
     def beta_values(self, xfrac = 0, xgrid = 0, order = 0):
         return np.array([self.fast_beta[xgrid][order][k](xfrac) for k in range(self.N)])
     def compute_derivs(self):
-        x0 = sp.Symbol('cd_temp_x0')
-        a = [sp.Symbol('cd_temp_alpha_{0}'.format(k)) for k in range(self.N-1)]
-        c0 = get_fornberg_coeffs(x0, a)
-        for i in range(self.x.shape[0]):
-            ctmp = copy.deepcopy(c0)
-            ctmp = ctmp.subs(x0, self.x[i])
-            for k in range(self.N - 1):
-                ctmp = ctmp.subs(a[k], self.tmpx[i+k])
-            self.deriv_coeff.append(ctmp)
+        topi = self.x.shape[0]
         if self.periodic:
-            i = self.x.shape[0]
-            ctmp = copy.deepcopy(c0)
-            ctmp = ctmp.subs(x0, self.tmpx[i+self.n])
-            for k in range(self.N - 1):
-                ctmp = ctmp.subs(a[k], k*self.dx[0])
-            self.deriv_coeff.append(ctmp)
+            topi += 1
+        for i in range(topi):
+            self.deriv_coeff.append(get_fornberg_coeffs(self.x[i], self.tmpx[i:i+self.N-1]))
         return None
     def compute_beta(self):
         topi = self.x.shape[0] - 1
@@ -145,13 +134,13 @@ class generic_spline_1D:
             topi += 1
         for i in range(topi):
             btmp = [sum(self.deriv_coeff[i][l, 0]*self.alpha0[l]*self.dx[i]**l
-                        for l in range(self.m + 1))]
+                              for l in range(self.m + 1))]
             for k in range(1, self.N-1):
                 btmp.append(sum(self.deriv_coeff[i  ][l, k  ]*self.alpha0[l]*self.dx[i]**l
-                              + self.deriv_coeff[i+1][l, k-1]*self.alpha0[l].subs(self.xi, 1 - self.xi)*(-self.dx[i])**l
-                                for l in range(self.m + 1)))
+                                        + self.deriv_coeff[i+1][l, k-1]*self.alpha0[l].subs(self.xi, 1 - self.xi)*(-self.dx[i])**l
+                                      for l in range(self.m + 1)))
             btmp.append(sum(self.deriv_coeff[i+1][l, self.N-2]*self.alpha0[l].subs(self.xi, 1 - self.xi)*(-self.dx[i])**l
-                            for l in range(self.m + 1)))
+                                  for l in range(self.m + 1)))
             self.beta.append([sp.Matrix(btmp).diff(self.xi, j)*self.dx[i]**(-j)
                               for j in range(self.m + 1)])
         return None
@@ -161,7 +150,7 @@ class generic_spline_1D:
         if self.periodic:
             topi += 1
         for i in range(topi):
-            self.fast_beta.append([[sp.utilities.lambdify((self.xi), sp.horner(self.beta[i][j][k]), np)
+            self.fast_beta.append([[sp.utilities.lambdify((self.xi), self.beta[i][j][k], np)
                                     for k in range(self.N)]
                                    for j in range(self.m + 1)])
         return None
