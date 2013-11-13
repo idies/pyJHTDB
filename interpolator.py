@@ -50,12 +50,12 @@ class spline_interpolator:
         return None
     def __call__(
             self,
-            time = 1.,
+            time = 0.,
             points = np.zeros((1,3)),
-            dorder = (0, 0, 0),
+            dorder = [(0, 0, 0)],
             lTDB = None,
             getFunction = 'getVelocityAndPressureSoap'):
-        if (not len(points.shape) == 2) or (not len(dorder) == 3):
+        if (not len(points.shape) == 2):
             return None
         xgrid = np.searchsorted(self.info['xnodes'], points[:, 0]) - 1
         ygrid = np.searchsorted(self.info['ynodes'], points[:, 1]) - 1
@@ -78,19 +78,20 @@ class spline_interpolator:
                 data_set = self.info['name'],
                 getFunction = getFunction)
         print 'got values from DB, now interpolating'
-        result = np.zeros((points.shape[0], field_values.shape[-1]), dtype = np.float32)
+        result = np.zeros((len(dorder), points.shape[0], field_values.shape[-1]), dtype = np.float32)
         for p in range(points.shape[0]):
-            xb[p] = np.array([self.spline['x'].fast_beta[0][dorder[0]][k](xfrac[p])
-                              for k in range(self.spline['x'].N)])
-            yb[p] = np.array([self.spline['y'].fast_beta[ygrid[p]][dorder[1]][k](yfrac[p])
-                              for k in range(self.spline['y'].N)])
-            zb[p] = np.array([self.spline['z'].fast_beta[0][dorder[2]][k](zfrac[p])
-                              for k in range(self.spline['z'].N)])
-            result[p] = sum(sum(sum(field_values[p, k, j, i]*xb[p, i]
-                                    for i in range(self.spline['x'].N)
-                                                           )*yb[p, j]
-                                for j in range(self.spline['y'].N)
-                                                           )*zb[p, k]
-                            for k in range(self.spline['z'].N))
+            for o in range(len(dorder)):
+                xb[p] = np.array([self.spline['x'].fast_beta[0][dorder[o][0]][k](xfrac[p])
+                                  for k in range(self.spline['x'].N)])
+                yb[p] = np.array([self.spline['y'].fast_beta[ygrid[p]][dorder[o][1]][k](yfrac[p])
+                                  for k in range(self.spline['y'].N)])
+                zb[p] = np.array([self.spline['z'].fast_beta[0][dorder[o][2]][k](zfrac[p])
+                                  for k in range(self.spline['z'].N)])
+                result[o, p] = sum(sum(sum(field_values[p, k, j, i]*xb[p, i]
+                                           for i in range(self.spline['x'].N)
+                                                                  )*yb[p, j]
+                                       for j in range(self.spline['y'].N)
+                                                                  )*zb[p, k]
+                                   for k in range(self.spline['z'].N))
         return result
 

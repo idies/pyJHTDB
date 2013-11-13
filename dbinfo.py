@@ -7,7 +7,7 @@ isotropic1024coarse = {'name'   : 'isotropic1024coarse'}
 
 for coord in ['x', 'y', 'z']:
     isotropic1024coarse[coord + 'nodes'] = (np.pi/512)*np.array(range(1024), dtype = np.float32)
-    isotropic1024coarse['n' + coord] = 1024,
+    isotropic1024coarse['n' + coord] = 1024
     isotropic1024coarse['l' + coord] = 2*np.pi
     isotropic1024coarse['d' + coord] = np.pi/512
     isotropic1024coarse[coord + 'periodic'] = True
