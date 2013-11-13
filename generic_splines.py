@@ -150,7 +150,7 @@ class generic_spline_1D:
         if self.periodic:
             topi += 1
         for i in range(topi):
-            self.fast_beta.append([[sp.utilities.lambdify((self.xi), self.beta[i][j][k], np)
+            self.fast_beta.append([[sp.utilities.lambdify((self.xi), sp.horner(self.beta[i][j][k]), np)
                                     for k in range(self.N)]
                                    for j in range(self.m + 1)])
         return None
