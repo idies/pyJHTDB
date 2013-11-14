@@ -3,6 +3,7 @@ import sympy as sp
 import copy
 import pickle
 import os
+import sys
 
 try:
     import matplotlib.pyplot as plt
@@ -37,7 +38,7 @@ def get_fornberg_coeffs(
         coeffs.append([])
         for j in range(len(d)):
             coeffs[-1].append(d[m][N][j])
-    return sp.Matrix(coeffs)
+    return np.array(coeffs)
 
 def get_alpha_polynomials(
         max_deriv = 2):
@@ -67,6 +68,15 @@ class generic_spline_1D:
         self.deriv_coeff = []
         self.beta = []
         self.xi, self.alpha0 = get_alpha_polynomials(max_deriv = self.m)
+        self.alpha0_coeff = []
+        self.alpha1_coeff = []
+        for l in range(self.m + 1):
+            tcoeff0 = sp.Poly(self.alpha0[l], self.xi).all_coeffs()
+            tcoeff1 = sp.Poly(self.alpha0[l].subs(self.xi, 1 - self.xi)*(-1)**l, self.xi).all_coeffs()
+            self.alpha0_coeff.append(tcoeff0)
+            self.alpha1_coeff.append(tcoeff1)
+        self.alpha0_coeff = np.array(self.alpha0_coeff)
+        self.alpha1_coeff = np.array(self.alpha1_coeff)
         if not self.periodic:
             prev_x = np.array([self.x[0] - (k + 1)*self.dx[0]
                                for k in range(self.n)])[::-1]
@@ -143,6 +153,26 @@ class generic_spline_1D:
                                   for l in range(self.m + 1)))
             self.beta.append([sp.Matrix(btmp).diff(self.xi, j)*self.dx[i]**(-j)
                               for j in range(self.m + 1)])
+        return None
+    def compute_beta_alternate(self):
+        topi = self.x.shape[0] - 1
+        if self.periodic:
+            topi += 1
+        for i in range(topi):
+            deltax = np.array([self.dx[i]**l for l in range(self.m + 1)])
+            a0 = self.alpha0_coeff*deltax[:, np.newaxis]
+            a1 = self.alpha1_coeff*deltax[:, np.newaxis]
+            btmp = [sp.Poly(list(np.sum(self.deriv_coeff[i][:self.m+1, 0, np.newaxis]*a0, axis = 0)), self.xi)]
+            for k in range(1, self.N-1):
+                btmp.append(sp.Poly(np.sum(
+                    self.deriv_coeff[i  ][:self.m+1, k  , np.newaxis]*a0
+                  + self.deriv_coeff[i+1][:self.m+1, k-1, np.newaxis]*a1, axis = 0), self.xi))
+            btmp.append(sp.Poly(list(np.sum(self.deriv_coeff[i+1][:self.m+1, self.N-2, np.newaxis]*a1, axis = 0)), self.xi))
+            diff_parameter = [tuple([0 for j in range(l)]) for l in range(self.m+1)]
+            self.beta.append([btmp])
+            for j in range(1, self.m + 1):
+                self.beta[-1].append([btmp[k].diff(*diff_parameter[j])*self.dx[i]**(-j)
+                               for k in range(self.N)])
         return None
     def compute_fast_beta(self):
         self.fast_beta = []
