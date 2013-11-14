@@ -73,6 +73,8 @@ class generic_spline_1D:
         for l in range(self.m + 1):
             tcoeff0 = sp.Poly(self.alpha0[l], self.xi).all_coeffs()
             tcoeff1 = sp.Poly(self.alpha0[l].subs(self.xi, 1 - self.xi)*(-1)**l, self.xi).all_coeffs()
+            tcoeff0.reverse()
+            tcoeff1.reverse()
             self.alpha0_coeff.append(tcoeff0)
             self.alpha1_coeff.append(tcoeff1)
         self.alpha0_coeff = np.array(self.alpha0_coeff)
@@ -139,32 +141,28 @@ class generic_spline_1D:
             self.deriv_coeff.append(get_fornberg_coeffs(self.tmpx[i], self.tmpx[i:i+self.N-1]))
         return None
     def compute_beta(self):
-        topi = self.x.shape[0] - 1
-        if self.periodic:
-            topi += 1
-        for i in range(topi):
+        for i in range(len(self.deriv_coeff)-1):
             deltax = np.array([self.dx[i]**l for l in range(self.m + 1)])
             a0 = self.alpha0_coeff*deltax[:, np.newaxis]
             a1 = self.alpha1_coeff*deltax[:, np.newaxis]
-            btmp = [sp.Poly(list(np.sum(self.deriv_coeff[i][:self.m+1, 0, np.newaxis]*a0, axis = 0)), self.xi)]
+            btmp = [np.polynomial.polynomial.Polynomial(
+                        list(np.sum(self.deriv_coeff[i][:self.m+1, 0, np.newaxis]*a0, axis = 0)))]
             for k in range(1, self.N-1):
-                btmp.append(sp.Poly(np.sum(
+                btmp.append(np.polynomial.polynomial.Polynomial(np.sum(
                     self.deriv_coeff[i  ][:self.m+1, k  , np.newaxis]*a0
-                  + self.deriv_coeff[i+1][:self.m+1, k-1, np.newaxis]*a1, axis = 0), self.xi))
-            btmp.append(sp.Poly(list(np.sum(self.deriv_coeff[i+1][:self.m+1, self.N-2, np.newaxis]*a1, axis = 0)), self.xi))
+                  + self.deriv_coeff[i+1][:self.m+1, k-1, np.newaxis]*a1, axis = 0)))
+            btmp.append(np.polynomial.polynomial.Polynomial(list(
+                    np.sum(self.deriv_coeff[i+1][:self.m+1, self.N-2, np.newaxis]*a1, axis = 0))))
             diff_parameter = [tuple([0 for j in range(l)]) for l in range(self.m+1)]
-            self.beta.append([btmp])
-            for j in range(1, self.m + 1):
-                self.beta[-1].append([btmp[k].diff(*diff_parameter[j])*self.dx[i]**(-j)
-                               for k in range(self.N)])
+            self.beta.append([[btmp[k].deriv(j)*self.dx[i]**(-j)
+                               for k in range(self.N)]
+                              for j in range(self.m+1)])
         return None
     def compute_fast_beta(self):
         self.fast_beta = []
-        topi = self.x.shape[0] - 1
-        if self.periodic:
-            topi += 1
-        for i in range(topi):
-            self.fast_beta.append([[sp.utilities.lambdify((self.xi), sp.horner(self.beta[i][j][k]), np)
+        for i in range(len(self.beta)):
+            self.fast_beta.append([[sp.utilities.lambdify((self.xi),
+                sp.horner(sp.Poly((self.beta[i][j][k].coef[::-1]), self.xi)), np)
                                     for k in range(self.N)]
                                    for j in range(self.m + 1)])
         return None
