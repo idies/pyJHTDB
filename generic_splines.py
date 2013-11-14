@@ -143,22 +143,6 @@ class generic_spline_1D:
         if self.periodic:
             topi += 1
         for i in range(topi):
-            btmp = [sum(self.deriv_coeff[i][l, 0]*self.alpha0[l]*self.dx[i]**l
-                              for l in range(self.m + 1))]
-            for k in range(1, self.N-1):
-                btmp.append(sum(self.deriv_coeff[i  ][l, k  ]*self.alpha0[l]*self.dx[i]**l
-                                        + self.deriv_coeff[i+1][l, k-1]*self.alpha0[l].subs(self.xi, 1 - self.xi)*(-self.dx[i])**l
-                                      for l in range(self.m + 1)))
-            btmp.append(sum(self.deriv_coeff[i+1][l, self.N-2]*self.alpha0[l].subs(self.xi, 1 - self.xi)*(-self.dx[i])**l
-                                  for l in range(self.m + 1)))
-            self.beta.append([sp.Matrix(btmp).diff(self.xi, j)*self.dx[i]**(-j)
-                              for j in range(self.m + 1)])
-        return None
-    def compute_beta_alternate(self):
-        topi = self.x.shape[0] - 1
-        if self.periodic:
-            topi += 1
-        for i in range(topi):
             deltax = np.array([self.dx[i]**l for l in range(self.m + 1)])
             a0 = self.alpha0_coeff*deltax[:, np.newaxis]
             a1 = self.alpha1_coeff*deltax[:, np.newaxis]
