@@ -11,7 +11,8 @@ class spline_interpolator:
             self,
             info,
             n = 1,
-            m = 1):
+            m = 1,
+            compute_fast_beta = False):
         self.n = n
         self.m = m
         self.info = info
@@ -40,9 +41,16 @@ class spline_interpolator:
             pickle.dump(self.spline,
                         open(info['name'] + '_spline_interpolator_n{0}_m{1}.p'.format(n, m),
                              'w'))
+        # either channel or periodic cube, so it's cheap to compute fast betas for x and z
         self.spline['x'].compute_fast_beta()
-        self.spline['y'].compute_fast_beta()
         self.spline['z'].compute_fast_beta()
+        self.bx = self.spline['x'].fast_beta
+        self.bz = self.spline['z'].fast_beta
+        if compute_fast_beta:
+            self.spline['y'].compute_fast_beta()
+            self.by = self.spline['y'].fast_beta
+        else:
+            self.by = self.spline['y'].beta
         self.dx = self.info['xnodes'][1:] - self.info['xnodes'][0:self.info['nx']-1]
         self.dy = self.info['ynodes'][1:] - self.info['ynodes'][0:self.info['ny']-1]
         self.dz = self.info['znodes'][1:] - self.info['znodes'][0:self.info['nz']-1]
@@ -78,13 +86,18 @@ class spline_interpolator:
                 getFunction = getFunction)
         print 'got values from DB, now interpolating'
         result = np.zeros((len(dorder), points.shape[0], field_values.shape[-1]), dtype = np.float32)
+        bxi = 0
+        byi = 0
+        bzi = 0
         for p in range(points.shape[0]):
+            if not self.info['yuniform']:
+                byi = ygrid[p]
             for o in range(len(dorder)):
-                xb[p] = np.array([self.spline['x'].fast_beta[0][dorder[o][0]][k](xfrac[p])
+                xb[p] = np.array([self.bx[bxi][dorder[o][0]][k](xfrac[p])
                                   for k in range(self.spline['x'].N)])
-                yb[p] = np.array([self.spline['y'].fast_beta[ygrid[p]][dorder[o][1]][k](yfrac[p])
+                yb[p] = np.array([self.by[byi][dorder[o][1]][k](yfrac[p])
                                   for k in range(self.spline['y'].N)])
-                zb[p] = np.array([self.spline['z'].fast_beta[0][dorder[o][2]][k](zfrac[p])
+                zb[p] = np.array([self.bz[bzi][dorder[o][2]][k](zfrac[p])
                                   for k in range(self.spline['z'].N)])
                 result[o, p] = sum(sum(sum(field_values[p, k, j, i]*xb[p, i]
                                            for i in range(self.spline['x'].N)
