@@ -87,17 +87,16 @@ class spline_interpolator:
         print 'got values from DB, now interpolating'
         result = np.zeros((len(dorder), points.shape[0], field_values.shape[-1]), dtype = np.float32)
         bxi = 0
-        byi = 0
+        if self.info['yuniform']:
+            ygrid[p] = 0
         bzi = 0
         for p in range(points.shape[0]):
-            if not self.info['yuniform']:
-                byi = ygrid[p]
             for o in range(len(dorder)):
-                xb[p] = np.array([self.bx[bxi][dorder[o][0]][k](xfrac[p])
+                xb[p] = np.array([self.bx[     bxi][dorder[o][0]][k](xfrac[p])
                                   for k in range(self.spline['x'].N)])
-                yb[p] = np.array([self.by[byi][dorder[o][1]][k](yfrac[p])
+                yb[p] = np.array([self.by[ygrid[p]][dorder[o][1]][k](yfrac[p])
                                   for k in range(self.spline['y'].N)])
-                zb[p] = np.array([self.bz[bzi][dorder[o][2]][k](zfrac[p])
+                zb[p] = np.array([self.bz[     bzi][dorder[o][2]][k](zfrac[p])
                                   for k in range(self.spline['z'].N)])
                 result[o, p] = sum(sum(sum(field_values[p, k, j, i]*xb[p, i]
                                            for i in range(self.spline['x'].N)
