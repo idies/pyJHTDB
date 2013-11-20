@@ -88,7 +88,7 @@ class spline_interpolator:
         result = np.zeros((len(dorder), points.shape[0], field_values.shape[-1]), dtype = np.float32)
         bxi = 0
         if self.info['yuniform']:
-            ygrid[p] = 0
+            ygrid[:] = 0
         bzi = 0
         for p in range(points.shape[0]):
             for o in range(len(dorder)):
