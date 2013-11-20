@@ -79,6 +79,9 @@ class spline_interpolator:
             field_points[p, :, :, :, 1] = self.info['ynodes'][np.newaxis, ygrid[p]-self.n:ygrid[p]+self.n+2, np.newaxis]
             field_points[p, :, :, :, 2] = self.info['znodes'][zgrid[p]-self.n:zgrid[p]+self.n+2, np.newaxis, np.newaxis]
         print 'computed points where field is needed, now getting values from DB'
+        ## I could in principle call getRaw[...] for each point,
+        ## but that would mean a lot of calls to the DB,
+        ## and we should avoid that due to the latency.
         field_values = lTDB.getData(
                 time, field_points,
                 sinterp = 0, tinterp = 0,
@@ -88,7 +91,7 @@ class spline_interpolator:
         result = np.zeros((len(dorder), points.shape[0], field_values.shape[-1]), dtype = np.float32)
         bxi = 0
         if self.info['yuniform']:
-            ygrid[p] = 0
+            ygrid[:] = 0
         bzi = 0
         for p in range(points.shape[0]):
             for o in range(len(dorder)):
