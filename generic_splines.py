@@ -90,8 +90,17 @@ class generic_spline_1D:
             self.tmpx[self.n + self.x.shape[0]:] = post_x[:]
         else:
             self.period = period
-            self.tmpx = np.arange(-self.n, self.n+3, 1)*self.dx[0]
-            self.dx = np.array([self.dx[0], self.dx[0]])
+            if self.x.shape[0] == 2: ## i.e. uniform grid
+                self.tmpx = np.arange(-self.n, self.n+3, 1)*self.dx[0]
+                self.dx = np.array([self.dx[0], self.dx[0]])
+            else:
+                prev_x = self.x[self.x.shape[0]-self.n:] - period
+                post_x = self.x[:self.n+1] + period
+                self.tmpx = np.zeros((self.x.shape[0] + self.n + post_x.shape[0]), dtype = self.x.dtype)
+                self.tmpx[:self.n] = prev_x[:]
+                self.tmpx[self.n:self.n + self.x.shape[0]] = self.x[:]
+                self.tmpx[self.n + self.x.shape[0]:] = post_x[:]
+                self.dx = np.append(self.dx, self.x[0] + period - self.x[-1])
         return None
     def put_yvals(self, yvals):
         self.y = yvals.copy()
@@ -138,7 +147,8 @@ class generic_spline_1D:
             self.deriv_coeff.append(get_fornberg_coeffs(self.x[i], self.tmpx[i:i+self.N-1]))
         if self.periodic:
             i = self.x.shape[0]
-            self.deriv_coeff.append(get_fornberg_coeffs(self.tmpx[i], self.tmpx[i:i+self.N-1]))
+            self.deriv_coeff.append(get_fornberg_coeffs(self.tmpx[i+self.n], self.tmpx[i:i+self.N-1]))
+            print self.deriv_coeff[i]
         return None
     def compute_beta(self):
         for i in range(len(self.deriv_coeff)-1):
