@@ -64,7 +64,8 @@ class generic_spline_1D:
         self.m = max_deriv
         self.n = neighbours
         self.N = 2*neighbours + 2
-        self.periodic = (not period == None)
+        self.periodic = not (period == None)
+        self.uniform = (self.x.shape[0] == 2)
         self.deriv_coeff = []
         self.beta = []
         self.xi, self.alpha0 = get_alpha_polynomials(max_deriv = self.m)
@@ -79,18 +80,9 @@ class generic_spline_1D:
             self.alpha1_coeff.append(tcoeff1)
         self.alpha0_coeff = np.array(self.alpha0_coeff)
         self.alpha1_coeff = np.array(self.alpha1_coeff)
-        if not self.periodic:
-            prev_x = np.array([self.x[0] - (k + 1)*self.dx[0]
-                               for k in range(self.n)])[::-1]
-            post_x = np.array([self.x[self.x.shape[0] - 1] + (k + 1)*self.dx[self.dx.shape[0] - 1]
-                               for k in range(self.n)])
-            self.tmpx = np.zeros((self.x.shape[0] + self.n + post_x.shape[0]), dtype = self.x.dtype)
-            self.tmpx[:self.n] = prev_x[:]
-            self.tmpx[self.n:self.n + self.x.shape[0]] = self.x[:]
-            self.tmpx[self.n + self.x.shape[0]:] = post_x[:]
-        else:
+        if self.periodic:
             self.period = period
-            if self.x.shape[0] == 2: ## i.e. uniform grid
+            if self.uniform:
                 self.tmpx = np.arange(-self.n, self.n+3, 1)*self.dx[0]
                 self.dx = np.array([self.dx[0], self.dx[0]])
             else:
@@ -104,24 +96,19 @@ class generic_spline_1D:
         return None
     def put_yvals(self, yvals):
         self.y = yvals.copy()
-        if not self.periodic:
-            tmpderiv = (self.y[1] - self.y[0])
-            prev_y = np.array([self.y[0] - (k + 1)*tmpderiv
-                               for k in range(self.n)])
-            tmpderiv = (self.y[self.y.shape[0] - 1] - self.y[self.y.shape[0] - 2])
-            post_y = np.array([self.y[self.y.shape[0] - 1] + (k + 1)*tmpderiv
-                               for k in range(self.n)])
-        else:
+        if self.periodic:
             prev_y = self.y[-self.n:] 
             post_y = self.y[: self.n+1]
-        shape_list = [self.y.shape[0] + self.n + post_y.shape[0]]
-        for i in range(1, len(self.y.shape)):
-            shape_list.append(self.y.shape[i])
-        self.yshape = tuple(shape_list[1:])
-        self.tmpy = np.zeros(tuple(shape_list), dtype = self.y.dtype)
-        self.tmpy[:self.n] = prev_y[:]
-        self.tmpy[self.n:self.n + self.y.shape[0]] = self.y[:]
-        self.tmpy[self.n + self.y.shape[0]:] = post_y[:]
+            shape_list = [self.y.shape[0] + self.n + post_y.shape[0]]
+            for i in range(1, len(self.y.shape)):
+                shape_list.append(self.y.shape[i])
+            self.yshape = tuple(shape_list[1:])
+            self.tmpy = np.zeros(tuple(shape_list), dtype = self.y.dtype)
+            self.tmpy[:self.n] = prev_y[:]
+            self.tmpy[self.n:self.n + self.y.shape[0]] = self.y[:]
+            self.tmpy[self.n + self.y.shape[0]:] = post_y[:]
+        else:
+            self.yshape = self.y.shape[1:]
         return None
     def __call__(self, x, order = 0):
         if not self.periodic:
@@ -131,8 +118,16 @@ class generic_spline_1D:
             elif ix >=  self.x.shape[0] - 1:
                 return self.y[self.x.shape[0] - 1]
             xi = (x - self.x[ix]) / self.dx[ix]
-            return (sum(self.fast_beta[ix][order][k](xi)*self.tmpy[ix + k]
-                    for k in range(self.N)))
+            print xi, ix, range(self.N)
+            print self.beta[ix][order]
+            if ix < self.n:
+                return sum(self.fast_beta[ix][order][k](xi)*self.y[k]
+                           for k in range(self.N))
+            elif ix > self.x.shape[0] - self.n - 2:
+                return sum(self.fast_beta[ix][order][k](xi)*self.y[self.x.shape[0] - self.N - 1 + k]
+                           for k in range(self.N))
+            return sum(self.fast_beta[ix][order][k](xi)*self.y[ix - self.n + k]
+                       for k in range(self.N))
         else:
             x = np.remainder(x, self.period)
             ix = np.searchsorted(self.tmpx, x) - 1
@@ -143,12 +138,19 @@ class generic_spline_1D:
     def beta_values(self, xfrac = 0, xgrid = 0, order = 0):
         return np.array([self.fast_beta[xgrid][order][k](xfrac) for k in range(self.N)])
     def compute_derivs(self):
-        for i in range(self.x.shape[0]):
-            self.deriv_coeff.append(get_fornberg_coeffs(self.x[i], self.tmpx[i:i+self.N-1]))
         if self.periodic:
-            i = self.x.shape[0]
-            self.deriv_coeff.append(get_fornberg_coeffs(self.tmpx[i+self.n], self.tmpx[i:i+self.N-1]))
-            print self.deriv_coeff[i]
+            for i in range(self.x.shape[0]+1):
+                self.deriv_coeff.append(get_fornberg_coeffs(self.tmpx[i+self.n], self.tmpx[i:i+self.N-1]))
+        else:
+            for i in range(self.n):
+                self.deriv_coeff.append(get_fornberg_coeffs(self.x[i], self.x[:self.N-1]))
+            #    print self.deriv_coeff[-1]
+            for i in range(self.n, self.x.shape[0] - self.n):
+                self.deriv_coeff.append(get_fornberg_coeffs(self.x[i], self.x[i-self.n:i+self.n+1]))
+            #    print self.deriv_coeff[-1]
+            for i in range(self.x.shape[0] - self.n, self.x.shape[0]):
+                self.deriv_coeff.append(get_fornberg_coeffs(self.x[i], self.x[self.x.shape[0] - self.N + 1:]))
+            #    print self.deriv_coeff[-1]
         return None
     def compute_beta(self):
         for i in range(len(self.deriv_coeff)-1):
