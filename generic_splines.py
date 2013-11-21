@@ -119,17 +119,17 @@ class generic_spline_1D:
                 return self.y[self.x.shape[0] - 1]
             xi = (x - self.x[ix]) / self.dx[ix]
             if ix < self.n:
-                terms = [self.fast_beta[ix][order][k](xi)
+                terms = [self.fast_beta[ix][order][k](xi)*self.y[k]
                            for k in range(self.N)]
-                print terms
+                #print terms
                 return sum(self.fast_beta[ix][order][k](xi)*self.y[k]
                            for k in range(self.N))
             elif ix > self.x.shape[0] - self.n - 2:
                 return sum(self.fast_beta[ix][order][k](xi)*self.y[self.x.shape[0] - self.N + k]
                            for k in range(self.N))
-            terms = [self.fast_beta[ix][order][k](xi)
-                       for k in range(self.N)]
-            print terms
+            #terms = [self.fast_beta[ix][order][k](xi)*self.y[k]
+            #           for k in range(self.N)]
+            #print terms
             return sum(self.fast_beta[ix][order][k](xi)*self.y[ix - self.n + k]
                        for k in range(self.N))
         else:
@@ -148,33 +148,33 @@ class generic_spline_1D:
         else:
             for i in range(self.n):
                 self.deriv_coeff.append(get_fornberg_coeffs(self.x[i], self.x[:self.N-1]))
-            #    print self.deriv_coeff[-1]
+                #print self.x[i], self.x[:self.N-1]
             for i in range(self.n, self.x.shape[0] - self.n):
                 self.deriv_coeff.append(get_fornberg_coeffs(self.x[i], self.x[i-self.n:i+self.n+1]))
-            #    print self.deriv_coeff[-1]
+                #print self.x[i], self.x[i-self.n:i+self.n+1]
             for i in range(self.x.shape[0] - self.n, self.x.shape[0]):
                 self.deriv_coeff.append(get_fornberg_coeffs(self.x[i], self.x[self.x.shape[0] - self.N + 1:]))
-            #    print self.deriv_coeff[-1]
+                #print self.x[i], self.x[self.x.shape[0] - self.N + 1:]
         return None
     def compute_beta(self):
         for i in range(len(self.deriv_coeff)-1):
             deltax = np.array([self.dx[i]**l for l in range(self.m + 1)])
             a0 = self.alpha0_coeff*deltax[:, np.newaxis]
             a1 = self.alpha1_coeff*deltax[:, np.newaxis]
-            #print self.deriv_coeff[i]
-            #print self.deriv_coeff[i+1]
             btmp = [np.polynomial.polynomial.Polynomial(
                         list(np.sum(self.deriv_coeff[i][:self.m+1, 0, np.newaxis]*a0, axis = 0)))]
             for k in range(1, self.N-1):
                 btmp.append(np.polynomial.polynomial.Polynomial(np.sum(
                     self.deriv_coeff[i  ][:self.m+1, k  , np.newaxis]*a0
-                  + self.deriv_coeff[i+1][:self.m+1, k-1, np.newaxis]*a1, axis = 0)))
+                  + self.deriv_coeff[i+1][:self.m+1, k-1, np.newaxis]*a1 , axis = 0)))
             btmp.append(np.polynomial.polynomial.Polynomial(list(
                     np.sum(self.deriv_coeff[i+1][:self.m+1, self.N-2, np.newaxis]*a1, axis = 0))))
-            diff_parameter = [tuple([0 for j in range(l)]) for l in range(self.m+1)]
             self.beta.append([[btmp[k].deriv(j)*self.dx[i]**(-j)
                                for k in range(self.N)]
                               for j in range(self.m+1)])
+            #print '   '
+            #for b in self.beta[-1][0]:
+            #    print b
         return None
     def compute_fast_beta(self):
         self.fast_beta = []
@@ -183,6 +183,9 @@ class generic_spline_1D:
                 sp.horner(sp.Poly((self.beta[i][j][k].coef[::-1]), self.xi)), np)
                                     for k in range(self.N)]
                                    for j in range(self.m + 1)])
+            print i
+            print [self.fast_beta[-1][0][k](0.) for k in range(self.N)]
+            print [self.fast_beta[-1][0][k](1.) for k in range(self.N)]
         return None
 
 def plot_generic_weight_functions(
