@@ -118,14 +118,18 @@ class generic_spline_1D:
             elif ix >=  self.x.shape[0] - 1:
                 return self.y[self.x.shape[0] - 1]
             xi = (x - self.x[ix]) / self.dx[ix]
-            print xi, ix, range(self.N)
-            print self.beta[ix][order]
             if ix < self.n:
+                terms = [self.fast_beta[ix][order][k](xi)
+                           for k in range(self.N)]
+                print terms
                 return sum(self.fast_beta[ix][order][k](xi)*self.y[k]
                            for k in range(self.N))
             elif ix > self.x.shape[0] - self.n - 2:
-                return sum(self.fast_beta[ix][order][k](xi)*self.y[self.x.shape[0] - self.N - 1 + k]
+                return sum(self.fast_beta[ix][order][k](xi)*self.y[self.x.shape[0] - self.N + k]
                            for k in range(self.N))
+            terms = [self.fast_beta[ix][order][k](xi)
+                       for k in range(self.N)]
+            print terms
             return sum(self.fast_beta[ix][order][k](xi)*self.y[ix - self.n + k]
                        for k in range(self.N))
         else:
@@ -157,6 +161,8 @@ class generic_spline_1D:
             deltax = np.array([self.dx[i]**l for l in range(self.m + 1)])
             a0 = self.alpha0_coeff*deltax[:, np.newaxis]
             a1 = self.alpha1_coeff*deltax[:, np.newaxis]
+            #print self.deriv_coeff[i]
+            #print self.deriv_coeff[i+1]
             btmp = [np.polynomial.polynomial.Polynomial(
                         list(np.sum(self.deriv_coeff[i][:self.m+1, 0, np.newaxis]*a0, axis = 0)))]
             for k in range(1, self.N-1):
