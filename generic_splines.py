@@ -142,13 +142,10 @@ class generic_spline_1D:
         else:
             for i in range(self.n):
                 self.deriv_coeff.append(get_fornberg_coeffs(self.x[i], self.x[:self.N-1]))
-                print i, self.deriv_coeff[-1][0].astype(np.int)
             for i in range(self.n, self.x.shape[0] - self.n):
                 self.deriv_coeff.append(get_fornberg_coeffs(self.x[i], self.x[i-self.n:i+self.n+1]))
-                print i, self.deriv_coeff[-1][0].astype(np.int)
             for i in range(self.x.shape[0] - self.n, self.x.shape[0]):
                 self.deriv_coeff.append(get_fornberg_coeffs(self.x[i], self.x[self.x.shape[0] - self.N + 1:]))
-                print i, self.deriv_coeff[-1][0].astype(np.int)
         return None
     def compute_beta(self):
         if self.periodic:
@@ -195,9 +192,6 @@ class generic_spline_1D:
                 self.beta.append([[btmp[k].deriv(j)*self.dx[i]**(-j)
                                    for k in range(self.N)]
                                   for j in range(self.m+1)])
-                print i
-                print [int(self.beta[-1][0][k](0.)+0.1) for k in range(self.N)]
-                print [int(self.beta[-1][0][k](1.)+0.1) for k in range(self.N)]
             for i in range(len(self.deriv_coeff)-self.n-1, len(self.deriv_coeff)-1):
                 deltax = np.array([self.dx[i]**l for l in range(self.m + 1)])
                 a0 = self.alpha0_coeff*deltax[:, np.newaxis]
@@ -210,9 +204,6 @@ class generic_spline_1D:
                 self.beta.append([[btmp[k].deriv(j)*self.dx[i]**(-j)
                                    for k in range(self.N-1)]
                                   for j in range(self.m+1)])
-                print i
-                print [int(self.beta[-1][0][k](0.)+0.1) for k in range(self.N-1)]
-                print [int(self.beta[-1][0][k](1.)+0.1) for k in range(self.N-1)]
         return None
     def compute_fast_beta(self):
         self.fast_beta = []
