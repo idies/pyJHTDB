@@ -119,19 +119,13 @@ class generic_spline_1D:
                 return self.y[self.x.shape[0] - 1]
             xi = (x - self.x[ix]) / self.dx[ix]
             if ix < self.n:
-                terms = [self.fast_beta[ix][order][k](xi)*self.y[k]
-                           for k in range(self.N)]
-                #print terms
                 return sum(self.fast_beta[ix][order][k](xi)*self.y[k]
-                           for k in range(self.N))
-            elif ix > self.x.shape[0] - self.n - 2:
-                return sum(self.fast_beta[ix][order][k](xi)*self.y[self.x.shape[0] - self.N + k]
-                           for k in range(self.N))
-            #terms = [self.fast_beta[ix][order][k](xi)*self.y[k]
-            #           for k in range(self.N)]
-            #print terms
+                           for k in range(len(self.fast_beta[ix][order])))
+            elif ix > self.x.shape[0] - self.n - 1:
+                return sum(self.fast_beta[ix][order][k](xi)*self.y[self.x.shape[0] - self.N + k+1]
+                           for k in range(len(self.fast_beta[ix][order])))
             return sum(self.fast_beta[ix][order][k](xi)*self.y[ix - self.n + k]
-                       for k in range(self.N))
+                       for k in range(len(self.fast_beta[ix][order])))
         else:
             x = np.remainder(x, self.period)
             ix = np.searchsorted(self.tmpx, x) - 1
@@ -148,44 +142,85 @@ class generic_spline_1D:
         else:
             for i in range(self.n):
                 self.deriv_coeff.append(get_fornberg_coeffs(self.x[i], self.x[:self.N-1]))
-                #print self.x[i], self.x[:self.N-1]
+                print i, self.deriv_coeff[-1][0].astype(np.int)
             for i in range(self.n, self.x.shape[0] - self.n):
                 self.deriv_coeff.append(get_fornberg_coeffs(self.x[i], self.x[i-self.n:i+self.n+1]))
-                #print self.x[i], self.x[i-self.n:i+self.n+1]
+                print i, self.deriv_coeff[-1][0].astype(np.int)
             for i in range(self.x.shape[0] - self.n, self.x.shape[0]):
                 self.deriv_coeff.append(get_fornberg_coeffs(self.x[i], self.x[self.x.shape[0] - self.N + 1:]))
-                #print self.x[i], self.x[self.x.shape[0] - self.N + 1:]
+                print i, self.deriv_coeff[-1][0].astype(np.int)
         return None
     def compute_beta(self):
-        for i in range(len(self.deriv_coeff)-1):
-            deltax = np.array([self.dx[i]**l for l in range(self.m + 1)])
-            a0 = self.alpha0_coeff*deltax[:, np.newaxis]
-            a1 = self.alpha1_coeff*deltax[:, np.newaxis]
-            btmp = [np.polynomial.polynomial.Polynomial(
-                        list(np.sum(self.deriv_coeff[i][:self.m+1, 0, np.newaxis]*a0, axis = 0)))]
-            for k in range(1, self.N-1):
-                btmp.append(np.polynomial.polynomial.Polynomial(np.sum(
-                    self.deriv_coeff[i  ][:self.m+1, k  , np.newaxis]*a0
-                  + self.deriv_coeff[i+1][:self.m+1, k-1, np.newaxis]*a1 , axis = 0)))
-            btmp.append(np.polynomial.polynomial.Polynomial(list(
-                    np.sum(self.deriv_coeff[i+1][:self.m+1, self.N-2, np.newaxis]*a1, axis = 0))))
-            self.beta.append([[btmp[k].deriv(j)*self.dx[i]**(-j)
-                               for k in range(self.N)]
-                              for j in range(self.m+1)])
-            #print '   '
-            #for b in self.beta[-1][0]:
-            #    print b
+        if self.periodic:
+            for i in range(len(self.deriv_coeff)-1):
+                deltax = np.array([self.dx[i]**l for l in range(self.m + 1)])
+                a0 = self.alpha0_coeff*deltax[:, np.newaxis]
+                a1 = self.alpha1_coeff*deltax[:, np.newaxis]
+                btmp = [np.polynomial.polynomial.Polynomial(
+                            list(np.sum(self.deriv_coeff[i][:self.m+1, 0, np.newaxis]*a0, axis = 0)))]
+                for k in range(1, self.N-1):
+                    btmp.append(np.polynomial.polynomial.Polynomial(np.sum(
+                        self.deriv_coeff[i  ][:self.m+1, k  , np.newaxis]*a0
+                      + self.deriv_coeff[i+1][:self.m+1, k-1, np.newaxis]*a1 , axis = 0)))
+                btmp.append(np.polynomial.polynomial.Polynomial(list(
+                        np.sum(self.deriv_coeff[i+1][:self.m+1, self.N-2, np.newaxis]*a1, axis = 0))))
+                self.beta.append([[btmp[k].deriv(j)*self.dx[i]**(-j)
+                                   for k in range(self.N)]
+                                  for j in range(self.m+1)])
+        else:
+            for i in range(self.n):
+                deltax = np.array([self.dx[i]**l for l in range(self.m + 1)])
+                a0 = self.alpha0_coeff*deltax[:, np.newaxis]
+                a1 = self.alpha1_coeff*deltax[:, np.newaxis]
+                btmp = []
+                for k in range(self.N-1):
+                    btmp.append(np.polynomial.polynomial.Polynomial(np.sum(
+                        self.deriv_coeff[i  ][:self.m+1, k, np.newaxis]*a0
+                      + self.deriv_coeff[i+1][:self.m+1, k, np.newaxis]*a1 , axis = 0)))
+                self.beta.append([[btmp[k].deriv(j)*self.dx[i]**(-j)
+                                   for k in range(self.N-1)]
+                                  for j in range(self.m+1)])
+            for i in range(self.n, len(self.deriv_coeff)-self.n-1):
+                deltax = np.array([self.dx[i]**l for l in range(self.m + 1)])
+                a0 = self.alpha0_coeff*deltax[:, np.newaxis]
+                a1 = self.alpha1_coeff*deltax[:, np.newaxis]
+                btmp = [np.polynomial.polynomial.Polynomial(
+                            list(np.sum(self.deriv_coeff[i][:self.m+1, 0, np.newaxis]*a0, axis = 0)))]
+                for k in range(1, self.N-1):
+                    btmp.append(np.polynomial.polynomial.Polynomial(np.sum(
+                        self.deriv_coeff[i  ][:self.m+1, k  , np.newaxis]*a0
+                      + self.deriv_coeff[i+1][:self.m+1, k-1, np.newaxis]*a1 , axis = 0)))
+                btmp.append(np.polynomial.polynomial.Polynomial(list(
+                        np.sum(self.deriv_coeff[i+1][:self.m+1, self.N-2, np.newaxis]*a1, axis = 0))))
+                self.beta.append([[btmp[k].deriv(j)*self.dx[i]**(-j)
+                                   for k in range(self.N)]
+                                  for j in range(self.m+1)])
+                print i
+                print [int(self.beta[-1][0][k](0.)+0.1) for k in range(self.N)]
+                print [int(self.beta[-1][0][k](1.)+0.1) for k in range(self.N)]
+            for i in range(len(self.deriv_coeff)-self.n-1, len(self.deriv_coeff)-1):
+                deltax = np.array([self.dx[i]**l for l in range(self.m + 1)])
+                a0 = self.alpha0_coeff*deltax[:, np.newaxis]
+                a1 = self.alpha1_coeff*deltax[:, np.newaxis]
+                btmp = []
+                for k in range(self.N-1):
+                    btmp.append(np.polynomial.polynomial.Polynomial(np.sum(
+                        self.deriv_coeff[i  ][:self.m+1, k, np.newaxis]*a0
+                      + self.deriv_coeff[i+1][:self.m+1, k, np.newaxis]*a1 , axis = 0)))
+                self.beta.append([[btmp[k].deriv(j)*self.dx[i]**(-j)
+                                   for k in range(self.N-1)]
+                                  for j in range(self.m+1)])
+                print i
+                print [int(self.beta[-1][0][k](0.)+0.1) for k in range(self.N-1)]
+                print [int(self.beta[-1][0][k](1.)+0.1) for k in range(self.N-1)]
         return None
     def compute_fast_beta(self):
         self.fast_beta = []
         for i in range(len(self.beta)):
             self.fast_beta.append([[sp.utilities.lambdify((self.xi),
                 sp.horner(sp.Poly((self.beta[i][j][k].coef[::-1]), self.xi)), np)
-                                    for k in range(self.N)]
+                                    for k in range(len(self.beta[i][j]))]
                                    for j in range(self.m + 1)])
-            print i
-            print [self.fast_beta[-1][0][k](0.) for k in range(self.N)]
-            print [self.fast_beta[-1][0][k](1.) for k in range(self.N)]
         return None
 
 def plot_generic_weight_functions(
