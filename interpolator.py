@@ -76,8 +76,11 @@ class spline_interpolator:
         zb = np.zeros((points.shape[0], 2*self.n+2), dtype = np.float32)
         for p in range(points.shape[0]):
             field_points[p, :, :, :, 0] = self.info['xnodes'][np.newaxis, np.newaxis, xgrid[p]-self.n:xgrid[p]+self.n+2]
-            field_points[p, :, :, :, 1] = self.info['ynodes'][np.newaxis, ygrid[p]-self.n:ygrid[p]+self.n+2, np.newaxis]
             field_points[p, :, :, :, 2] = self.info['znodes'][zgrid[p]-self.n:zgrid[p]+self.n+2, np.newaxis, np.newaxis]
+            if self.info['yperiodic']:
+                field_points[p, :, :, :, 1] = self.info['ynodes'][np.newaxis, ygrid[p]-self.n:ygrid[p]+self.n+2, np.newaxis]
+            else:
+                if ygrid[p] < 0
         print 'computed points where field is needed, now getting values from DB'
         ## I could in principle call getRaw[...] for each point,
         ## but that would mean a lot of calls to the DB,
@@ -90,7 +93,7 @@ class spline_interpolator:
         print 'got values from DB, now interpolating'
         result = np.zeros((len(dorder), points.shape[0], field_values.shape[-1]), dtype = np.float32)
         bxi = 0
-        if self.info['yuniform']:
+        if self.info['yperiodic']:
             ygrid[:] = 0
         bzi = 0
         for p in range(points.shape[0]):
