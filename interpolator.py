@@ -71,16 +71,14 @@ class spline_interpolator:
         yfrac = (points[:, 1] - self.info['ynodes'][ygrid])/self.dy[ygrid]
         zfrac = (points[:, 2] - self.info['znodes'][zgrid])/self.dz[zgrid]
         field_points = np.zeros((points.shape[0], 2*self.n+2, 2*self.n+2, 2*self.n+2, 3), dtype = np.float32)
-        xb = np.zeros((points.shape[0], 2*self.n+2), dtype = np.float32)
-        yb = np.zeros((points.shape[0], 2*self.n+2), dtype = np.float32)
-        zb = np.zeros((points.shape[0], 2*self.n+2), dtype = np.float32)
         for p in range(points.shape[0]):
             field_points[p, :, :, :, 0] = self.info['xnodes'][np.newaxis, np.newaxis, xgrid[p]-self.n:xgrid[p]+self.n+2]
             field_points[p, :, :, :, 2] = self.info['znodes'][zgrid[p]-self.n:zgrid[p]+self.n+2, np.newaxis, np.newaxis]
             if self.info['yperiodic']:
                 field_points[p, :, :, :, 1] = self.info['ynodes'][np.newaxis, ygrid[p]-self.n:ygrid[p]+self.n+2, np.newaxis]
             else:
-                if ygrid[p] < 0
+                if ygrid[p] < 0 or ygrid[p] > self.info['ny'] - 1:
+                    return None
         print 'computed points where field is needed, now getting values from DB'
         ## I could in principle call getRaw[...] for each point,
         ## but that would mean a lot of calls to the DB,
@@ -98,17 +96,12 @@ class spline_interpolator:
         bzi = 0
         for p in range(points.shape[0]):
             for o in range(len(dorder)):
-                xb[p] = np.array([self.bx[     bxi][dorder[o][0]][k](xfrac[p])
-                                  for k in range(self.spline['x'].N)])
-                yb[p] = np.array([self.by[ygrid[p]][dorder[o][1]][k](yfrac[p])
-                                  for k in range(self.spline['y'].N)])
-                zb[p] = np.array([self.bz[     bzi][dorder[o][2]][k](zfrac[p])
-                                  for k in range(self.spline['z'].N)])
-                result[o, p] = sum(sum(sum(field_values[p, k, j, i]*xb[p, i]
-                                           for i in range(self.spline['x'].N)
-                                                                  )*yb[p, j]
-                                       for j in range(self.spline['y'].N)
-                                                                  )*zb[p, k]
-                                   for k in range(self.spline['z'].N))
+                xb = np.array([self.bx[     bxi][dorder[o][0]][k](xfrac[p])
+                               for k in range(self.spline['x'].N)]).astype(field_values.dtype)
+                yb = np.array([self.by[ygrid[p]][dorder[o][1]][k](yfrac[p])
+                               for k in range(self.spline['y'].N)]).astype(field_values.dtype)
+                zb = np.array([self.bz[     bzi][dorder[o][2]][k](zfrac[p])
+                               for k in range(self.spline['z'].N)]).astype(field_values.dtype)
+                result[o, p] = np.einsum('kjil,i,j,k->l', field_values[p], xb, yb, zb)
         return result
 
