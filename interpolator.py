@@ -97,11 +97,11 @@ class spline_interpolator:
         for p in range(points.shape[0]):
             for o in range(len(dorder)):
                 xb = np.array([self.bx[     bxi][dorder[o][0]][k](xfrac[p])
-                               for k in range(self.spline['x'].N)]).astype(field_values.dtype)
+                               for k in range(len(self.bx[     bxi][dorder[o][0]]))]).astype(field_values.dtype)
                 yb = np.array([self.by[ygrid[p]][dorder[o][1]][k](yfrac[p])
-                               for k in range(self.spline['y'].N)]).astype(field_values.dtype)
+                               for k in range(len(self.by[ygrid[p]][dorder[o][1]]))]).astype(field_values.dtype)
                 zb = np.array([self.bz[     bzi][dorder[o][2]][k](zfrac[p])
-                               for k in range(self.spline['z'].N)]).astype(field_values.dtype)
+                               for k in range(len(self.bz[     bzi][dorder[o][2]]))]).astype(field_values.dtype)
                 result[o, p] = np.einsum('kjil,i,j,k->l', field_values[p], xb, yb, zb)
         return result
 
