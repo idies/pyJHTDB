@@ -51,9 +51,6 @@ class spline_interpolator:
             self.by = self.spline['y'].fast_beta
         else:
             self.by = self.spline['y'].beta
-        self.dx = self.info['xnodes'][1:] - self.info['xnodes'][0:self.info['nx']-1]
-        self.dy = self.info['ynodes'][1:] - self.info['ynodes'][0:self.info['ny']-1]
-        self.dz = self.info['znodes'][1:] - self.info['znodes'][0:self.info['nz']-1]
         return None
     def __call__(
             self,
@@ -64,21 +61,35 @@ class spline_interpolator:
             getFunction = 'getVelocityAndPressureSoap'):
         if (not len(points.shape) == 2):
             return None
-        xgrid = np.searchsorted(self.info['xnodes'], points[:, 0]) - 1
-        ygrid = np.searchsorted(self.info['ynodes'], points[:, 1]) - 1
-        zgrid = np.searchsorted(self.info['znodes'], points[:, 2]) - 1
-        xfrac = (points[:, 0] - self.info['xnodes'][xgrid])/self.dx[xgrid]
-        yfrac = (points[:, 1] - self.info['ynodes'][ygrid])/self.dy[ygrid]
-        zfrac = (points[:, 2] - self.info['znodes'][zgrid])/self.dz[zgrid]
         field_points = np.zeros((points.shape[0], 2*self.n+2, 2*self.n+2, 2*self.n+2, 3), dtype = np.float32)
+        xgrid = np.floor(points[:, 0] / self.info['dx']).astype(np.int) % self.info['nx']
+        xfrac = (points[:, 0] - self.info['xnodes'][xgrid])/self.info['dx']
         for p in range(points.shape[0]):
-            field_points[p, :, :, :, 0] = self.info['xnodes'][np.newaxis, np.newaxis, xgrid[p]-self.n:xgrid[p]+self.n+2]
-            field_points[p, :, :, :, 2] = self.info['znodes'][zgrid[p]-self.n:zgrid[p]+self.n+2, np.newaxis, np.newaxis]
-            if self.info['yperiodic']:
-                field_points[p, :, :, :, 1] = self.info['ynodes'][np.newaxis, ygrid[p]-self.n:ygrid[p]+self.n+2, np.newaxis]
-            else:
+            field_points[p, :, :, :, 0] = (self.info['xnodes'][xgrid[p]]
+                    + np.array(range(-self.n, self.n+2))*self.info['dx'])[np.newaxis, np.newaxis, :]
+        if self.info['yperiodic']:
+            ygrid = np.floor(points[:, 1] / self.info['dy']).astype(np.int) % self.info['ny']
+            yfrac = (points[:, 1] - self.info['ynodes'][ygrid])/self.info['dy']
+            for p in range(points.shape[0]):
+                field_points[p, :, :, :, 1] = (self.info['ynodes'][ygrid[p]]
+                        + np.array(range(-self.n, self.n+2))*self.info['dy'])[np.newaxis, :, np.newaxis]
+        else:
+            ygrid = np.searchsorted(self.info['ynodes'], points[:, 1]).astype(np.int) - 1
+            yfrac = (points[:, 1] - self.info['ynodes'][ygrid])/self.info['dy'][ygrid]
+            for p in range(points.shape[0]):
                 if ygrid[p] < 0 or ygrid[p] > self.info['ny'] - 1:
                     return None
+                elif ygrid[p] < self.n:
+                    field_points[p, :, :2*self.n+1, :, 1] = self.info['ynodes'][np.newaxis, :2*self.n+1, np.newaxis]
+                elif ygrid[p] > self.info['ny'] - self.n - 1:
+                    field_points[p, :, :2*self.n+1, :, 1] = self.info['ynodes'][np.newaxis, self.info['ny'] - (2*self.n+1):, np.newaxis]
+                else:
+                    field_points[p, :, :, :, 1] = self.info['ynodes'][np.newaxis, ygrid[p]-self.n:ygrid[p]+self.n+2, np.newaxis]
+        zgrid = np.floor(points[:, 2] / self.info['dz']).astype(np.int) % self.info['nz']
+        zfrac = (points[:, 2] - self.info['znodes'][zgrid])/self.info['dz']
+        for p in range(points.shape[0]):
+            field_points[p, :, :, :, 2] = (self.info['znodes'][zgrid[p]]
+                    + np.array(range(-self.n, self.n+2))*self.info['dz'])[:, np.newaxis, np.newaxis]
         print 'computed points where field is needed, now getting values from DB'
         ## I could in principle call getRaw[...] for each point,
         ## but that would mean a lot of calls to the DB,

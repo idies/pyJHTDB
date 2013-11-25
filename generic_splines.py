@@ -174,8 +174,9 @@ class generic_spline_1D:
                     btmp.append(np.polynomial.polynomial.Polynomial(np.sum(
                         self.deriv_coeff[i  ][:self.m+1, k, np.newaxis]*a0
                       + self.deriv_coeff[i+1][:self.m+1, k, np.newaxis]*a1 , axis = 0)))
+                btmp.append(np.polynomial.polynomial.Polynomial([0]))
                 self.beta.append([[btmp[k].deriv(j)*self.dx[i]**(-j)
-                                   for k in range(self.N-1)]
+                                   for k in range(self.N)]
                                   for j in range(self.m+1)])
             for i in range(self.n, len(self.deriv_coeff)-self.n-1):
                 deltax = np.array([self.dx[i]**l for l in range(self.m + 1)])
@@ -201,8 +202,9 @@ class generic_spline_1D:
                     btmp.append(np.polynomial.polynomial.Polynomial(np.sum(
                         self.deriv_coeff[i  ][:self.m+1, k, np.newaxis]*a0
                       + self.deriv_coeff[i+1][:self.m+1, k, np.newaxis]*a1 , axis = 0)))
+                btmp.append(np.polynomial.polynomial.Polynomial([0]))
                 self.beta.append([[btmp[k].deriv(j)*self.dx[i]**(-j)
-                                   for k in range(self.N-1)]
+                                   for k in range(self.N)]
                                   for j in range(self.m+1)])
         return None
     def compute_fast_beta(self):
