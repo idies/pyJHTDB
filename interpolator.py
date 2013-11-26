@@ -96,7 +96,7 @@ class spline_interpolator:
         ## and we should avoid that due to the latency.
         field_values = lTDB.getData(
                 time, field_points,
-                sinterp = 4, tinterp = 0,
+                sinterp = 0, tinterp = 0,
                 data_set = self.info['name'],
                 getFunction = getFunction)
         print 'got values from DB, now interpolating'
@@ -113,9 +113,9 @@ class spline_interpolator:
                                for k in range(len(self.by[ygrid[p]][dorder[o][1]]))]).astype(field_values.dtype)
                 zb = np.array([self.bz[     bzi][dorder[o][2]][k](zfrac[p])
                                for k in range(len(self.bz[     bzi][dorder[o][2]]))]).astype(field_values.dtype)
-                print ['{0:6}'.format(yb[k]) for k in range(2*self.n + 2)]
-                print ['{0:6}'.format(field_points[p, 0, k, 0, 1]) for k in range(2*self.n + 2)]
-                print ['{0:6}'.format(field_values[p, 0, k, 0, 1]) for k in range(2*self.n + 2)]
+                #print ['{0:6}'.format(yb[k]) for k in range(2*self.n + 2)]
+                #print ['{0:6}'.format(field_points[p, 0, k, 0, 1]) for k in range(2*self.n + 2)]
+                #print ['{0:6}'.format(field_values[p, 0, k, 0, 1]) for k in range(2*self.n + 2)]
                 result[o, p] = np.einsum('kjil,i,j,k->l', field_values[p], xb, yb, zb)
         return result
 
