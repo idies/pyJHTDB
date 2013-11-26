@@ -81,7 +81,7 @@ class spline_interpolator:
                     return None
                 elif ygrid[p] < self.n:
                     field_points[p, :, :2*self.n+1, :, 1] = self.info['ynodes'][np.newaxis, :2*self.n+1, np.newaxis]
-                elif ygrid[p] > self.info['ny'] - self.n - 1:
+                elif ygrid[p] >= self.info['ny'] - self.n - 1:
                     field_points[p, :, :2*self.n+1, :, 1] = self.info['ynodes'][np.newaxis, self.info['ny'] - (2*self.n+1):, np.newaxis]
                 else:
                     field_points[p, :, :, :, 1] = self.info['ynodes'][np.newaxis, ygrid[p]-self.n:ygrid[p]+self.n+2, np.newaxis]

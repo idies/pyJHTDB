@@ -120,12 +120,12 @@ class generic_spline_1D:
             xi = (x - self.x[ix]) / self.dx[ix]
             if ix < self.n:
                 return sum(self.fast_beta[ix][order][k](xi)*self.y[k]
-                           for k in range(len(self.fast_beta[ix][order])))
-            elif ix > self.x.shape[0] - self.n - 1:
+                           for k in range(self.N-1))
+            elif ix >= self.x.shape[0] - self.n - 1:
                 return sum(self.fast_beta[ix][order][k](xi)*self.y[self.x.shape[0] - self.N + k+1]
-                           for k in range(len(self.fast_beta[ix][order])))
+                           for k in range(self.N-1))
             return sum(self.fast_beta[ix][order][k](xi)*self.y[ix - self.n + k]
-                       for k in range(len(self.fast_beta[ix][order])))
+                       for k in range(self.N))
         else:
             x = np.remainder(x, self.period)
             ix = np.searchsorted(self.tmpx, x) - 1
