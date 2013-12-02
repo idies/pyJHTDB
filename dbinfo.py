@@ -16,17 +16,19 @@ for coord in ['x', 'y', 'z']:
 channel = {'name'   : 'channel',
            'xnodes' : np.load(os.path.join(package_dir, 'data/channel_xgrid.npy')),
            'ynodes' : np.load(os.path.join(package_dir, 'data/channel_ygrid.npy')),
-           'znodes' : np.load(os.path.join(package_dir, 'data/channel_zgrid.npy'))}
+           'znodes' : np.load(os.path.join(package_dir, 'data/channel_zgrid.npy')),
+           'lx'     : 8*np.pi,
+           'ly'     : 2.,
+           'lz'     : 3*np.pi,}
 
-for coord in ['x', 'y', 'z']:
+for coord in ['x', 'z']:
     channel['n' + coord] = channel[coord + 'nodes'].shape[0]
-    channel['d' + coord] = np.zeros(channel['n' + coord], dtype = channel[coord + 'nodes'].dtype)
-    channel['d' + coord][:channel['n' + coord] - 1] = (channel[coord + 'nodes'][1:]
-                                                     - channel[coord + 'nodes'][:channel['n' + coord] - 1])
-    channel['d' + coord][channel['n' + coord] - 1] = channel['d' + coord][0]
-    channel['l' + coord] = np.sum(channel['d' + coord])
     channel[coord + 'periodic'] = True
     channel[coord + 'uniform'] = True
+    channel['d' + coord] = channel['l' + coord] / channel['n' + coord]
 
+channel['ny'] = 512
+channel['dy'] = channel['ynodes'][1:] - channel['ynodes'][:channel['ynodes'].shape[0]-1]
+channel['dy'] = np.append(channel['dy'], [channel['dy'][0]])
 channel['yperiodic'] = False
 channel['yuniform'] = False
