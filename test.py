@@ -1,5 +1,5 @@
-import pyTDB
-import pyTDB.cutout
+import pyJHTDB
+import pyJHTDB.cutout
 
 import matplotlib
 import matplotlib.pyplot as plt
@@ -28,7 +28,7 @@ def clean_2D_field(
     return None
 
 def main():
-    pyTDB.cutout.get_big_cutout(
+    pyJHTDB.cutout.get_big_cutout(
             cube_dim = 32,
             chunk_dim = 16,
             data_type = 'u',

@@ -2,8 +2,8 @@ import numpy as np
 import os
 import pickle
 
-import pyTDB
-import pyTDB.generic_splines as gs
+import pyJHTDB
+import pyJHTDB.generic_splines as gs
 
 
 class spline_interpolator:
