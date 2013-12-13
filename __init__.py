@@ -1,6 +1,5 @@
 """
-    Python wrappers for Turbulence DataBase library.
-    Also, for cutout downloads over http.
+    Python tools and wrappers for the Johns Hopkins Turbulence Databases C library.
 """
 
 import sys
