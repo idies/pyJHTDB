@@ -13,6 +13,16 @@ for coord in ['x', 'y', 'z']:
     isotropic1024coarse[coord + 'periodic'] = True
     isotropic1024coarse[coord + 'uniform'] = True
 
+mhd1024 = {'name'   : 'mhd'}
+
+for coord in ['x', 'y', 'z']:
+    mhd1024[coord + 'nodes'] = (np.pi/512)*np.array(range(1024), dtype = np.float32)
+    mhd1024['n' + coord] = 1024
+    mhd1024['l' + coord] = 2*np.pi
+    mhd1024['d' + coord] = np.pi/512
+    mhd1024[coord + 'periodic'] = True
+    mhd1024[coord + 'uniform'] = True
+
 channel = {'name'   : 'channel',
            'xnodes' : np.load(os.path.join(package_dir, 'data/channel_xgrid.npy')),
            'ynodes' : np.load(os.path.join(package_dir, 'data/channel_ygrid.npy')),
