@@ -13,7 +13,10 @@ for coord in ['x', 'y', 'z']:
     isotropic1024coarse[coord + 'periodic'] = True
     isotropic1024coarse[coord + 'uniform'] = True
 
-mhd1024 = {'name'   : 'mhd'}
+mhd1024 = {}
+for key in isotropic1024coarse.keys():
+    mhd1024[key] = isotropic1024coarse[key]
+mhd1024['name'] = 'mhd1024'
 
 for coord in ['x', 'y', 'z']:
     mhd1024[coord + 'nodes'] = (np.pi/512)*np.array(range(1024), dtype = np.float32)
