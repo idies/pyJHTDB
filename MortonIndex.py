@@ -1,52 +1,40 @@
 # taken from http://code.activestate.com/recipes/577558-interleave-bits-aka-morton-ize-aka-z-order-curve/
 
-def part1by1(n):
-        n&= 0x0000ffff
-        n = (n | (n << 8)) & 0x00FF00FF
-        n = (n | (n << 4)) & 0x0F0F0F0F
-        n = (n | (n << 2)) & 0x33333333
-        n = (n | (n << 1)) & 0x55555555
-        return n
-
-
-def unpart1by1(n):
-        n&= 0x55555555
-        n = (n ^ (n >> 1)) & 0x33333333
-        n = (n ^ (n >> 2)) & 0x0f0f0f0f
-        n = (n ^ (n >> 4)) & 0x00ff00ff
-        n = (n ^ (n >> 8)) & 0x0000ffff
-        return n
-
-
-def interleave2(x, y):
-        return part1by1(x) | (part1by1(y) << 1)
-
-
-def deinterleave2(n):
-        return unpart1by1(n), unpart1by1(n >> 1)
-
-
-def part1by2(n):
-        n&= 0x000003ff
+def part1by2(x):
+        n = x & 0x000003ff
         n = (n ^ (n << 16)) & 0xff0000ff
         n = (n ^ (n <<  8)) & 0x0300f00f
         n = (n ^ (n <<  4)) & 0x030c30c3
         n = (n ^ (n <<  2)) & 0x09249249
         return n
 
-
-def unpart1by2(n):
-        n&= 0x09249249
+def unpart1by2(z):
+        n = z & 0x09249249
         n = (n ^ (n >>  2)) & 0x030c30c3
         n = (n ^ (n >>  4)) & 0x0300f00f
         n = (n ^ (n >>  8)) & 0xff0000ff
         n = (n ^ (n >> 16)) & 0x000003ff
         return n
 
+def grid3D_to_zindex(x):
+    """return the corresponding Morton z-indices for an array of 3D indices
+       
+       :param x: input indices
+       :type x: numpy array of integers, of shape (n, 3),
+          where n is the number of points
+       :returns: z, array of integers, of shape (n,) 
+    """
+    return part1by2(x[:, 0]) | (part1by2(x[:, 1]) << 1) | (part1by2(x[:, 2]) << 2)
 
-def interleave3(x, y, z):
-        return part1by2(x) | (part1by2(y) << 1) | (part1by2(z) << 2)
+def zindex_to_grid3D(z):
+    """return the 3D indices corresponding to an array of Morton z-indices
+       
+       :param z: input indices
+       :type z: numpy array of integers, of shape (n,),
+          where n is the number of points
+       :returns: x, array of integers, of shape (n, 3)
+    """
+    return np.array([unpart1by2(z     ),
+                     unpart1by2(z >> 1),
+                     unpart1by2(z >> 2)]).transpose()
 
-
-def deinterleave3(n):
-        return unpart1by2(n), unpart1by2(n >> 1), unpart1by2(n >> 2)
