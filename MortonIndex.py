@@ -1,5 +1,7 @@
 # taken from http://code.activestate.com/recipes/577558-interleave-bits-aka-morton-ize-aka-z-order-curve/
 
+import numpy
+
 def part1by2(x):
         n = x & 0x000003ff
         n = (n ^ (n << 16)) & 0xff0000ff
