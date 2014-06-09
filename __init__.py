@@ -29,8 +29,7 @@ class libTDB:
         self.connection_on = False
         return None
     def add_hdf5_file(self, filename):
-        self.lib.turblibAddLocalSource(ctypes.c_char_p(filename + '.h5'))
-        return None
+        return self.lib.turblibAddLocalSource(ctypes.c_char_p(filename + '.h5'))
     def getData(self,
             time, point_coords,
             sinterp = 0, tinterp = 0,
