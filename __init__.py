@@ -117,7 +117,7 @@ class libTDB:
         if not self.connection_on:
             print('you didn\'t connect to the database')
             sys.exit()
-        if not (point_coords.shape[1] == 3):
+        if not (point_coords.shape[-1] == 3):
             print ('wrong number of values for coordinates in getPosition')
             sys.exit()
             return None
@@ -133,4 +133,92 @@ class libTDB:
                 point_coords.ctypes.data_as(ctypes.POINTER(ctypes.POINTER(ctypes.c_float))),
                 result_array.ctypes.data_as(ctypes.POINTER(ctypes.POINTER(ctypes.c_float))))
         return result_array
+    def getBlines(self,
+            time = 0.0,
+            ds = 0.0004,
+            S = 0.1,
+            points = numpy.array([[0, 0, 0]]).astype(numpy.float32),
+            sinterp = 4,
+            tinterp = 0,
+            data_set = 'mhd1024'):
+        """ use Heun solver to integrate magnetic field lines.
+            better solvers can be written in the future.
+        """
+        if not self.connection_on:
+            print('you didn\'t connect to the database')
+            sys.exit()
+        if not (points.shape[1] == 3 and len(points.shape) == 2):
+            print ('wrong shape of initial condition in getBlines')
+            sys.exit()
+            return None
+        iterations = int(S / ds)
+        npoints = points.shape[0]
+        history = numpy.zeros(
+                (iterations+1, npoints, 3),
+                dtype = numpy.float32)
+        history[0] = points
+        result_array = points.copy()
+        get_data = getattr(self.lib, 'getMagneticField')
+        def getBunit(point_coords):
+            get_data(
+                    self.authToken,
+                    ctypes.c_char_p(data_set),
+                    ctypes.c_float(time),
+                    ctypes.c_int(sinterp), ctypes.c_int(tinterp), ctypes.c_int(npoints),
+                    point_coords.ctypes.data_as(ctypes.POINTER(ctypes.POINTER(ctypes.c_float))),
+                    result_array.ctypes.data_as(ctypes.POINTER(ctypes.POINTER(ctypes.c_float))))
+            bsize = numpy.maximum(numpy.sqrt(numpy.sum(result_array**2, axis = 1)), 1e-18)
+            return result_array / bsize[:, None]
+        for s in range(1, iterations + 1):
+            bhat0 = getBunit(history[s-1])
+            y = history[s-1] + ds * bhat0
+            history[s] = history[s-1] + .5*ds * (bhat0 + getBunit(y))
+        return history
+    def getBline(self,
+            time = 0.0,
+            ds = 0.0004,
+            S = 0.1,
+            point = numpy.array([0, 0, 0]).astype(numpy.float32),
+            sinterp = 4,
+            tinterp = 0,
+            data_set = 'mhd1024',
+            out_of_domain = None):
+        """ use Heun solver to integrate magnetic 1 magnetic field line, within a given domain.
+            better solvers can be written in the future.
+        """
+        if not self.connection_on:
+            print('you didn\'t connect to the database')
+            sys.exit()
+        if not (point.shape[0] == 3 and len(point.shape) == 1):
+            print ('wrong shape of initial condition in getBline')
+            sys.exit()
+            return None
+        iterations = int(S / abs(ds))
+        history = numpy.zeros(
+                (iterations+1, 3),
+                dtype = numpy.float32)
+        history[0] = point
+        result_array = point.copy()
+        get_data = getattr(self.lib, 'getMagneticField')
+        def getBunit(point_coords):
+            #print point_coords
+            get_data(
+                    self.authToken,
+                    ctypes.c_char_p(data_set),
+                    ctypes.c_float(time),
+                    ctypes.c_int(sinterp), ctypes.c_int(tinterp), ctypes.c_int(1),
+                    point_coords.ctypes.data_as(ctypes.POINTER(ctypes.POINTER(ctypes.c_float))),
+                    result_array.ctypes.data_as(ctypes.POINTER(ctypes.POINTER(ctypes.c_float))))
+            #print 'get_data finished'
+            bsize = max(numpy.sqrt(numpy.sum(result_array**2)), 1e-18)
+            return result_array / bsize
+        for s in range(1, iterations + 1):
+            if not out_of_domain == None:
+                if out_of_domain(history[s-1]):
+                    return history[:s]
+            y = history[s-1].copy()
+            bhat0 = getBunit(y)
+            y = history[s-1] + ds * bhat0
+            history[s] = history[s-1] + .5*ds * (bhat0 + getBunit(y))
+        return history
 
