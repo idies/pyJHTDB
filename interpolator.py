@@ -105,17 +105,34 @@ class spline_interpolator:
         if self.info['yperiodic']:
             ygrid[:] = 0
         bzi = 0
+        #if self.info['yperiodic']:
+        #    xb = np.zeros((len(dorder), points.shape[0], len(self.bx[0][dorder[0][0]])), field_values.dtype)
+        #    yb = np.zeros((len(dorder), points.shape[0], len(self.bx[0][dorder[0][1]])), field_values.dtype)
+        #    zb = np.zeros((len(dorder), points.shape[0], len(self.bx[0][dorder[0][2]])), field_values.dtype)
+        #    for p in range(points.shape[0]):
+        #        for o in range(len(dorder)):
+        #            xb[o, p] = np.array([self.bx[     bxi][dorder[o][0]][k](xfrac[p])
+        #                                 for k in range(len(self.bx[     bxi][dorder[o][0]]))]).astype(field_values.dtype)
+        #            yb[o, p] = np.array([self.by[ygrid[p]][dorder[o][1]][k](yfrac[p])
+        #                                 for k in range(len(self.by[ygrid[p]][dorder[o][1]]))]).astype(field_values.dtype)
+        #            zb[o, p] = np.array([self.bz[     bzi][dorder[o][2]][k](zfrac[p])
+        #                                 for k in range(len(self.bz[     bzi][dorder[o][2]]))]).astype(field_values.dtype)
+        #        result[:, p] = np.einsum('okjil,oi,oj,ok->ol', field_values[None, p], xb, yb, zb)
+        #else:
         for p in range(points.shape[0]):
+            xb = np.zeros((len(dorder), len(self.bx[     bxi][dorder[0][0]])), field_values.dtype)
+            yb = np.zeros((len(dorder), len(self.bx[ygrid[p]][dorder[0][1]])), field_values.dtype)
+            zb = np.zeros((len(dorder), len(self.bx[     bxi][dorder[0][2]])), field_values.dtype)
             for o in range(len(dorder)):
-                xb = np.array([self.bx[     bxi][dorder[o][0]][k](xfrac[p])
+                xb[o] = np.array([self.bx[     bxi][dorder[o][0]][k](xfrac[p])
                                for k in range(len(self.bx[     bxi][dorder[o][0]]))]).astype(field_values.dtype)
-                yb = np.array([self.by[ygrid[p]][dorder[o][1]][k](yfrac[p])
+                yb[o] = np.array([self.by[ygrid[p]][dorder[o][1]][k](yfrac[p])
                                for k in range(len(self.by[ygrid[p]][dorder[o][1]]))]).astype(field_values.dtype)
-                zb = np.array([self.bz[     bzi][dorder[o][2]][k](zfrac[p])
+                zb[o] = np.array([self.bz[     bzi][dorder[o][2]][k](zfrac[p])
                                for k in range(len(self.bz[     bzi][dorder[o][2]]))]).astype(field_values.dtype)
                 #print ['{0:6}'.format(yb[k]) for k in range(2*self.n + 2)]
                 #print ['{0:6}'.format(field_points[p, 0, k, 0, 1]) for k in range(2*self.n + 2)]
                 #print ['{0:6}'.format(field_values[p, 0, k, 0, 1]) for k in range(2*self.n + 2)]
-                result[o, p] = np.einsum('kjil,i,j,k->l', field_values[p], xb, yb, zb)
+            result[:, p] = np.einsum('okjil,oi,oj,ok->ol', field_values[None, p], xb, yb, zb)
         return result
 
