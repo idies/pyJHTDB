@@ -31,6 +31,9 @@ def get_cutout(
             xl*yl*zl*ncomponents * 4. / 10**6,
             xl*yl*zl*ncomponents * 4. / 2**20)
     urllib.urlretrieve(url, filename + '.h5')
+    # check if file downloaded ok
+    data = h5py.File(filename + '.h5', mode = 'r')
+    data.close()
     print 'Data downloaded and ' + filename + '.h5 written successfuly.'
     return None
 
