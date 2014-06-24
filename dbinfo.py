@@ -25,6 +25,7 @@ for coord in ['x', 'y', 'z']:
     mhd1024['d' + coord] = np.pi/512
     mhd1024[coord + 'periodic'] = True
     mhd1024[coord + 'uniform'] = True
+mhd1024['time'] = np.array(range(1024), dtype = np.float32) * 2.56 / 1024
 
 channel = {'name'   : 'channel',
            'xnodes' : np.load(os.path.join(package_dir, 'data/channel_xgrid.npy')),
