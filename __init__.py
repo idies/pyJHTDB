@@ -221,4 +221,32 @@ class libTDB:
             y = history[s-1] + ds * bhat0
             history[s] = history[s-1] + .5*ds * (bhat0 + getBunit(y))
         return history
+    def get2wayBline(self,
+            time = 0.0,
+            ds = 0.0004,
+            S = 0.1,
+            point = numpy.array([0, 0, 0]).astype(numpy.float32),
+            sinterp = 4,
+            tinterp = 0,
+            data_set = 'mhd1024',
+            out_of_domain = None):
+        l0 = self.getBline(
+                time = time,
+                ds = ds,
+                S = S,
+                point = point,
+                sinterp = sinterp,
+                tinterp = tinterp,
+                data_set = data_set,
+                out_of_domain = out_of_domain)
+        l1 = self.getBline(
+                time = time,
+                ds = -ds,
+                S = S,
+                point = point,
+                sinterp = sinterp,
+                tinterp = tinterp,
+                data_set = data_set,
+                out_of_domain = out_of_domain)
+        return numpy.concatenate((l1[::-1], l0[1:]), axis = 0)
 
