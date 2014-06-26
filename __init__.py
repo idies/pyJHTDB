@@ -2,16 +2,25 @@
     Python tools and wrappers for the Johns Hopkins Turbulence Databases C library.
 """
 
+import os
 import sys
-import numpy
+import numpy as np
 import ctypes
+import inspect
 
 class libTDB:
     def __init__(self,
             libname = 'libTDB',
             libdir = '.',
+            srcdir = None,
             auth_token = 'edu.jhu.pha.turbulence.testing-201302'):
-        self.lib = numpy.ctypeslib.load_library(libname, libdir)
+        self.libname = libname
+        self.libdir = libdir
+        if srcdir == None:
+            self.srcdir = libdir
+        else:
+            self.srcdir = srcdir
+        self.lib = np.ctypeslib.load_library(libname, libdir)
         self.authToken = ctypes.c_char_p(auth_token)
         self.connection_on = False
         return None
@@ -43,7 +52,7 @@ class libTDB:
             print ('wrong number of values for coordinates in getData')
             sys.exit()
             return None
-        if not (point_coords.dtype == numpy.float32):
+        if not (point_coords.dtype == np.float32):
             print 'point coordinates in getData must be floats. stopping.'
             sys.exit()
             return None
@@ -51,13 +60,14 @@ class libTDB:
         for i in range(1, len(point_coords.shape)-1):
             npoints *= point_coords.shape[i]
         if make_modulo:
-            pcoords = numpy.zeros(point_coords.shape, numpy.float64)
+            pcoords = np.zeros(point_coords.shape, np.float64)
             pcoords[:] = point_coords
-            numpy.mod(pcoords, 2*numpy.pi, point_coords)
+            np.mod(pcoords, 2*np.pi, point_coords)
         get_data = getattr(self.lib, getFunction)
         if getFunction in ['getVelocity',
                            'getForce',
                            'getMagneticField',
+                           'getBunit',
                            'getVectorPotential',
                            'getPressureGradient',
                            'getVelocityLaplacian',
@@ -101,13 +111,38 @@ class libTDB:
             return None
         newshape = list(point_coords.shape[0:len(point_coords.shape)-1])
         newshape.append(result_dim)
-        result_array = numpy.empty(newshape, dtype=numpy.float32)
+        result_array = np.empty(newshape, dtype=np.float32)
         get_data(self.authToken,
                  ctypes.c_char_p(data_set),
                  ctypes.c_float(time),
                  ctypes.c_int(sinterp), ctypes.c_int(tinterp), ctypes.c_int(npoints),
                  point_coords.ctypes.data_as(ctypes.POINTER(ctypes.POINTER(ctypes.c_float))),
                  result_array.ctypes.data_as(ctypes.POINTER(ctypes.POINTER(ctypes.c_float))))
+        return result_array
+    def getBlineAlt(self,
+            time, nsteps, ds,
+            x0,
+            sinterp = 4,
+            tinterp = 0,
+            data_set = 'mhd1024'):
+        if not self.connection_on:
+            print('you didn\'t connect to the database')
+            sys.exit()
+        if not (x0.shape[1] == 3 and len(x0.shape) == 2):
+            print ('wrong shape of initial condition in getBlineAlt, ', x0.shape)
+            sys.exit()
+            return None
+        npoints = x0.shape[0]
+        result_array = np.empty((nsteps+1, npoints, 3), dtype=np.float32)
+        result_array[0] = x0
+        self.lib.getBline(
+                self.authToken,
+                ctypes.c_char_p(data_set),
+                ctypes.c_float(time),
+                ctypes.c_int(nsteps),
+                ctypes.c_float(ds),
+                ctypes.c_int(sinterp), ctypes.c_int(tinterp), ctypes.c_int(npoints),
+                result_array.ctypes.data_as(ctypes.POINTER(ctypes.POINTER(ctypes.c_float))))
         return result_array
     def getPosition(self,
             starttime, endtime, lag_dt,
@@ -122,7 +157,7 @@ class libTDB:
             sys.exit()
             return None
         npoints = point_coords.shape[0]
-        result_array = numpy.empty((npoints, 3), dtype=numpy.float32)
+        result_array = np.empty((npoints, 3), dtype=np.float32)
         self.lib.getPosition(
                 self.authToken,
                 ctypes.c_char_p(data_set),
@@ -137,7 +172,7 @@ class libTDB:
             time = 0.0,
             ds = 0.0004,
             S = 0.1,
-            points = numpy.array([[0, 0, 0]]).astype(numpy.float32),
+            points = np.array([[0, 0, 0]]).astype(np.float32),
             sinterp = 4,
             tinterp = 0,
             data_set = 'mhd1024'):
@@ -153,9 +188,9 @@ class libTDB:
             return None
         iterations = int(S / ds)
         npoints = points.shape[0]
-        history = numpy.zeros(
+        history = np.zeros(
                 (iterations+1, npoints, 3),
-                dtype = numpy.float32)
+                dtype = np.float32)
         history[0] = points
         result_array = points.copy()
         get_data = getattr(self.lib, 'getMagneticField')
@@ -167,7 +202,7 @@ class libTDB:
                     ctypes.c_int(sinterp), ctypes.c_int(tinterp), ctypes.c_int(npoints),
                     point_coords.ctypes.data_as(ctypes.POINTER(ctypes.POINTER(ctypes.c_float))),
                     result_array.ctypes.data_as(ctypes.POINTER(ctypes.POINTER(ctypes.c_float))))
-            bsize = numpy.maximum(numpy.sqrt(numpy.sum(result_array**2, axis = 1)), 1e-18)
+            bsize = np.maximum(np.sqrt(np.sum(result_array**2, axis = 1)), 1e-18)
             return result_array / bsize[:, None]
         for s in range(1, iterations + 1):
             bhat0 = getBunit(history[s-1])
@@ -178,7 +213,7 @@ class libTDB:
             time = 0.0,
             ds = 0.0004,
             S = 0.1,
-            point = numpy.array([0, 0, 0]).astype(numpy.float32),
+            point = np.array([0, 0, 0]).astype(np.float32),
             sinterp = 4,
             tinterp = 0,
             data_set = 'mhd1024',
@@ -194,9 +229,9 @@ class libTDB:
             sys.exit()
             return None
         iterations = int(S / abs(ds))
-        history = numpy.zeros(
+        history = np.zeros(
                 (iterations+1, 3),
-                dtype = numpy.float32)
+                dtype = np.float32)
         history[0] = point
         result_array = point.copy()
         get_data = getattr(self.lib, 'getMagneticField')
@@ -210,7 +245,7 @@ class libTDB:
                     point_coords.ctypes.data_as(ctypes.POINTER(ctypes.POINTER(ctypes.c_float))),
                     result_array.ctypes.data_as(ctypes.POINTER(ctypes.POINTER(ctypes.c_float))))
             #print 'get_data finished'
-            bsize = max(numpy.sqrt(numpy.sum(result_array**2)), 1e-18)
+            bsize = max(np.sqrt(np.sum(result_array**2)), 1e-18)
             return result_array / bsize
         for s in range(1, iterations + 1):
             if not out_of_domain == None:
@@ -225,7 +260,7 @@ class libTDB:
             time = 0.0,
             ds = 0.0004,
             S = 0.1,
-            point = numpy.array([0, 0, 0]).astype(numpy.float32),
+            point = np.array([0, 0, 0]).astype(np.float32),
             sinterp = 4,
             tinterp = 0,
             data_set = 'mhd1024',
@@ -248,5 +283,26 @@ class libTDB:
                 tinterp = tinterp,
                 data_set = data_set,
                 out_of_domain = out_of_domain)
-        return numpy.concatenate((l1[::-1], l0[1:]), axis = 0)
-
+        return np.concatenate((l1[::-1], l0[1:]), axis = 0)
+    def expand(self):
+        repo_dir = os.path.dirname(inspect.getfile(libTDB))
+        print repo_dir
+        os.system('gcc -O3 -fPIC -c '
+                + '-DCUTOUT_SUPPORT '
+                + '-I' + self.srcdir + ' '
+                + repo_dir + '/local_tools.c '
+                + '-o ' + repo_dir + '/local_tools.o')
+        linkcommand = ('ld -shared '
+                + '-L' + self.libdir + ' '
+                + repo_dir + '/local_tools.o '
+                + '-o ' + repo_dir + '/libTDBe.so '
+                + '-lhdf5 '
+                + '-Bstatic -l' + self.libname[3:])
+        os.system(linkcommand)
+        if self.connection_on:
+            self.finalize()
+            self.connection_on = True
+        self.lib = np.ctypeslib.load_library('libTDBe', repo_dir)
+        if self.connection_on:
+            self.initialize()
+        return None
