@@ -10,7 +10,8 @@
 
 #include "turblib.h"
 
-float float_error = 1e-10;
+// relative error of single precision numbers
+float float_error = 1e-6;
 
 int getBline(
         char *authToken,
@@ -86,6 +87,14 @@ int getRectangularBoundedBline(
 	float y[1][3];
 	float bfield0[1][3];
 	float bfield1[1][3];
+   
+    // keep a little way away from the actual edge...
+    xmin *= 1 + (xmin > 0 ? -1 : +1)*float_error;
+    ymin *= 1 + (ymin > 0 ? -1 : +1)*float_error;
+    zmin *= 1 + (zmin > 0 ? -1 : +1)*float_error;
+    xmax *= 1 + (xmax > 0 ? +1 : -1)*float_error;
+    ymax *= 1 + (ymax > 0 ? +1 : -1)*float_error;
+    zmax *= 1 + (zmax > 0 ? +1 : -1)*float_error;
 
     //loop after particles
     for (p = 0; p < count; p++)
@@ -152,6 +161,8 @@ int getSphericalBoundedBline(
 	float bfield0[1][3];
 	float bfield1[1][3];
 
+    radius *= 1 + float_error;
+
     //loop after particles
     for (p = 0; p < count; p++)
     {
@@ -184,7 +195,7 @@ int getSphericalBoundedBline(
             x += 1;
             if (sqrt((x[0][0] - ox)*(x[0][0] - ox)
                    + (x[0][1] - oy)*(x[0][1] - oy)
-                   + (x[0][2] - oz)*(x[0][2] - oz)) > radius + float_error)
+                   + (x[0][2] - oz)*(x[0][2] - oz)) > radius)
                 break;
         }
         traj_length[p] = s+1;
