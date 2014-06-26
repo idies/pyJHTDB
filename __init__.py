@@ -261,8 +261,7 @@ class libTDB:
         return np.concatenate((l1[::-1], l0[1:]), axis = 0)
     def expand(self):
         repo_dir = os.path.dirname(inspect.getfile(libTDB))
-        print repo_dir
-        os.system('gcc -O3 -funroll-loops -fPIC -Wall -c '
+        os.system('gcc -O3 -fPIC -Wall -c '
                 + '-DCUTOUT_SUPPORT '
                 + '-I' + self.srcdir + ' '
                 + repo_dir + '/local_tools.c '
