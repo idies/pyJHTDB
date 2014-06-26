@@ -307,8 +307,10 @@ class libTDB:
                 result_array.ctypes.data_as(ctypes.POINTER(ctypes.POINTER(ctypes.c_float))))
         return result_array
     def getBlineSphereBounded(self,
-            time, nsteps, ds,
-            x0,
+            time = 0,
+            S = 0.05,
+            ds = 0.005,
+            x0 = np.array([[0, 0, 0]], dtype = np.float32),
             sinterp = 4,
             tinterp = 0,
             data_set = 'mhd1024',
@@ -322,6 +324,7 @@ class libTDB:
             print ('wrong shape of initial condition in getBlineAlt, ', x0.shape)
             sys.exit()
             return None
+        nsteps = int(S / abs(ds))
         npoints = x0.shape[0]
         result_array = np.empty((npoints, nsteps+1, 3), dtype=np.float32)
         length_array = np.empty((npoints), dtype = np.int32)
