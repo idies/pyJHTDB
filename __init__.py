@@ -361,4 +361,59 @@ class libTDB:
             for l in range(len(bline_list)):
                 bline_list[l] = np.concatenate((result_array[l, 1:length_array[l]][::-1].copy(), bline_list[l]), axis = 0)
         return bline_list
+    def getBlineRectBounded(self,
+            time = 0,
+            S = 0.05,
+            ds = 0.005,
+            x0 = np.array([[0, 0, 0]], dtype = np.float32),
+            sinterp = 4,
+            tinterp = 0,
+            data_set = 'mhd1024',
+            xmin = 0, xmax = 1,
+            ymin = 0, ymax = 1,
+            zmin = 0, zmax = 1,
+            both_ways = False):
+        if not self.connection_on:
+            print('you didn\'t connect to the database')
+            sys.exit()
+        if not (x0.shape[1] == 3 and len(x0.shape) == 2):
+            print ('wrong shape of initial condition in getBlineAlt, ', x0.shape)
+            sys.exit()
+            return None
+        nsteps = int(S / abs(ds))
+        npoints = x0.shape[0]
+        result_array = np.empty((npoints, nsteps+1, 3), dtype=np.float32)
+        length_array = np.empty((npoints), dtype = np.int32)
+        result_array[:, 0] = x0
+        self.lib.getRectangularBoundedBline(
+                self.authToken,
+                ctypes.c_char_p(data_set),
+                ctypes.c_float(time),
+                ctypes.c_int(nsteps),
+                ctypes.c_float(ds),
+                ctypes.c_int(sinterp), ctypes.c_int(tinterp), ctypes.c_int(npoints),
+                result_array.ctypes.data_as(ctypes.POINTER(ctypes.POINTER(ctypes.c_float))),
+                length_array.ctypes.data_as(ctypes.POINTER(ctypes.c_int)),
+                ctypes.c_float(xmin), ctypes.c_float(xmax),
+                ctypes.c_float(ymin), ctypes.c_float(ymax),
+                ctypes.c_float(zmin), ctypes.c_float(zmax))
+        bline_list = [result_array[p, :length_array[p]].copy()
+                      for p in range(x0.shape[0])]
+        if both_ways:
+            result_array[:, 0] = x0
+            self.lib.getRectangularBoundedBline(
+                    self.authToken,
+                    ctypes.c_char_p(data_set),
+                    ctypes.c_float(time),
+                    ctypes.c_int(nsteps),
+                    ctypes.c_float(-ds),
+                    ctypes.c_int(sinterp), ctypes.c_int(tinterp), ctypes.c_int(npoints),
+                    result_array.ctypes.data_as(ctypes.POINTER(ctypes.POINTER(ctypes.c_float))),
+                    length_array.ctypes.data_as(ctypes.POINTER(ctypes.c_int)),
+                    ctypes.c_float(xmin), ctypes.c_float(xmax),
+                    ctypes.c_float(ymin), ctypes.c_float(ymax),
+                    ctypes.c_float(zmin), ctypes.c_float(zmax))
+            for l in range(len(bline_list)):
+                bline_list[l] = np.concatenate((result_array[l, 1:length_array[l]][::-1].copy(), bline_list[l]), axis = 0)
+        return bline_list
 
