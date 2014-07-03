@@ -67,6 +67,7 @@ class libTDB:
         if getFunction in ['getVelocity',
                            'getForce',
                            'getMagneticField',
+                           'getMagneticFieldDebug',
                            'getBunit',
                            'getVectorPotential',
                            'getPressureGradient',
@@ -346,6 +347,62 @@ class libTDB:
         if both_ways:
             result_array[:, 0] = x0
             self.lib.getSphericalBoundedBline(
+                    self.authToken,
+                    ctypes.c_char_p(data_set),
+                    ctypes.c_float(time),
+                    ctypes.c_int(nsteps),
+                    ctypes.c_float(-ds),
+                    ctypes.c_int(sinterp), ctypes.c_int(tinterp), ctypes.c_int(npoints),
+                    result_array.ctypes.data_as(ctypes.POINTER(ctypes.POINTER(ctypes.c_float))),
+                    length_array.ctypes.data_as(ctypes.POINTER(ctypes.c_int)),
+                    ctypes.c_float(origin[0]),
+                    ctypes.c_float(origin[1]),
+                    ctypes.c_float(origin[2]),
+                    ctypes.c_float(radius))
+            for l in range(len(bline_list)):
+                bline_list[l] = np.concatenate((result_array[l, 1:length_array[l]][::-1].copy(), bline_list[l]), axis = 0)
+        return bline_list
+    def getBlineSphereBoundedDebug(self,
+            time = 0,
+            S = 0.05,
+            ds = 0.005,
+            x0 = np.array([[0, 0, 0]], dtype = np.float32),
+            sinterp = 4,
+            tinterp = 0,
+            data_set = 'mhd1024',
+            origin = [0, 0, 0],
+            radius = 1,
+            both_ways = False):
+        if not self.connection_on:
+            print('you didn\'t connect to the database')
+            sys.exit()
+        if not (x0.shape[1] == 3 and len(x0.shape) == 2):
+            print ('wrong shape of initial condition in getBlineAlt, ', x0.shape)
+            sys.exit()
+            return None
+        nsteps = int(S / abs(ds))
+        npoints = x0.shape[0]
+        result_array = np.empty((npoints, nsteps+1, 3), dtype=np.float32)
+        length_array = np.empty((npoints), dtype = np.int32)
+        result_array[:, 0] = x0
+        self.lib.getSphericalBoundedBlineDebug(
+                self.authToken,
+                ctypes.c_char_p(data_set),
+                ctypes.c_float(time),
+                ctypes.c_int(nsteps),
+                ctypes.c_float(ds),
+                ctypes.c_int(sinterp), ctypes.c_int(tinterp), ctypes.c_int(npoints),
+                result_array.ctypes.data_as(ctypes.POINTER(ctypes.POINTER(ctypes.c_float))),
+                length_array.ctypes.data_as(ctypes.POINTER(ctypes.c_int)),
+                ctypes.c_float(origin[0]),
+                ctypes.c_float(origin[1]),
+                ctypes.c_float(origin[2]),
+                ctypes.c_float(radius))
+        bline_list = [result_array[p, :length_array[p]].copy()
+                      for p in range(x0.shape[0])]
+        if both_ways:
+            result_array[:, 0] = x0
+            self.lib.getSphericalBoundedBlineDebug(
                     self.authToken,
                     ctypes.c_char_p(data_set),
                     ctypes.c_float(time),
