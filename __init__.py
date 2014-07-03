@@ -7,6 +7,7 @@ import sys
 import numpy as np
 import ctypes
 import inspect
+import platform
 
 class libTDB:
     def __init__(self,
@@ -267,14 +268,24 @@ class libTDB:
                 + '-I' + self.srcdir + ' '
                 + repo_dir + '/local_tools.c '
                 + '-o ' + repo_dir + '/local_tools.o')
-        linkcommand = ('gcc -dynamiclib '
-                + self.libdir + '/stdsoap2.o '
-                + self.libdir + '/soapC.o '
-                + self.libdir + '/soapClient.o '
-                + self.libdir + '/turblib.o '
-                + repo_dir + '/local_tools.o '
-                + '-o ' + repo_dir + '/libTDBe.so '
-                + '-lhdf5 ')
+        if platform.system() == 'Linux':
+            linkcommand = ('gcc -shared '
+                    + self.libdir + '/stdsoap2.o '
+                    + self.libdir + '/soapC.o '
+                    + self.libdir + '/soapClient.o '
+                    + self.libdir + '/turblib.o '
+                    + repo_dir + '/local_tools.o '
+                    + '-o ' + repo_dir + '/libTDBe.so '
+                    + '-lhdf5 ')
+        else:
+            linkcommand = ('gcc -dynamiclib '
+                    + self.libdir + '/stdsoap2.o '
+                    + self.libdir + '/soapC.o '
+                    + self.libdir + '/soapClient.o '
+                    + self.libdir + '/turblib.o '
+                    + repo_dir + '/local_tools.o '
+                    + '-o ' + repo_dir + '/libTDBe.so '
+                    + '-lhdf5 ')
         os.system(linkcommand)
         if self.connection_on:
             self.finalize()
