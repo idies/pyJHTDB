@@ -266,12 +266,14 @@ class libTDB:
                 + '-I' + self.srcdir + ' '
                 + repo_dir + '/local_tools.c '
                 + '-o ' + repo_dir + '/local_tools.o')
-        linkcommand = ('ld -shared '
-                + '-L' + self.libdir + ' '
+        linkcommand = ('gcc -dynamiclib '
+                + self.libdir + '/stdsoap2.o '
+                + self.libdir + '/soapC.o '
+                + self.libdir + '/soapClient.o '
+                + self.libdir + '/turblib.o '
                 + repo_dir + '/local_tools.o '
                 + '-o ' + repo_dir + '/libTDBe.so '
-                + '-lhdf5 '
-                + '-Bstatic -l' + self.libname[3:])
+                + '-lhdf5 ')
         os.system(linkcommand)
         if self.connection_on:
             self.finalize()
