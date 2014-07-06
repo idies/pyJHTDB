@@ -9,7 +9,7 @@ import ctypes
 import inspect
 import platform
 
-class libTDB:
+class libTDB(object):
     def __init__(self,
             libname = 'libTDB',
             libdir = '.',
@@ -24,6 +24,7 @@ class libTDB:
         self.lib = np.ctypeslib.load_library(libname, libdir)
         self.authToken = ctypes.c_char_p(auth_token)
         self.connection_on = False
+        self.hdf5_file_list = []
         return None
     def initialize(self, exit_on_error = True):
         #initialize gSOAP
@@ -39,7 +40,11 @@ class libTDB:
         self.connection_on = False
         return None
     def add_hdf5_file(self, filename):
-        return self.lib.turblibAddLocalSource(ctypes.c_char_p(filename + '.h5'))
+        if not filename in self.hdf5_file_list:
+            self.hdf5_file_list.append(filename)
+            return self.lib.turblibAddLocalSource(ctypes.c_char_p(filename + '.h5'))
+        else:
+            return 0
     def getData(self,
             time, point_coords,
             sinterp = 0, tinterp = 0,
@@ -122,9 +127,12 @@ class libTDB:
                  result_array.ctypes.data_as(ctypes.POINTER(ctypes.POINTER(ctypes.c_float))))
         return result_array
     def getPosition(self,
-            starttime, endtime, lag_dt,
-            point_coords,
+            starttime = 0.0,
+            endtime = 0.1,
+            dt = 0.0004,
+            point_coords = None,
             sinterp = 4,
+            steps_to_keep = 1,
             data_set = 'isotropic1024coarse'):
         if not self.connection_on:
             print('you didn\'t connect to the database')
@@ -135,16 +143,25 @@ class libTDB:
             return None
         npoints = point_coords.shape[0]
         result_array = np.empty((npoints, 3), dtype=np.float32)
-        self.lib.getPosition(
-                self.authToken,
-                ctypes.c_char_p(data_set),
-                ctypes.c_float(starttime),
-                ctypes.c_float(endtime),
-                ctypes.c_float(lag_dt),
-                ctypes.c_int(sinterp), ctypes.c_int(npoints),
-                point_coords.ctypes.data_as(ctypes.POINTER(ctypes.POINTER(ctypes.c_float))),
-                result_array.ctypes.data_as(ctypes.POINTER(ctypes.POINTER(ctypes.c_float))))
-        return result_array
+        traj_array = np.empty((steps_to_keep+1, npoints, 3), dtype = np.float32)
+        traj_array[0] = point_coords
+        time_array = np.empty((steps_to_keep+1), dtype = np.float32)
+        integration_time = (endtime - starttime) / steps_to_keep
+        time_array[0] = starttime
+        for tstep in range(1, steps_to_keep + 1):
+            pcoords = traj_array[tstep - 1].copy()
+            self.lib.getPosition(
+                    self.authToken,
+                    ctypes.c_char_p(data_set),
+                    ctypes.c_float(starttime + (tstep - 1)*integration_time),
+                    ctypes.c_float(starttime +  tstep     *integration_time),
+                    ctypes.c_float(dt),
+                    ctypes.c_int(sinterp), ctypes.c_int(npoints),
+                    pcoords.ctypes.data_as(ctypes.POINTER(ctypes.POINTER(ctypes.c_float))),
+                    result_array.ctypes.data_as(ctypes.POINTER(ctypes.POINTER(ctypes.c_float))))
+            traj_array[tstep] = result_array
+            time_array[tstep] = starttime + tstep * integration_time
+        return traj_array, time_array
     def getBlines(self,
             time = 0.0,
             ds = 0.0004,
@@ -263,29 +280,34 @@ class libTDB:
         return np.concatenate((l1[::-1], l0[1:]), axis = 0)
     def expand(self):
         repo_dir = os.path.dirname(inspect.getfile(libTDB))
-        os.system('gcc -O3 -fPIC -Wall -c '
-                + '-DCUTOUT_SUPPORT '
-                + '-I' + self.srcdir + ' '
-                + repo_dir + '/local_tools.c '
-                + '-o ' + repo_dir + '/local_tools.o')
+        compile_command = ('gcc -O3 -fPIC -Wall -c '
+                         + '-DCUTOUT_SUPPORT '
+                         + '-I' + self.srcdir + ' ')
+        for fname in [repo_dir + '/local_tools.',
+                      self.libdir + '/stdsoap2.',
+                      self.libdir + '/soapC.',
+                      self.libdir + '/soapClient.',
+                      self.libdir + '/turblib.']:
+            mtimec = os.path.getmtime(fname + 'c')
+            if os.path.exists(fname + 'o'):
+                mtimeo = os.path.getmtime(fname + 'o')
+            else:
+                mtimeo = mtimec - 1
+            if mtimec > mtimeo:
+                os.system(compile_command
+                        + fname + 'c -o '
+                        + fname + 'o')
         if platform.system() == 'Linux':
-            linkcommand = ('gcc -shared '
-                    + self.libdir + '/stdsoap2.o '
-                    + self.libdir + '/soapC.o '
-                    + self.libdir + '/soapClient.o '
-                    + self.libdir + '/turblib.o '
-                    + repo_dir + '/local_tools.o '
-                    + '-o ' + repo_dir + '/libTDBe.so '
-                    + '-lhdf5 ')
+            linkcommand = 'gcc -shared '
         else:
-            linkcommand = ('gcc -dynamiclib '
-                    + self.libdir + '/stdsoap2.o '
-                    + self.libdir + '/soapC.o '
-                    + self.libdir + '/soapClient.o '
-                    + self.libdir + '/turblib.o '
-                    + repo_dir + '/local_tools.o '
-                    + '-o ' + repo_dir + '/libTDBe.so '
-                    + '-lhdf5 ')
+            linkcommand = 'gcc -dynamiclib '
+        linkcommand += (self.libdir + '/stdsoap2.o '
+                      + self.libdir + '/soapC.o '
+                      + self.libdir + '/soapClient.o '
+                      + self.libdir + '/turblib.o '
+                      + repo_dir + '/local_tools.o '
+                      + '-o ' + repo_dir + '/libTDBe.so '
+                      + '-lhdf5 ')
         os.system(linkcommand)
         if self.connection_on:
             self.finalize()
