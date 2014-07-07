@@ -149,6 +149,7 @@ class libTDB(object):
         integration_time = (endtime - starttime) / steps_to_keep
         time_array[0] = starttime
         for tstep in range(1, steps_to_keep + 1):
+            print 'at time step {0} out of {1}'.format(tstep, steps_to_keep)
             pcoords = traj_array[tstep - 1].copy()
             self.lib.getPosition(
                     self.authToken,
