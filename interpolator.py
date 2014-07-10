@@ -161,7 +161,7 @@ class spline_interpolator:
                 for cy in range(factor):
                     for cz in range(factor):
                         result[:, cz:result.shape[1]:factor, cy:result.shape[2]:factor, cx:result.shape[3]:factor] = sum(sum(sum(
-                                data     [None, k0+kk:k1+kk, j0+jj:j1+jj, i0+ii:i1+ii]
+                                data     [None, k0+kk-self.n:k1+kk-self.n, j0+jj-self.n:j1+jj-self.n, i0+ii-self.n:i1+ii-self.n]
                               * beta_vals[   :, 0,     None,        None,        None, cx, ii] for ii in range(len(self.bx[0][0])))
                               * beta_vals[   :, 1,     None,        None,        None, cy, jj] for jj in range(len(self.bx[0][0])))
                               * beta_vals[   :, 2,     None,        None,        None, cz, kk] for kk in range(len(self.bx[0][0])))
@@ -171,7 +171,7 @@ class spline_interpolator:
                 for cy in range(factor):
                     for cz in range(factor):
                         result[:, cz:result.shape[1]:factor, cy:result.shape[2]:factor, cx:result.shape[3]:factor] = sum(sum(sum(
-                                data     [None, k0+kk:k1+kk, j0+jj:j1+jj, i0+ii:i1+ii,            :]
+                                data     [None, k0+kk-self.n:k1+kk-self.n, j0+jj-self.n:j1+jj-self.n, i0+ii-self.n:i1+ii-self.n,            :]
                               * beta_vals[   :, 0,     None,        None,        None, cx, ii, None] for ii in range(len(self.bx[0][0])))
                               * beta_vals[   :, 1,     None,        None,        None, cy, jj, None] for jj in range(len(self.bx[0][0])))
                               * beta_vals[   :, 2,     None,        None,        None, cz, kk, None] for kk in range(len(self.bx[0][0])))
