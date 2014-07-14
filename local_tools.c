@@ -235,8 +235,8 @@ int getMagneticFieldDebug(
     for (p = 0; p < count; p++)
     {
         dataout[p][0] = 1;
-        dataout[p][1] = 1;
-        dataout[p][2] = 1;
+        dataout[p][1] = 0;
+        dataout[p][2] = 0;
     }
     return 0;
 }
