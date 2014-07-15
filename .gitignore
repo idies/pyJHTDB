@@ -3,5 +3,7 @@
 *.o
 #shared objects
 *.so
+#big files
+*.eps
 #temporary files
 .*.swp
