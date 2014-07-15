@@ -1,4 +1,7 @@
-#py compiled files
+#compiled files
 *.pyc
+*.o
+#shared objects
+*.so
 #temporary files
 .*.swp

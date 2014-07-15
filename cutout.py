@@ -20,14 +20,20 @@ def get_cutout(
          + '{0},{1}/'.format(x0, xl)
          + '{0},{1}/'.format(y0, yl)
          + '{0},{1}/'.format(z0, zl))
+    print url
     if data_type in ['u', 'b', 'a']:
         ncomponents = 3
     elif data_type in ['p']:
         ncomponents = 1
+    elif data_type in ['ub']:
+        ncomponents = 6
     print 'Retrieving h5 file, size {0} MB = {1} MiB.'.format(
             xl*yl*zl*ncomponents * 4. / 10**6,
             xl*yl*zl*ncomponents * 4. / 2**20)
     urllib.urlretrieve(url, filename + '.h5')
+    # check if file downloaded ok
+    data = h5py.File(filename + '.h5', mode = 'r')
+    data.close()
     print 'Data downloaded and ' + filename + '.h5 written successfuly.'
     return None
 

@@ -1,6 +1,7 @@
 import numpy as np
 import os
 import pickle
+import gzip
 
 import pyJHTDB
 import pyJHTDB.generic_splines as gs
@@ -16,9 +17,8 @@ class spline_interpolator:
         self.n = n
         self.m = m
         self.info = info
-        if os.path.exists(info['name'] + '_spline_interpolator_n{0}_m{1}.p'.format(n, m)):
-            self.spline = pickle.load(open(info['name'] + '_spline_interpolator_n{0}_m{1}.p'.format(n, m),
-                                           'r'))
+        if os.path.exists(info['name'] + '_spline_interpolator_n{0}_m{1}.pickle.gz'.format(n, m)):
+            self.spline = pickle.load(gzip.open(info['name'] + '_spline_interpolator_n{0}_m{1}.pickle.gz'.format(n, m)))
         else:
             func = []
             for coord in ['x', 'y', 'z']:
@@ -39,8 +39,8 @@ class spline_interpolator:
                            'y': func[1],
                            'z': func[2]}
             pickle.dump(self.spline,
-                        open(info['name'] + '_spline_interpolator_n{0}_m{1}.p'.format(n, m),
-                             'w'))
+                        gzip.open(info['name'] + '_spline_interpolator_n{0}_m{1}.pickle.gz'.format(n, m),
+                             'wb'))
         # either channel or periodic cube, so it's cheap to compute fast betas for x and z
         self.spline['x'].compute_fast_beta()
         self.spline['z'].compute_fast_beta()
@@ -105,17 +105,75 @@ class spline_interpolator:
         if self.info['yperiodic']:
             ygrid[:] = 0
         bzi = 0
-        for p in range(points.shape[0]):
-            for o in range(len(dorder)):
-                xb = np.array([self.bx[     bxi][dorder[o][0]][k](xfrac[p])
-                               for k in range(len(self.bx[     bxi][dorder[o][0]]))]).astype(field_values.dtype)
-                yb = np.array([self.by[ygrid[p]][dorder[o][1]][k](yfrac[p])
-                               for k in range(len(self.by[ygrid[p]][dorder[o][1]]))]).astype(field_values.dtype)
-                zb = np.array([self.bz[     bzi][dorder[o][2]][k](zfrac[p])
-                               for k in range(len(self.bz[     bzi][dorder[o][2]]))]).astype(field_values.dtype)
-                #print ['{0:6}'.format(yb[k]) for k in range(2*self.n + 2)]
-                #print ['{0:6}'.format(field_points[p, 0, k, 0, 1]) for k in range(2*self.n + 2)]
-                #print ['{0:6}'.format(field_values[p, 0, k, 0, 1]) for k in range(2*self.n + 2)]
-                result[o, p] = np.einsum('kjil,i,j,k->l', field_values[p], xb, yb, zb)
+        if self.info['yperiodic']:
+            xb = np.zeros((len(dorder), points.shape[0], len(self.bx[0][dorder[0][0]])), field_values.dtype)
+            yb = np.zeros((len(dorder), points.shape[0], len(self.bx[0][dorder[0][1]])), field_values.dtype)
+            zb = np.zeros((len(dorder), points.shape[0], len(self.bx[0][dorder[0][2]])), field_values.dtype)
+            for p in range(points.shape[0]):
+                for o in range(len(dorder)):
+                    xb[o, p] = np.array([self.bx[     bxi][dorder[o][0]][k](xfrac[p])
+                                         for k in range(len(self.bx[     bxi][dorder[o][0]]))]).astype(field_values.dtype)
+                    yb[o, p] = np.array([self.by[ygrid[p]][dorder[o][1]][k](yfrac[p])
+                                         for k in range(len(self.by[ygrid[p]][dorder[o][1]]))]).astype(field_values.dtype)
+                    zb[o, p] = np.array([self.bz[     bzi][dorder[o][2]][k](zfrac[p])
+                                         for k in range(len(self.bz[     bzi][dorder[o][2]]))]).astype(field_values.dtype)
+            result = np.einsum('opkjil,opi,opj,opk->opl', field_values[None, :], xb, yb, zb)
+        else:
+            for p in range(points.shape[0]):
+                xb = np.zeros((len(dorder), len(self.bx[     bxi][dorder[0][0]])), field_values.dtype)
+                yb = np.zeros((len(dorder), len(self.bx[ygrid[p]][dorder[0][1]])), field_values.dtype)
+                zb = np.zeros((len(dorder), len(self.bx[     bxi][dorder[0][2]])), field_values.dtype)
+                for o in range(len(dorder)):
+                    xb[o] = np.array([self.bx[     bxi][dorder[o][0]][k](xfrac[p])
+                                   for k in range(len(self.bx[     bxi][dorder[o][0]]))]).astype(field_values.dtype)
+                    yb[o] = np.array([self.by[ygrid[p]][dorder[o][1]][k](yfrac[p])
+                                   for k in range(len(self.by[ygrid[p]][dorder[o][1]]))]).astype(field_values.dtype)
+                    zb[o] = np.array([self.bz[     bzi][dorder[o][2]][k](zfrac[p])
+                                   for k in range(len(self.bz[     bzi][dorder[o][2]]))]).astype(field_values.dtype)
+                    #print ['{0:6}'.format(yb[k]) for k in range(2*self.n + 2)]
+                    #print ['{0:6}'.format(field_points[p, 0, k, 0, 1]) for k in range(2*self.n + 2)]
+                    #print ['{0:6}'.format(field_values[p, 0, k, 0, 1]) for k in range(2*self.n + 2)]
+                result[:, p] = np.einsum('okjil,oi,oj,ok->ol', field_values[None, p], xb, yb, zb)
+        return result
+    def refine_grid(
+            self,
+            data = None,
+            i0 = None, i1 = None,
+            j0 = None, j1 = None,
+            k0 = None, k1 = None,
+            dorder = [(0, 0, 0)],
+            factor = 2):
+        """
+            meant to be called for regularly spaced data, otherwise results make no sense.
+        """
+        beta_vals = np.empty((len(dorder), 3, factor, len(self.bx[0][0])), dtype = data.dtype)
+        for o in range(len(dorder)):
+            for i in range(factor):
+                beta_vals[o, 0, i] = np.array([self.bx[0][dorder[o][0]][k](i*1./factor)
+                                               for k in range(len(self.bx[0][0]))])
+                beta_vals[o, 1, i] = np.array([self.bx[0][dorder[o][1]][k](i*1./factor)
+                                               for k in range(len(self.bx[0][0]))])
+                beta_vals[o, 2, i] = np.array([self.bx[0][dorder[o][2]][k](i*1./factor)
+                                               for k in range(len(self.bx[0][0]))])
+        if len(data.shape) == 3:
+            result = np.empty((len(dorder), (k1 - k0)*factor, (j1 - j0)*factor, (i1 - i0)*factor), dtype = data.dtype)
+            for cx in range(factor):
+                for cy in range(factor):
+                    for cz in range(factor):
+                        result[:, cz:result.shape[1]:factor, cy:result.shape[2]:factor, cx:result.shape[3]:factor] = sum(sum(sum(
+                                data     [None, k0+kk-self.n:k1+kk-self.n, j0+jj-self.n:j1+jj-self.n, i0+ii-self.n:i1+ii-self.n]
+                              * beta_vals[   :, 0,     None,        None,        None, cx, ii] for ii in range(len(self.bx[0][0])))
+                              * beta_vals[   :, 1,     None,        None,        None, cy, jj] for jj in range(len(self.bx[0][0])))
+                              * beta_vals[   :, 2,     None,        None,        None, cz, kk] for kk in range(len(self.bx[0][0])))
+        elif len(data.shape) == 4:
+            result = np.empty((len(dorder), (k1 - k0)*factor, (j1 - j0)*factor, (i1 - i0)*factor, 3), dtype = data.dtype)
+            for cx in range(factor):
+                for cy in range(factor):
+                    for cz in range(factor):
+                        result[:, cz:result.shape[1]:factor, cy:result.shape[2]:factor, cx:result.shape[3]:factor] = sum(sum(sum(
+                                data     [None, k0+kk-self.n:k1+kk-self.n, j0+jj-self.n:j1+jj-self.n, i0+ii-self.n:i1+ii-self.n,            :]
+                              * beta_vals[   :, 0,     None,        None,        None, cx, ii, None] for ii in range(len(self.bx[0][0])))
+                              * beta_vals[   :, 1,     None,        None,        None, cy, jj, None] for jj in range(len(self.bx[0][0])))
+                              * beta_vals[   :, 2,     None,        None,        None, cz, kk, None] for kk in range(len(self.bx[0][0])))
         return result
 
