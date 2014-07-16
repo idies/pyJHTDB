@@ -59,6 +59,8 @@ def get_big_cutout(
             (cube_dim, cube_dim, cube_dim, ncomponents),
             np.float32,
             compression = 'lzf') ### is compression a good idea?
+    # TODO: put in the data descriptors
+    # _contents, _dataset, _size and _start
     for cz in range(cube_dim/chunk_dim):
         for cy in range(cube_dim/chunk_dim):
             for cx in range(cube_dim/chunk_dim):
