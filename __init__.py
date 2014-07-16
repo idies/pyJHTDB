@@ -12,16 +12,11 @@ import platform
 class libTDB(object):
     def __init__(self,
             libname = 'libTDB',
-            libdir = '.',
-            srcdir = None,
+            srcdir = '.',
             auth_token = 'edu.jhu.pha.turbulence.testing-201302'):
         self.libname = libname
-        self.libdir = libdir
-        if srcdir == None:
-            self.srcdir = libdir
-        else:
-            self.srcdir = srcdir
-        self.lib = np.ctypeslib.load_library(libname, libdir)
+        self.srcdir = srcdir
+        self.generate_shared_library()
         self.authToken = ctypes.c_char_p(auth_token)
         self.connection_on = False
         self.hdf5_file_list = []
@@ -279,16 +274,16 @@ class libTDB(object):
                 data_set = data_set,
                 out_of_domain = out_of_domain)
         return np.concatenate((l1[::-1], l0[1:]), axis = 0)
-    def expand(self):
+    def generate_shared_library(self):
         repo_dir = os.path.dirname(inspect.getfile(libTDB))
         compile_command = ('gcc -O3 -fPIC -Wall -c '
                          + '-DCUTOUT_SUPPORT '
                          + '-I' + self.srcdir + ' ')
         for fname in [repo_dir + '/local_tools.',
-                      self.libdir + '/stdsoap2.',
-                      self.libdir + '/soapC.',
-                      self.libdir + '/soapClient.',
-                      self.libdir + '/turblib.']:
+                      self.srcdir + '/stdsoap2.',
+                      self.srcdir + '/soapC.',
+                      self.srcdir + '/soapClient.',
+                      self.srcdir + '/turblib.']:
             mtimec = os.path.getmtime(fname + 'c')
             if os.path.exists(fname + 'o'):
                 mtimeo = os.path.getmtime(fname + 'o')
@@ -302,20 +297,15 @@ class libTDB(object):
             linkcommand = 'gcc -shared '
         else:
             linkcommand = 'gcc -dynamiclib '
-        linkcommand += (self.libdir + '/stdsoap2.o '
-                      + self.libdir + '/soapC.o '
-                      + self.libdir + '/soapClient.o '
-                      + self.libdir + '/turblib.o '
+        linkcommand += (self.srcdir + '/stdsoap2.o '
+                      + self.srcdir + '/soapC.o '
+                      + self.srcdir + '/soapClient.o '
+                      + self.srcdir + '/turblib.o '
                       + repo_dir + '/local_tools.o '
-                      + '-o ' + repo_dir + '/libTDBe.so '
+                      + '-o ' + repo_dir + '/' + self.libname + '.so '
                       + '-lhdf5 ')
         os.system(linkcommand)
-        if self.connection_on:
-            self.finalize()
-            self.connection_on = True
-        self.lib = np.ctypeslib.load_library('libTDBe', repo_dir)
-        if self.connection_on:
-            self.initialize()
+        self.lib = np.ctypeslib.load_library(self.libname, repo_dir)
         return None
     def getBlineAlt(self,
             time, nsteps, ds,
