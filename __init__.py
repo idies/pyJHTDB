@@ -5,6 +5,7 @@
 import os
 import sys
 import numpy as np
+import h5py
 import ctypes
 import inspect
 import platform
@@ -20,6 +21,7 @@ class libTDB(object):
         self.authToken = ctypes.c_char_p(auth_token)
         self.connection_on = False
         self.hdf5_file_list = []
+        self.hdf5_file_desc = {}
         return None
     def initialize(self, exit_on_error = True):
         #initialize gSOAP
@@ -37,6 +39,11 @@ class libTDB(object):
     def add_hdf5_file(self, filename):
         if not filename in self.hdf5_file_list:
             self.hdf5_file_list.append(filename)
+            data = h5py.File(filename + '.h5', mode = 'r')
+            self.hdf5_file_desc[filename] = {}
+            for key in ['_contents', '_dataset', '_size', '_start']:
+                self.hdf5_file_desc[filename][key] = data[key][:]
+            data.close()
             return self.lib.turblibAddLocalSource(ctypes.c_char_p(filename + '.h5'))
         else:
             return 0
