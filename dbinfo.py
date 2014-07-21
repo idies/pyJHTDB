@@ -28,6 +28,10 @@ for coord in ['x', 'y', 'z']:
 mhd1024['time'] = np.array(range(1024), dtype = np.float32) * 2.56 / 1024
 mhd1024['nu']  = 1.1e-4
 mhd1024['eta'] = 1.1e-4
+mhd1024['diss_u'] = 1.1e-2
+mhd1024['diss_b'] = 2.2e-2
+mhd1024['dt']     = 2.5e-3
+mhd1024['T']      = 2.56
 
 channel = {'name'   : 'channel',
            'xnodes' : np.load(os.path.join(package_dir, 'data/channel_xgrid.npy')),
