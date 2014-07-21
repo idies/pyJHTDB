@@ -4,9 +4,11 @@
  *
  * */
 
+#include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <hdf5.h>
 
 #include "turblib.h"
 
@@ -311,3 +313,50 @@ int getSphericalBoundedBlineDebug(
     }
     return 0;
 }
+
+int set_custom_dataset_description(float dx, float dt, int size)
+{
+    extern set_info DataSets[8];
+    DataSets[7].dx = dx;
+    DataSets[7].dt = dt;
+    DataSets[7].size = size;
+    return 0;
+}
+
+int read_from_file(
+        char *dataset,
+        int tindex,
+        int xindex, int xsize,
+        int yindex, int ysize,
+        int zindex, int zsize,
+        float *ufield,
+        float *bfield)
+{
+    TurbDataset dataset_ = getDataSet(dataset);
+    hsize_t dim_mem[] = {zsize, ysize, xsize, 3};
+    hid_t mspace = H5Screate_simple(4, dim_mem, NULL);
+    loadSubBlock(
+            dataset_,
+            turb_velocity,
+            tindex,
+            mspace,
+            ufield,
+            xindex, yindex, zindex,
+            xsize,
+            ysize,
+            zsize,
+            0, 0, 0);
+    loadSubBlock(
+            dataset_,
+            turb_magnetic,
+            tindex,
+            mspace,
+            bfield,
+            xindex, yindex, zindex,
+            xsize,
+            ysize,
+            zsize,
+            0, 0, 0);
+    return 0;
+}
+

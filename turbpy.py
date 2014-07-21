@@ -47,7 +47,7 @@ def turbc_clone(N=10):
    
     # load shared library
     lTDB = pyJHTDB.libTDB(libname = 'libTDB',
-                          libdir = homefolder + '/ext_installs/turblib')
+                          srcdir = homefolder + '/ext_installs/turblib')
     #initialize webservices
     lTDB.initialize()
 
