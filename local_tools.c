@@ -314,6 +314,15 @@ int getSphericalBoundedBlineDebug(
     return 0;
 }
 
+int set_custom_dataset_description(float dx, float dt, int size)
+{
+    extern set_info DataSets[8];
+    DataSets[7].dx = dx;
+    DataSets[7].dt = dt;
+    DataSets[7].size = size;
+    return 0;
+}
+
 int read_from_file(
         char *dataset,
         int tindex,
