@@ -128,6 +128,40 @@ class libTDB(object):
                  point_coords.ctypes.data_as(ctypes.POINTER(ctypes.POINTER(ctypes.c_float))),
                  result_array.ctypes.data_as(ctypes.POINTER(ctypes.POINTER(ctypes.c_float))))
         return result_array
+    def getBoxFilter(self,
+            time, point_coords,
+            data_set = 'isotropic1024coarse',
+            make_modulo = False,
+            field = 'velocity',
+            filter_width = 7*2*np.pi / 1024):
+        if not self.connection_on:
+            print('you didn\'t connect to the database')
+            sys.exit()
+        if not (point_coords.shape[-1] == 3):
+            print ('wrong number of values for coordinates in getBoxFilter')
+            sys.exit()
+            return None
+        if not (point_coords.dtype == np.float32):
+            print 'point coordinates in getBoxFilter must be floats. stopping.'
+            sys.exit()
+            return None
+        npoints = point_coords.shape[0]
+        for i in range(1, len(point_coords.shape)-1):
+            npoints *= point_coords.shape[i]
+        if make_modulo:
+            pcoords = np.zeros(point_coords.shape, np.float64)
+            pcoords[:] = point_coords
+            np.mod(pcoords, 2*np.pi, point_coords)
+        result_array = point_coords.copy()
+        self.lib.getBoxFilter(self.authToken,
+                 ctypes.c_char_p(data_set),
+                 ctypes.c_char_p(field),
+                 ctypes.c_float(time),
+                 ctypes.c_float(filter_width),
+                 ctypes.c_int(npoints),
+                 point_coords.ctypes.data_as(ctypes.POINTER(ctypes.POINTER(ctypes.c_float))),
+                 result_array.ctypes.data_as(ctypes.POINTER(ctypes.POINTER(ctypes.c_float))))
+        return result_array
     def getPosition(self,
             starttime = 0.0,
             endtime = 0.1,
@@ -150,10 +184,13 @@ class libTDB(object):
         time_array = np.empty((steps_to_keep+1), dtype = np.float32)
         integration_time = (endtime - starttime) / steps_to_keep
         time_array[0] = starttime
+        evolver = self.lib.getPosition
+        if data_set == 'custom':
+            evolver = self.lib.getCustomPosition
         for tstep in range(1, steps_to_keep + 1):
             print 'at time step {0} out of {1}'.format(tstep, steps_to_keep)
             pcoords = traj_array[tstep - 1].copy()
-            self.lib.getPosition(
+            evolver(
                     self.authToken,
                     ctypes.c_char_p(data_set),
                     ctypes.c_float(starttime + (tstep - 1)*integration_time),
@@ -162,6 +199,7 @@ class libTDB(object):
                     ctypes.c_int(sinterp), ctypes.c_int(npoints),
                     pcoords.ctypes.data_as(ctypes.POINTER(ctypes.POINTER(ctypes.c_float))),
                     result_array.ctypes.data_as(ctypes.POINTER(ctypes.POINTER(ctypes.c_float))))
+            print 'got next position for time step {0}'.format(tstep)
             traj_array[tstep] = result_array
             time_array[tstep] = starttime + tstep * integration_time
         return traj_array, time_array
