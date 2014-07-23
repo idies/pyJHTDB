@@ -101,6 +101,7 @@ int getRectangularBoundedBline(
     //loop after particles
     for (p = 0; p < count; p++)
     {
+//        fprintf(stderr, "hello %d %g\n", p, time);
         // x is at the start of the current trajectory
         x = traj + p*(maxsteps+1);
         for (s = 1; s <= maxsteps; s++)
@@ -357,6 +358,53 @@ int read_from_file(
             ysize,
             zsize,
             0, 0, 0);
+    return 0;
+}
+
+int getCustomPosition(
+        char *authToken,
+        char *dataset,
+        float startTime,
+        float endTime,
+        float dt,
+        enum SpatialInterpolation spatial,
+        int count,
+        float datain[][3],
+        float dataout[][3])
+{
+    TurbDataset dataset_ = getDataSet(dataset);
+    extern set_info DataSets[8];
+    float vel0[count][3], time0;
+    float vel1[count][3];
+    float vel[count][3];
+    float time, deltat;
+    int p, tcounter, nsteps;
+    deltat = DataSets[dataset_].dt;
+    nsteps = ceil((endTime - startTime) / dt);
+    dt = (endTime - startTime) / nsteps;
+    for (p = 0; p < count; p++)
+    {
+        dataout[p][0] = datain[p][0];
+        dataout[p][1] = datain[p][1];
+        dataout[p][2] = datain[p][2];
+    }
+    time = startTime;
+    for (tcounter = 0; tcounter < nsteps; tcounter++)
+    {
+        time0 = deltat * floor(time / deltat);
+        getVelocity(authToken, dataset, time         , spatial, 0, count, datain, vel0);
+        getVelocity(authToken, dataset, time + deltat, spatial, 0, count, datain, vel1);
+        for (p = 0; p < count; p++)
+        {
+            vel[p][0] = ((time - time0) / deltat) * (vel1[p][0] - vel0[p][0]) + vel0[p][0];
+            vel[p][1] = ((time - time0) / deltat) * (vel1[p][1] - vel0[p][1]) + vel0[p][1];
+            vel[p][2] = ((time - time0) / deltat) * (vel1[p][2] - vel0[p][2]) + vel0[p][2];
+            dataout[p][0] = dataout[p][0] + dt * vel[p][0];
+            dataout[p][1] = dataout[p][1] + dt * vel[p][1];
+            dataout[p][2] = dataout[p][2] + dt * vel[p][2];
+        }
+        time += dt;
+    }
     return 0;
 }
 
