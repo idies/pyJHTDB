@@ -6,6 +6,7 @@ import gzip
 import pyJHTDB
 import pyJHTDB.generic_splines as gs
 
+from scipy.ndimage.filters import correlate1d
 
 class spline_interpolator:
     def __init__(
@@ -170,10 +171,22 @@ class spline_interpolator:
             for cx in range(factor):
                 for cy in range(factor):
                     for cz in range(factor):
-                        result[:, cz:result.shape[1]:factor, cy:result.shape[2]:factor, cx:result.shape[3]:factor] = sum(sum(sum(
-                                data     [None, k0+kk-self.n:k1+kk-self.n, j0+jj-self.n:j1+jj-self.n, i0+ii-self.n:i1+ii-self.n,            :]
-                              * beta_vals[   :, 0,     None,        None,        None, cx, ii, None] for ii in range(len(self.bx[0][0])))
-                              * beta_vals[   :, 1,     None,        None,        None, cy, jj, None] for jj in range(len(self.bx[0][0])))
-                              * beta_vals[   :, 2,     None,        None,        None, cz, kk, None] for kk in range(len(self.bx[0][0])))
+                        for coord in range(3):
+                            for o in range(len(dorder)):
+                                tmp = correlate1d(data[:, :, :, coord], np.array(beta_vals[o, 0, cx, :]), axis = 2)
+                                tmp = correlate1d(                 tmp, np.array(beta_vals[o, 1, cy, :]), axis = 1)
+                                tmp = correlate1d(                 tmp, np.array(beta_vals[o, 2, cz, :]), axis = 0)
+                                result[ o,
+                                        cz:result.shape[1]:factor,
+                                        cy:result.shape[2]:factor,
+                                        cx:result.shape[3]:factor,
+                                        coord] = tmp[self.n:result.shape[1]+self.n,
+                                                     self.n:result.shape[2]+self.n,
+                                                     self.n:result.shape[3]+self.n]
+                        #result[:, cz:result.shape[1]:factor, cy:result.shape[2]:factor, cx:result.shape[3]:factor] = sum(sum(sum(
+                        #        data     [None, k0+kk-self.n:k1+kk-self.n, j0+jj-self.n:j1+jj-self.n, i0+ii-self.n:i1+ii-self.n,            :]
+                        #      * beta_vals[   :, 0,     None,        None,        None, cx, ii, None] for ii in range(len(self.bx[0][0])))
+                        #      * beta_vals[   :, 1,     None,        None,        None, cy, jj, None] for jj in range(len(self.bx[0][0])))
+                        #      * beta_vals[   :, 2,     None,        None,        None, cz, kk, None] for kk in range(len(self.bx[0][0])))
         return result
 
