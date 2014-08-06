@@ -10,6 +10,12 @@ import ctypes
 import inspect
 import platform
 
+class ThresholdInfo(ctypes.Structure):
+    _fields_ = [('x', ctypes.c_int),
+                ('y', ctypes.c_int),
+                ('z', ctypes.c_int),
+                ('value', ctypes.c_float)]
+
 class libTDB(object):
     def __init__(self,
             libname = 'libTDB',
@@ -162,6 +168,44 @@ class libTDB(object):
                  point_coords.ctypes.data_as(ctypes.POINTER(ctypes.POINTER(ctypes.c_float))),
                  result_array.ctypes.data_as(ctypes.POINTER(ctypes.POINTER(ctypes.c_float))))
         return result_array
+    def getThreshold(
+            self,
+            data_set = 'isotropic1024coarse',
+            field = 'vorticity',
+            time = 0.1,
+            threshold = 0.0,
+            cx = 0, cy = 0, cz = 0,
+            nx = 4, ny = 4, nz = 4,
+            sinterp = 40,
+            tinterp = 0):
+        result = ctypes.POINTER(ThresholdInfo)()
+        result_size = ctypes.c_int()
+        call_result = self.lib.getThreshold(
+                self.authToken,
+                ctypes.c_char_p(data_set),
+                ctypes.c_char_p(field),
+                ctypes.c_float(time),
+                ctypes.c_float(threshold),
+                ctypes.c_int32(sinterp),
+                ctypes.c_int32(cx),
+                ctypes.c_int32(cy),
+                ctypes.c_int32(cz),
+                ctypes.c_int32(nx),
+                ctypes.c_int32(ny),
+                ctypes.c_int32(nz),
+                ctypes.byref(result),
+                ctypes.byref(result_size))
+        data_type = np.dtype([('x', np.int32),
+                              ('y', np.int32),
+                              ('z', np.int32),
+                              ('value', np.float32)])
+        data = np.empty((result_size.value,), data_type)
+        for i in range(result_size.value):
+            data[i]['x'] = result[i].x
+            data[i]['y'] = result[i].y
+            data[i]['z'] = result[i].z
+            data[i]['value'] = result[i].value
+        return data
     def getPosition(self,
             starttime = 0.0,
             endtime = 0.1,
