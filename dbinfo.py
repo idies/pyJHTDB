@@ -12,6 +12,7 @@ for coord in ['x', 'y', 'z']:
     isotropic1024coarse['d' + coord] = np.pi/512
     isotropic1024coarse[coord + 'periodic'] = True
     isotropic1024coarse[coord + 'uniform'] = True
+isotropic1024coarse['time'] = np.array(range(1024), dtype = np.float32) * 2.048 / 1024
 
 mhd1024 = {}
 for key in isotropic1024coarse.keys():

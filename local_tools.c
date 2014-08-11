@@ -15,6 +15,12 @@
 // relative error of single precision numbers
 float float_error = 1e-6;
 
+int free_threshold_array(ThresholdInfo *data)
+{
+    free(data);
+    return 0;
+}
+
 int getBline(
         char *authToken,
         char *dataset,
@@ -104,7 +110,10 @@ int getRectangularBoundedBline(
 //        fprintf(stderr, "hello %d %g\n", p, time);
         // x is at the start of the current trajectory
         x = traj + p*(maxsteps+1);
-        for (s = 1; s <= maxsteps; s++)
+        for (s = 1;
+             (s <= maxsteps) && !(((*x)[0] < xmin || (*x)[0] > xmax)
+                               || ((*x)[1] < ymin || (*x)[1] > ymax)
+                               || ((*x)[2] < zmin || (*x)[2] > zmax)); s++)
         {
             // get bhat0 and compute y
             getMagneticField(authToken, dataset, time, spatial, temporal, 1, x, bfield0);
@@ -129,10 +138,6 @@ int getRectangularBoundedBline(
             x[1][1] = x[0][1] + .5*ds*(bfield0[0][1] + bfield1[0][1]);
             x[1][2] = x[0][2] + .5*ds*(bfield0[0][2] + bfield1[0][2]);
             x += 1;
-            if (((*x)[0] < xmin || (*x)[0] > xmax)
-             || ((*x)[1] < ymin || (*x)[1] > ymax)
-             || ((*x)[2] < zmin || (*x)[2] > zmax))
-                break;
         }
         traj_length[p] = s;
     }
