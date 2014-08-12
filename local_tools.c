@@ -413,3 +413,65 @@ int getCustomPosition(
     return 0;
 }
 
+int getFilteredPosition(
+        char *authToken,
+        char *dataset,
+        float startTime,
+        float endTime,
+        float dt,
+        float filterwidth,
+        int count,
+        float datain[][3],
+        float dataout[][3])
+{
+    float vel0[count][3], vel1[count][3];
+    float y[count][3];
+    float time, deltat;
+    int p, tcounter, nsteps;
+    nsteps = ceil((endTime - startTime) / dt);
+    dt = (endTime - startTime) / nsteps;
+    fprintf(stderr, "hello\n");
+    for (p = 0; p < count; p++)
+    {
+        dataout[p][0] = datain[p][0];
+        dataout[p][1] = datain[p][1];
+        dataout[p][2] = datain[p][2];
+    }
+    time = startTime;
+    for (tcounter = 0; tcounter < nsteps; tcounter++)
+    {
+        getBoxFilter(
+                authToken,
+                dataset,
+                "velocity",
+                time,
+                filterwidth,
+                count,
+                dataout,
+                vel0);
+        for (p = 0; p < count; p++)
+        {
+            y[p][0] = dataout[p][0] + dt * vel0[p][0];
+            y[p][1] = dataout[p][1] + dt * vel0[p][1];
+            y[p][2] = dataout[p][2] + dt * vel0[p][2];
+        }
+        time += dt;
+        getBoxFilter(
+                authToken,
+                dataset,
+                "velocity",
+                time,
+                filterwidth,
+                count,
+                y,
+                vel1);
+        for (p = 0; p < count; p++)
+        {
+            dataout[p][0] = dataout[p][0] + dt * .5 * (vel0[p][0] + vel1[p][0]);
+            dataout[p][1] = dataout[p][1] + dt * .5 * (vel0[p][1] + vel1[p][1]);
+            dataout[p][2] = dataout[p][2] + dt * .5 * (vel0[p][2] + vel1[p][2]);
+        }
+    }
+    return 0;
+}
+
