@@ -107,7 +107,6 @@ int getRectangularBoundedBline(
     //loop after particles
     for (p = 0; p < count; p++)
     {
-//        fprintf(stderr, "hello %d %g\n", p, time);
         // x is at the start of the current trajectory
         x = traj + p*(maxsteps+1);
         for (s = 1;
@@ -430,7 +429,6 @@ int getFilteredPosition(
     int p, tcounter, nsteps;
     nsteps = ceil((endTime - startTime) / dt);
     dt = (endTime - startTime) / nsteps;
-    fprintf(stderr, "hello\n");
     for (p = 0; p < count; p++)
     {
         dataout[p][0] = datain[p][0];
