@@ -473,3 +473,23 @@ int getFilteredPosition(
     return 0;
 }
 
+int isBLocal(
+        const char *data_set,
+        int x,
+        int y,
+        int z,
+        int time)
+{
+    TurbDataset d = getDataSet(data_set);
+    return isDataComplete(
+            d,
+            2,
+            x - 16,
+            y - 16,
+            z - 16,
+            32,
+            32,
+            32,
+            time);
+}
+
