@@ -481,6 +481,7 @@ int isBLocal(
         int time)
 {
     TurbDataset d = getDataSet(data_set);
+    fprintf(stderr, "%d %d %d %d\n", time, x, y, z);
     return isDataComplete(
             d,
             2,

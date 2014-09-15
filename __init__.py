@@ -231,6 +231,7 @@ class libTDB(object):
         evolver = self.lib.getPosition
         if data_set == 'custom':
             evolver = self.lib.getCustomPosition
+        print 'starting integration loop, dataset is ', data_set
         for tstep in range(1, steps_to_keep + 1):
             print 'at time step {0} out of {1}'.format(tstep, steps_to_keep)
             pcoords = traj_array[tstep - 1].copy()
