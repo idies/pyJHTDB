@@ -6,9 +6,9 @@ import h5py
 def get_cutout(
         filename = 'tst',
         t0 = 0, tl = 1,
-        x0 = 0, xl = 32,
-        y0 = 0, yl = 32,
-        z0 = 0, zl = 32,
+        x0 = 0, xl = 16,
+        y0 = 0, yl = 16,
+        z0 = 0, zl = 16,
         data_set = 'isotropic1024coarse',
         data_type = 'u',
         auth_token = 'edu.jhu.pha.turbulence.testing-201302',
@@ -91,6 +91,8 @@ def get_big_cutout(
             new_file['_contents'].shape,
             new_file['_contents'].dtype)
     big_data_file['_contents'][:] = new_file['_contents'][:]
+    if data_type == 'ub':
+        big_data_file['_contents'][0] = 5
     big_data_file.create_dataset(
             '_dataset',
             new_file['_dataset'].shape,
@@ -118,11 +120,13 @@ def get_big_cutout(
 
 def main():
     # dumb test
-    get_cutout(filename = 'tst0')
-    get_big_cutout(filename = 'tst1')
-    f0 = h5py.File('tst0.h5', mode='r')
-    f1 = h5py.File('tst1.h5', mode='r')
-    print np.abs(f0['u00000'][:] - f1['u00000'][:]).max()
+    for data_type in ['u', 'b', 'ub']:
+        get_cutout(
+            data_set = 'mhd1024',
+            data_type = data_type)
+        f0 = h5py.File('tst.h5', mode='r')
+        print(data_type, f0['_contents'][:])
+        f0.close()
     return None
 
 if __name__ == '__main__':
