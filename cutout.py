@@ -39,46 +39,81 @@ def get_cutout(
 
 def get_big_cutout(
         filename = 'tst',
-        time = 0,
-        cube_dim = 32,
+        t0 = 0, tl = 1,
+        x0 = 0, xl = 32,
+        y0 = 0, yl = 32,
+        z0 = 0, zl = 32,
         chunk_dim = 16,
         data_set = 'isotropic1024coarse',
         data_type = 'u',
         auth_token = 'edu.jhu.pha.turbulence.testing-201302',
         base_website = 'turbulence.pha.jhu.edu'):
-    if cube_dim % chunk_dim != 0:
-        print 'in get_big_cutout, cube_dim must be a multiple of chunk_dim'
+    if ((xl % chunk_dim != 0) or
+        (yl % chunk_dim != 0) or
+        (zl % chunk_dim != 0)):
+        print 'in get_big_cutout, each dimension except time must be a multiple of chunk_dim'
         return None
-    if data_type in ['u', 'b', 'a']:
-        ncomponents = 3
-    elif data_type in ['p']:
-        ncomponents = 1
     big_data_file = h5py.File(filename + '.h5', mode='w')
-    big_cube = big_data_file.create_dataset(
-            data_type + '{0:0>5}'.format(time*10),
-            (cube_dim, cube_dim, cube_dim, ncomponents),
-            np.float32,
-            compression = 'lzf') ### is compression a good idea?
-    # TODO: put in the data descriptors
-    # _contents, _dataset, _size and _start
-    for cz in range(cube_dim/chunk_dim):
-        for cy in range(cube_dim/chunk_dim):
-            for cx in range(cube_dim/chunk_dim):
-                if not os.path.exists(filename + '_{0:0>2x}{1:0>2x}{2:0>2x}.h5'.format(cz, cy, cx)):
-                    get_cutout(
-                            filename + '_{0:0>2x}{1:0>2x}{2:0>2x}'.format(cz, cy, cx),
-                            t0 = time, tl = 1,
-                            x0 = cx*chunk_dim, y0 = cy*chunk_dim, z0 = cz*chunk_dim,
-                            xl = chunk_dim, yl = chunk_dim, zl = chunk_dim,
-                            data_set = data_set,
-                            data_type = data_type,
-                            auth_token = auth_token,
-                            base_website = base_website)
-                new_file = h5py.File(filename + '_{0:0>2x}{1:0>2x}{2:0>2x}.h5'.format(cz, cy, cx), mode='r')
-                new_data = new_file[data_type + '{0:0>5}'.format(time*10)]
-                big_cube[cz*chunk_dim:(cz+1)*chunk_dim,
-                         cy*chunk_dim:(cy+1)*chunk_dim,
-                         cx*chunk_dim:(cx+1)*chunk_dim, :] = new_data
+    for current_data_type in data_type:
+        if current_data_type in ['u', 'b', 'a']:
+            ncomponents = 3
+        elif current_data_type in ['p']:
+            ncomponents = 1
+        big_data = []
+        for time in range(t0, t0 + tl):
+            big_data.append(big_data_file.create_dataset(
+                    current_data_type + '{0:0>5}'.format(time*10),
+                    (zl, yl, xl, ncomponents),
+                    np.float32,
+                    compression = 'lzf')) ### is compression a good idea?
+        for cz in range(zl/chunk_dim):
+            for cy in range(yl/chunk_dim):
+                for cx in range(xl/chunk_dim):
+                    for time in range(t0, t0 + tl):
+                        tmp_filename = filename + '_{0:0>2x}{1:0>2x}{2:0>2x}_{3}'.format(cz, cy, cx, current_data_type)
+                        if not os.path.exists(tmp_filename + '.h5'):
+                            get_cutout(
+                                    tmp_filename,
+                                    t0 = time, tl = tl,
+                                    x0 = cx*chunk_dim, y0 = cy*chunk_dim, z0 = cz*chunk_dim,
+                                    xl = chunk_dim, yl = chunk_dim, zl = chunk_dim,
+                                    data_set = data_set,
+                                    data_type = current_data_type,
+                                    auth_token = auth_token,
+                                    base_website = base_website)
+                        new_file = h5py.File(tmp_filename + '.h5', mode='r')
+                        new_data = new_file[current_data_type + '{0:0>5}'.format(time*10)]
+                        big_data[time - t0][cz*chunk_dim:(cz+1)*chunk_dim,
+                                            cy*chunk_dim:(cy+1)*chunk_dim,
+                                            cx*chunk_dim:(cx+1)*chunk_dim, :] = new_data
+    big_data_file.create_dataset(
+            '_contents',
+            new_file['_contents'].shape,
+            new_file['_contents'].dtype)
+    big_data_file['_contents'][:] = new_file['_contents'][:]
+    big_data_file.create_dataset(
+            '_dataset',
+            new_file['_dataset'].shape,
+            new_file['_dataset'].dtype)
+    big_data_file['_dataset'][:] = new_file['_dataset'][:]
+    big_data_file.create_dataset(
+            '_size',
+            new_file['_size'].shape,
+            new_file['_size'].dtype)
+    big_data_file['_size'][0] = new_file['_size'][0]
+    big_data_file['_size'][1] = xl
+    big_data_file['_size'][2] = yl
+    big_data_file['_size'][3] = zl
+    big_data_file.create_dataset(
+            '_start',
+            new_file['_start'].shape,
+            new_file['_start'].dtype)
+    big_data_file['_start'][0] = new_file['_start'][0]
+    big_data_file['_start'][1] = x0
+    big_data_file['_start'][2] = y0
+    big_data_file['_start'][3] = z0
+    new_file.close()
+    big_data_file.close()
     return None
 
 def main():
