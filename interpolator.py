@@ -151,7 +151,7 @@ class spline_interpolator:
         for o in range(len(dorder)):
             for i in range(factor):
                 beta_vals[o, 0, i] = np.array([self.bx[0][dorder[o][0]][k](i*1./factor)
-                                               for k in range(len(self.bx[0][0]))])                             
+                                               for k in range(len(self.bx[0][0]))])
                 beta_vals[o, 1, i] = np.array([self.bx[0][dorder[o][1]][k](i*1./factor)
                                                for k in range(len(self.bx[0][0]))])
                 beta_vals[o, 2, i] = np.array([self.bx[0][dorder[o][2]][k](i*1./factor)
