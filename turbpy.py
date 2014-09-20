@@ -25,7 +25,7 @@ import pyJHTDB.dbinfo
 
 def turbc_clone(N=10):
     #time = 0.364
-    #turbc.c has a fixed time, but it makes more sense to have a random one 
+    #turbc.c has a fixed time, but it makes more sense to have a random one
     time = 0.002 * numpy.random.randint(1024)
     # points must be created with the single precision data type
     points = numpy.empty((N, 3), dtype = 'float32')
@@ -44,7 +44,7 @@ def turbc_clone(N=10):
     for p in range(N):
         print p, points[p]
     print 'Data is requested at time {0}'.format(time)
-   
+
     # load shared library
     lTDB = pyJHTDB.libTDB(libname = 'libTDB',
                           srcdir = homefolder + '/ext_installs/turblib')
@@ -239,9 +239,9 @@ def contour_check(
     planes[0][:, :, :, 2] = info['znodes'][         numpy.newaxis, numpy.newaxis,             :]
     #planes[1][:, :, :, 0] = info['dx']*numpy.arange(.0, info['nx'], 1)
     #planes[1][:, :, :, 1] = info['dy']*numpy.random.randint(0, info['ny'], size = (nplanes))[:, numpy.newaxis, numpy.newaxis]
-    #planes[1][:, :, :, 2] = info['dz']*numpy.arange(.0, info['nz'], 1)                                       
-    #planes[2][:, :, :, 0] = info['dx']*numpy.arange(.0, info['nx'], 1)                                       
-    #planes[2][:, :, :, 1] = info['dy']*numpy.arange(.0, info['ny'], 1)                                       
+    #planes[1][:, :, :, 2] = info['dz']*numpy.arange(.0, info['nz'], 1)
+    #planes[2][:, :, :, 0] = info['dx']*numpy.arange(.0, info['nx'], 1)
+    #planes[2][:, :, :, 1] = info['dy']*numpy.arange(.0, info['ny'], 1)
     #planes[2][:, :, :, 2] = info['dz']*numpy.random.randint(0, info['nz'], size = (nplanes))[:, numpy.newaxis, numpy.newaxis]
     coordname = ['yz', 'zx', 'xy']
     for i in range(1):
@@ -266,7 +266,7 @@ def main():
     spectra_check(libTDB = lTDB)
     contour_check(libTDB = lTDB,
                   info = pyJHTDB.dbinfo.channel)
-    
+
     #finalize webservices
     lTDB.finalize()
     return None

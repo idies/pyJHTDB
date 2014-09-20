@@ -96,7 +96,7 @@ class generic_spline_1D:
     def put_yvals(self, yvals):
         self.y = yvals.copy()
         if self.periodic:
-            prev_y = self.y[-self.n:] 
+            prev_y = self.y[-self.n:]
             post_y = self.y[: self.n+1]
             shape_list = [self.y.shape[0] + self.n + post_y.shape[0]]
             for i in range(1, len(self.y.shape)):

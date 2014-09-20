@@ -1,4 +1,4 @@
-/*  
+/*
  *  These subroutines are meant to be called from a pyJHTDB.libTDB object.
  *  You're on your own otherwise.
  *
@@ -95,7 +95,7 @@ int getRectangularBoundedBline(
 	float y[1][3];
 	float bfield0[1][3];
 	float bfield1[1][3];
-   
+
     // keep a little way away from the actual edge...
     xmin *= 1 + (xmin > 0 ? -1 : +1)*float_error;
     ymin *= 1 + (ymin > 0 ? -1 : +1)*float_error;

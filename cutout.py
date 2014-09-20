@@ -56,8 +56,8 @@ def get_big_cutout(
         print 'in get_big_cutout, each dimension except time must be a multiple of chunk_dim'
         return None
     big_data_file = h5py.File(filename + '.h5', mode='w')
-    
-     
+
+
     for current_data_type in data_type:
         if current_data_type in ['u', 'b', 'a']:
             ncomponents = 3
