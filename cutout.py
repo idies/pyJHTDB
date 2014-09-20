@@ -43,17 +43,21 @@ def get_big_cutout(
         x0 = 0, xl = 32,
         y0 = 0, yl = 32,
         z0 = 0, zl = 32,
-        chunk_dim = 16,
+        chunk_xdim = 16,
+        chunk_ydim = 16,
+        chunk_zdim = 16,
         data_set = 'isotropic1024coarse',
         data_type = 'u',
         auth_token = 'edu.jhu.pha.turbulence.testing-201302',
         base_website = 'turbulence.pha.jhu.edu'):
-    if ((xl % chunk_dim != 0) or
-        (yl % chunk_dim != 0) or
-        (zl % chunk_dim != 0)):
+    if ((xl % chunk_xdim != 0) or
+        (yl % chunk_ydim != 0) or
+        (zl % chunk_zdim != 0)):
         print 'in get_big_cutout, each dimension except time must be a multiple of chunk_dim'
         return None
     big_data_file = h5py.File(filename + '.h5', mode='w')
+    
+     
     for current_data_type in data_type:
         if current_data_type in ['u', 'b', 'a']:
             ncomponents = 3
@@ -66,26 +70,26 @@ def get_big_cutout(
                     (zl, yl, xl, ncomponents),
                     np.float32,
                     compression = 'lzf')) ### is compression a good idea?
-        for cz in range(zl/chunk_dim):
-            for cy in range(yl/chunk_dim):
-                for cx in range(xl/chunk_dim):
+        for cz in range(zl/chunk_zdim):
+            for cy in range(yl/chunk_ydim):
+                for cx in range(xl/chunk_xdim):
                     for time in range(t0, t0 + tl):
                         tmp_filename = filename + '_{0:0>2x}{1:0>2x}{2:0>2x}_{3}'.format(cz, cy, cx, current_data_type)
                         if not os.path.exists(tmp_filename + '.h5'):
                             get_cutout(
                                     tmp_filename,
                                     t0 = time, tl = tl,
-                                    x0 = cx*chunk_dim, y0 = cy*chunk_dim, z0 = cz*chunk_dim,
-                                    xl = chunk_dim, yl = chunk_dim, zl = chunk_dim,
+                                    x0 = x0+cx*chunk_xdim, y0 = y0+cy*chunk_ydim, z0 = z0+cz*chunk_zdim,
+                                    xl = chunk_xdim, yl = chunk_ydim, zl = chunk_zdim,
                                     data_set = data_set,
                                     data_type = current_data_type,
                                     auth_token = auth_token,
                                     base_website = base_website)
                         new_file = h5py.File(tmp_filename + '.h5', mode='r')
                         new_data = new_file[current_data_type + '{0:0>5}'.format(time*10)]
-                        big_data[time - t0][cz*chunk_dim:(cz+1)*chunk_dim,
-                                            cy*chunk_dim:(cy+1)*chunk_dim,
-                                            cx*chunk_dim:(cx+1)*chunk_dim, :] = new_data
+                        big_data[time - t0][cz*chunk_zdim:(cz+1)*chunk_zdim,
+                                            cy*chunk_ydim:(cy+1)*chunk_ydim,
+                                            cx*chunk_xdim:(cx+1)*chunk_xdim, :] = new_data
     big_data_file.create_dataset(
             '_contents',
             new_file['_contents'].shape,

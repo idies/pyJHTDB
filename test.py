@@ -30,10 +30,13 @@ def clean_2D_field(
 def main():
     pyJHTDB.cutout.get_big_cutout(
             t0 = 0, tl = 2,
-            x0 = 0, xl = 48,
-            y0 = 0, yl = 16,
-            z0 = 0, zl = 32,
-            chunk_dim = 16,
+            x0 = 243, xl = 32,
+            y0 = 48, yl = 30,
+            z0 = 48, zl = 26,
+            chunk_xdim = 16,
+            chunk_ydim = 15,
+            chunk_zdim = 13,
+            data_set = 'mhd1024',
             data_type = 'ub',
             filename = 'tmp',
             base_website = 'turbulence.pha.jhu.edu')
