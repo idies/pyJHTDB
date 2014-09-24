@@ -285,7 +285,6 @@ class libTDB(object):
                     ctypes.c_int(npoints),
                     pcoords.ctypes.data_as(ctypes.POINTER(ctypes.POINTER(ctypes.c_float))),
                     result_array.ctypes.data_as(ctypes.POINTER(ctypes.POINTER(ctypes.c_float))))
-            print 'got next position for time step {0}'.format(tstep)
             traj_array[tstep] = result_array
             time_array[tstep] = starttime + tstep * integration_time
         return traj_array, time_array
