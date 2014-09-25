@@ -20,17 +20,17 @@ def unpart1by2(z):
 
 def grid3D_to_zindex(x):
     """return the corresponding Morton z-indices for an array of 3D indices
-       
+
        :param x: input indices
        :type x: numpy array of integers, of shape (3, whatever),
           where n is the number of points
-       :returns: z, array of integers, of shape (whatever) 
+       :returns: z, array of integers, of shape (whatever)
     """
     return part1by2(x[0]) | (part1by2(x[1]) << 1) | (part1by2(x[2]) << 2)
 
 def zindex_to_grid3D(z):
     """return the 3D indices corresponding to an array of Morton z-indices
-       
+
        :param z: input indices
        :type z: numpy array of integers, of shape (whatever),
           where n is the number of points

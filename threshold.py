@@ -76,7 +76,7 @@ class plotter(HasTraits):
     xaxis = Instance(HasTraits)
     yaxis = Instance(HasTraits)
     zaxis = Instance(HasTraits)
-    
+
     # The vectors
     vectors = Instance(HasTraits)
 

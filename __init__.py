@@ -231,6 +231,7 @@ class libTDB(object):
         evolver = self.lib.getPosition
         if data_set == 'custom':
             evolver = self.lib.getCustomPosition
+        print 'starting integration loop, dataset is ', data_set
         for tstep in range(1, steps_to_keep + 1):
             print 'at time step {0} out of {1}'.format(tstep, steps_to_keep)
             pcoords = traj_array[tstep - 1].copy()
@@ -244,6 +245,46 @@ class libTDB(object):
                     pcoords.ctypes.data_as(ctypes.POINTER(ctypes.POINTER(ctypes.c_float))),
                     result_array.ctypes.data_as(ctypes.POINTER(ctypes.POINTER(ctypes.c_float))))
             print 'got next position for time step {0}'.format(tstep)
+            traj_array[tstep] = result_array
+            time_array[tstep] = starttime + tstep * integration_time
+        return traj_array, time_array
+    def getFilteredPosition(self,
+            starttime = 0.0,
+            endtime = 0.1,
+            dt = 0.0004,
+            filterwidth = (2*np.pi / 1024) * 5,
+            point_coords = None,
+            sinterp = 4,
+            steps_to_keep = 1,
+            data_set = 'isotropic1024coarse'):
+        if not self.connection_on:
+            print('you didn\'t connect to the database')
+            sys.exit()
+        if not (point_coords.shape[-1] == 3):
+            print ('wrong number of values for coordinates in getPosition')
+            sys.exit()
+            return None
+        npoints = point_coords.shape[0]
+        result_array = np.empty((npoints, 3), dtype=np.float32)
+        traj_array = np.empty((steps_to_keep+1, npoints, 3), dtype = np.float32)
+        traj_array[0] = point_coords
+        time_array = np.empty((steps_to_keep+1), dtype = np.float32)
+        integration_time = (endtime - starttime) / steps_to_keep
+        time_array[0] = starttime
+        evolver = self.lib.getFilteredPosition
+        for tstep in range(1, steps_to_keep + 1):
+            print 'at time step {0} out of {1}'.format(tstep, steps_to_keep)
+            pcoords = traj_array[tstep - 1].copy()
+            evolver(
+                    self.authToken,
+                    ctypes.c_char_p(data_set),
+                    ctypes.c_float(starttime + (tstep - 1)*integration_time),
+                    ctypes.c_float(starttime +  tstep     *integration_time),
+                    ctypes.c_float(dt),
+                    ctypes.c_float(filterwidth),
+                    ctypes.c_int(npoints),
+                    pcoords.ctypes.data_as(ctypes.POINTER(ctypes.POINTER(ctypes.c_float))),
+                    result_array.ctypes.data_as(ctypes.POINTER(ctypes.POINTER(ctypes.c_float))))
             traj_array[tstep] = result_array
             time_array[tstep] = starttime + tstep * integration_time
         return traj_array, time_array
