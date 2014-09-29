@@ -225,8 +225,7 @@ class libTDB(object):
         result_array = np.empty((npoints, 3), dtype=np.float32)
         traj_array = np.empty((steps_to_keep+1, npoints, 3), dtype = np.float32)
         traj_array[0] = point_coords
-        time_array = np.empty((steps_to_keep+1), dtype = np.float32)
-        integration_time = (endtime - starttime) / steps_to_keep
+        time_array = np.linspace(starttime, endtime, steps_to_keep+1).astype(np.float32)
         time_array[0] = starttime
         evolver = self.lib.getPosition
         if data_set == 'custom':
@@ -238,15 +237,14 @@ class libTDB(object):
             evolver(
                     self.authToken,
                     ctypes.c_char_p(data_set),
-                    ctypes.c_float(starttime + (tstep - 1)*integration_time),
-                    ctypes.c_float(starttime +  tstep     *integration_time),
+                    ctypes.c_float(time_array[tstep-1]),
+                    ctypes.c_float(time_array[tstep  ]),
                     ctypes.c_float(dt),
                     ctypes.c_int(sinterp), ctypes.c_int(npoints),
                     pcoords.ctypes.data_as(ctypes.POINTER(ctypes.POINTER(ctypes.c_float))),
                     result_array.ctypes.data_as(ctypes.POINTER(ctypes.POINTER(ctypes.c_float))))
             print 'got next position for time step {0}'.format(tstep)
             traj_array[tstep] = result_array
-            time_array[tstep] = starttime + tstep * integration_time
         return traj_array, time_array
     def getFilteredPosition(self,
             starttime = 0.0,
