@@ -72,9 +72,9 @@ def get_big_cutout(
                     (zl, yl, xl, ncomponents),
                     np.float32,
                     compression = 'lzf')) ### is compression a good idea?
-        for cz in range(len(zchunk_list):
-            for cy in range(len(ychunk_list):
-                for cx in range(len(xchunk_list):
+        for cz in range(len(zchunk_list)):
+            for cy in range(len(ychunk_list)):
+                for cx in range(len(xchunk_list)):
                     for time in range(t0, t0 + tl):
                         tmp_filename = filename + '_{0:0>2x}{1:0>2x}{2:0>2x}_{3}'.format(cz, cy, cx, current_data_type)
                         if not os.path.exists(tmp_filename + '.h5'):
