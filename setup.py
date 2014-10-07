@@ -3,8 +3,8 @@
 import shlib
 from shlib import build_shlib
 
-from distutils.core import setup
-#from setuptools import setup # doesn't work because of build_shlib...
+import distutils
+import distutils.core
 import datetime
 
 TURBLIB_VERSION = '20140606'
@@ -24,8 +24,8 @@ date_name = '{0:0>4}{1:0>2}{2:0>2}'.format(now.year, now.month, now.day)
 #
 # check what's available on the system
 #
-from distutils.spawn import find_executable
-h5cc_executable = find_executable('h5cc')
+import distutils.spawn
+h5cc_executable = distutils.spawn.find_executable('h5cc')
 h5cc_present = not (h5cc_executable == None)
 #
 ########################################################################
@@ -55,7 +55,7 @@ extra_compile_args = []
 if h5cc_present:
     libraries.append('hdf5')
     extra_compile_args.append('-DCUTOUT_SUPPORT')
-setup(
+distutils.core.setup(
         name = 'pyJHTDB',
         version = date_name,
         packages = ['pyJHTDB',],
@@ -73,5 +73,6 @@ setup(
                      include_dirs = ['turblib-' + TURBLIB_VERSION],
                      language     = 'c',
                      extra_compile_args = extra_compile_args)],
-        install_requires = 'numpy>=1.6')
+#        install_requires = 'numpy>=1.6',
+        )
 
