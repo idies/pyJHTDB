@@ -10,16 +10,20 @@
 #include <math.h>
 #include <hdf5.h>
 
-#include "turblib.h"
+#include <turblib.h>
 
 // relative error of single precision numbers
 float float_error = 1e-6;
 
+/* TODO:
+ * uncomment this function when turblib is updated on the website
+ *
 int free_threshold_array(ThresholdInfo *data)
 {
     free(data);
     return 0;
 }
+*/
 
 int getBline(
         char *authToken,

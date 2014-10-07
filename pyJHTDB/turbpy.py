@@ -46,8 +46,7 @@ def turbc_clone(N=10):
     print 'Data is requested at time {0}'.format(time)
 
     # load shared library
-    lTDB = pyJHTDB.libTDB(libname = 'libTDB',
-                          srcdir = homefolder + '/ext_installs/turblib')
+    lTDB = pyJHTDB.libTDB()
     #initialize webservices
     lTDB.initialize()
 
@@ -257,9 +256,7 @@ def contour_check(
 
 def main():
     # load shared library
-    lTDB = pyJHTDB.libTDB(libname = 'libTDB',
-                        libdir = 'turblib',
-                        auth_token = 'edu.jhu.pha.turbulence.testing-201302')
+    lTDB = pyJHTDB.libTDB(auth_token = 'edu.jhu.pha.turbulence.testing-201302')
     #initialize webservices
     lTDB.initialize()
 

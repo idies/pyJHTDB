@@ -18,12 +18,18 @@ class ThresholdInfo(ctypes.Structure):
 
 class libTDB(object):
     def __init__(self,
-            libname = 'libTDB',
-            srcdir = '.',
             auth_token = 'edu.jhu.pha.turbulence.testing-201302'):
-        self.libname = libname
-        self.srcdir = srcdir
-        self.generate_shared_library()
+        self.libname = 'libJHTDB'
+        for lib_location in ['/usr/lib', '/usr/local/lib']:
+            try:
+                self.lib = np.ctypeslib.load_library(self.libname, lib_location)
+                found_library = True
+                break
+            except OSError:
+                found_library = False
+        if not found_library:
+            print('failed to find shared library, exiting')
+            sys.exit()
         self.authToken = ctypes.c_char_p(auth_token)
         self.connection_on = False
         self.hdf5_file_list = []
@@ -402,39 +408,33 @@ class libTDB(object):
                 data_set = data_set,
                 out_of_domain = out_of_domain)
         return np.concatenate((l1[::-1], l0[1:]), axis = 0)
-    def generate_shared_library(self):
-        repo_dir = os.path.dirname(inspect.getfile(libTDB))
-        compile_command = ('gcc -O3 -fPIC -Wall -c '
-                         + '-DCUTOUT_SUPPORT '
-                         + '-I' + self.srcdir + ' ')
-        for fname in [repo_dir + '/local_tools.',
-                      self.srcdir + '/stdsoap2.',
-                      self.srcdir + '/soapC.',
-                      self.srcdir + '/soapClient.',
-                      self.srcdir + '/turblib.']:
-            mtimec = os.path.getmtime(fname + 'c')
-            if os.path.exists(fname + 'o'):
-                mtimeo = os.path.getmtime(fname + 'o')
-            else:
-                mtimeo = mtimec - 1
-            if mtimec > mtimeo:
-                os.system(compile_command
-                        + fname + 'c -o '
-                        + fname + 'o')
-        if platform.system() == 'Linux':
-            linkcommand = 'gcc -shared '
-        else:
-            linkcommand = 'gcc -dynamiclib '
-        linkcommand += (self.srcdir + '/stdsoap2.o '
-                      + self.srcdir + '/soapC.o '
-                      + self.srcdir + '/soapClient.o '
-                      + self.srcdir + '/turblib.o '
-                      + repo_dir + '/local_tools.o '
-                      + '-o ' + repo_dir + '/' + self.libname + '.so '
-                      + '-lhdf5 ')
-        os.system(linkcommand)
-        self.lib = np.ctypeslib.load_library(self.libname, repo_dir)
-        return None
+    #def generate_shared_library(self):
+    #    repo_dir = os.path.dirname(inspect.getfile(libTDB))
+    #    compile_command = ('gcc -O3 -fPIC -Wall -c '
+    #                     + '-DCUTOUT_SUPPORT '
+    #                     + '-I/home/chichi/.JHTDB/include '
+    #                     + '-I' + self.srcdir + ' ')
+    #    fname = repo_dir + '/C/local_tools.'
+    #    mtimec = os.path.getmtime(fname + 'c')
+    #    if os.path.exists(fname + 'o'):
+    #        mtimeo = os.path.getmtime(fname + 'o')
+    #    else:
+    #        mtimeo = mtimec - 1
+    #    if mtimec > mtimeo:
+    #        os.system(compile_command
+    #                + fname + 'c -o '
+    #                + fname + 'o')
+    #    if platform.system() == 'Linux':
+    #        linkcommand = 'gcc -shared '
+    #    else:
+    #        linkcommand = 'gcc -dynamiclib '
+    #    linkcommand += (repo_dir + '/C/local_tools.o '
+    #                  + '-o ' + repo_dir + '/' + self.libname + '.so '
+    #                  + '-L/home/chichi/.JHTDB/lib '
+    #                  + '-lJHTDB '
+    #                  + '-lhdf5 ')
+    #    os.system(linkcommand)
+    #    return None
     def getBlineAlt(self,
             time, nsteps, ds,
             x0,
