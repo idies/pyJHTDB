@@ -1,4 +1,4 @@
 pyJHTDB
 =======
 
-Python wrapper for the turbululence database library
+Python wrapper for the turbulence database library
