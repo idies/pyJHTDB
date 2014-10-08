@@ -1,15 +1,47 @@
 #! /usr/bin/env python
 
-import datetime
-
-TURBLIB_VERSION = '20140606'
 
 ########################################################################
 #
-# version
+# some global settings
 #
+TURBLIB_VERSION = '20140606'
+#
+########################################################################
+
+
+
+########################################################################
+#
+# define version for pyJHTDB
+# TODO: how to do this correctly? the date should come from checking
+# when the sources were last modified.
+#
+import datetime
 now = datetime.datetime.now()
 date_name = '{0:0>4}{1:0>2}{2:0>2}'.format(now.year, now.month, now.day)
+#
+########################################################################
+
+
+
+########################################################################
+#
+# get the turbulence library
+#
+import os
+if not os.path.isdir('turblib-' + TURBLIB_VERSION):
+    import urllib
+    urllib.urlretrieve('http://turbulence.pha.jhu.edu/download/turblib-'
+                                + TURBLIB_VERSION
+                                + '.tar.gz',
+                             'turblib-'
+                                + TURBLIB_VERSION
+                                + '.tar.gz')
+    import tarfile
+    turblib = tarfile.open('turblib-' + TURBLIB_VERSION + '.tar.gz')
+    turblib.extractall()
+    turblib.close()
 #
 ########################################################################
 
@@ -26,22 +58,6 @@ h5cc_present = not (h5cc_executable == None)
 ########################################################################
 
 
-
-########################################################################
-#
-# get the turbulence library
-#
-import os
-if not os.path.isdir('turblib-' + TURBLIB_VERSION):
-    import urllib
-    bla = urllib.urlretrieve('http://turbulence.pha.jhu.edu/download/turblib-' + TURBLIB_VERSION + '.tar.gz',
-                             'turblib-' + TURBLIB_VERSION + '.tar.gz')
-    import tarfile
-    turblib = tarfile.open('turblib-' + TURBLIB_VERSION + '.tar.gz')
-    turblib.extractall()
-    turblib.close()
-#
-########################################################################
 
 libraries = []
 macros = []
