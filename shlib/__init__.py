@@ -1,1 +1,0 @@
-import setup_shlib

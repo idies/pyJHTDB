@@ -20,16 +20,8 @@ class libTDB(object):
     def __init__(self,
             auth_token = 'edu.jhu.pha.turbulence.testing-201302'):
         self.libname = 'libJHTDB'
-        for lib_location in ['/usr/lib', '/usr/local/lib']:
-            try:
-                self.lib = np.ctypeslib.load_library(self.libname, lib_location)
-                found_library = True
-                break
-            except OSError:
-                found_library = False
-        if not found_library:
-            print('failed to find shared library, exiting')
-            sys.exit()
+        lib_location = os.path.dirname(inspect.getfile(libTDB))
+        self.lib = np.ctypeslib.load_library(self.libname, os.path.abspath(os.path.join(lib_location, os.path.pardir)))
         self.authToken = ctypes.c_char_p(auth_token)
         self.connection_on = False
         self.hdf5_file_list = []

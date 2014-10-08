@@ -1,10 +1,5 @@
 #! /usr/bin/env python
 
-import shlib
-from shlib import build_shlib
-
-import distutils
-import distutils.core
 import datetime
 
 TURBLIB_VERSION = '20140606'
@@ -48,31 +43,32 @@ if not os.path.isdir('turblib-' + TURBLIB_VERSION):
 #
 ########################################################################
 
-
-
 libraries = []
-extra_compile_args = []
+macros = []
 if h5cc_present:
     libraries.append('hdf5')
-    extra_compile_args.append('-DCUTOUT_SUPPORT')
-distutils.core.setup(
+    macros.append(('CUTOUT_SUPPORT', '1'))
+
+from setuptools import setup, Extension
+libJHTDB = Extension(
+        'libJHTDB',
+        sources = ['C/local_tools.c',
+                   'turblib-' + TURBLIB_VERSION + '/turblib.c',
+                   'turblib-' + TURBLIB_VERSION + '/soapC.c',
+                   'turblib-' + TURBLIB_VERSION + '/soapClient.c',
+                   'turblib-' + TURBLIB_VERSION + '/stdsoap2.c'],
+        include_dirs = ['turblib-' + TURBLIB_VERSION],
+        define_macros = macros,
+        libraries = libraries)
+
+setup(
         name = 'pyJHTDB',
         version = date_name,
-        packages = ['pyJHTDB',],
+        packages = ['pyJHTDB'],
         package_data = {'pyJHTDB': ['data/channel_xgrid.npy',
                                     'data/channel_ygrid.npy',
                                     'data/channel_zgrid.npy']},
-        shlibs = [build_shlib.SharedLibrary(
-                     name         = 'JHTDB',
-                     sources      = ['C/local_tools.c',
-                                     'turblib-' + TURBLIB_VERSION + '/turblib.c',
-                                     'turblib-' + TURBLIB_VERSION + '/soapC.c',
-                                     'turblib-' + TURBLIB_VERSION + '/soapClient.c',
-                                     'turblib-' + TURBLIB_VERSION + '/stdsoap2.c'],
-                     libraries    = libraries,
-                     include_dirs = ['turblib-' + TURBLIB_VERSION],
-                     language     = 'c',
-                     extra_compile_args = extra_compile_args)],
-#        install_requires = 'numpy>=1.6',
+        install_requires = 'numpy>=1.6',
+        ext_modules = [libJHTDB]
         )
 
