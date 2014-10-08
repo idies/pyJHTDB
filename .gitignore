@@ -1,3 +1,10 @@
+# setuptools stuff
+build/
+dist/
+pyJHTDB.egg-info/
+# turblib stuff
+turblib-*.tar.gz
+turblib-*/
 #compiled files
 *.pyc
 *.o
