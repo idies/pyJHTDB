@@ -84,7 +84,7 @@ setup(
         package_data = {'pyJHTDB': ['data/channel_xgrid.npy',
                                     'data/channel_ygrid.npy',
                                     'data/channel_zgrid.npy']},
-        install_requires = 'numpy>=1.6',
+        install_requires = 'numpy>=1.8',
         ext_modules = [libJHTDB]
         )
 
