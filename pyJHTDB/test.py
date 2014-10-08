@@ -308,7 +308,7 @@ def test_cutout():
 
 def test_misc():
     # load shared library
-    lJHTDB = pyJHTDB.libJHTDB(auth_token = 'edu.jhu.pha.turbulence.testing-201302')
+    lJHTDB = pyJHTDB.libJHTDB()
     #initialize webservices
     lJHTDB.initialize()
 
