@@ -3,6 +3,7 @@
 """
 
 import os
+import os.path
 import sys
 import numpy as np
 import h5py
@@ -11,7 +12,6 @@ import inspect
 import platform
 
 from pkg_resources import get_distribution, DistributionNotFound
-import os.path
 
 try:
     _dist = get_distribution('pyJHTDB')
@@ -31,6 +31,13 @@ auth_token = 'edu.jhu.pha.turbulence.testing-201302'
 #__configuration_file__ = os.path.join(os.path.expanduser('~'), '/.config/pyJHTDB.cfg')
 #__config__ = ConfigParser.ConfigParser()
 #__config__.readfp(open(__configuration_file__))
+
+homefolder = os.path.expanduser('~')
+data_dir = '../data/'
+if os.path.isfile(homefolder + '/JHTDB_user_token.txt'):
+    tokenfile = open(homefolder + '/JHTDB_user_token.txt', 'r')
+    auth_token = tokenfile.readline().split()[0]
+    tokenfile.close()
 
 from libJHTDB import *
 from test import test_plain, test_misc, test_cutout
