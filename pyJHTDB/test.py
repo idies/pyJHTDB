@@ -10,10 +10,12 @@ homefolder = os.path.expanduser('~')
 
 try:
     import matplotlib.pyplot as plt
+    import matplotlib.cm as cm
 except ImportError:
     print 'matplotlib is needed for contour plots.'
     print 'You should be able to find installation instructions at http://matplotlib.sourceforge.net'
     plt = None
+    cm  = None
 
 try:
     import h5py
@@ -23,6 +25,7 @@ except ImportError:
 
 import pyJHTDB
 import pyJHTDB.dbinfo
+import pyJHTDB.cutout
 
 def test_plain(N=10):
     #time = 0.364
