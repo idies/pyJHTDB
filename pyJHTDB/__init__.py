@@ -33,3 +33,5 @@ auth_token = 'edu.jhu.pha.turbulence.testing-201302'
 #__config__.readfp(open(__configuration_file__))
 
 from libJHTDB import *
+from test import test_plain, test_misc, test_cutout
+
