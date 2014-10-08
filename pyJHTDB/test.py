@@ -4,26 +4,30 @@ import os
 import sys
 import ctypes
 import math
+import numpy
 
 homefolder = os.path.expanduser('~')
 
 try:
-    import numpy
-except ImportError:
-    print 'Numpy is needed for this to work.'
-    print 'You should be able to find installation instructions at http://www.scipy.org'
-    sys.exit()
-try:
     import matplotlib.pyplot as plt
+    import matplotlib.cm as cm
 except ImportError:
     print 'matplotlib is needed for contour plots.'
     print 'You should be able to find installation instructions at http://matplotlib.sourceforge.net'
     plt = None
+    cm  = None
+
+try:
+    import h5py
+except ImportError:
+    print 'h5py is needed for working with cutouts.'
+    h5py = None
 
 import pyJHTDB
 import pyJHTDB.dbinfo
+import pyJHTDB.cutout
 
-def turbc_clone(N=10):
+def test_plain(N=10):
     #time = 0.364
     #turbc.c has a fixed time, but it makes more sense to have a random one
     time = 0.002 * numpy.random.randint(1024)
@@ -46,8 +50,7 @@ def turbc_clone(N=10):
     print 'Data is requested at time {0}'.format(time)
 
     # load shared library
-    lTDB = pyJHTDB.libTDB(libname = 'libTDB',
-                          srcdir = homefolder + '/ext_installs/turblib')
+    lTDB = pyJHTDB.libJHTDB()
     #initialize webservices
     lTDB.initialize()
 
@@ -180,8 +183,8 @@ def ken_contours(
 
 def spectra_check(
         info = pyJHTDB.dbinfo.isotropic1024coarse,
-        libTDB = None):
-    if not libTDB:
+        lJHTDB = None):
+    if not lJHTDB:
         print ('no library given')
         return None
     nlines = 32
@@ -205,7 +208,7 @@ def spectra_check(
     axp = fig.add_axes([.55, .1, .4, .8])
     coordname = ['x', 'y', 'z']
     for i in range(3):
-        result = libTDB.getData(.0, lines[i],
+        result = lJHTDB.getData(.0, lines[i],
             sinterp = 0, tinterp = 0,
             data_set = info['name'], getFunction = 'getVelocityAndPressureSoap')
         spec = numpy.fft.rfft(
@@ -226,8 +229,8 @@ def spectra_check(
 
 def contour_check(
         info = pyJHTDB.dbinfo.isotropic1024coarse,
-        libTDB = None):
-    if not libTDB:
+        lJHTDB = None):
+    if not lJHTDB:
         print ('no library given')
         return None
     nplanes = 1
@@ -245,7 +248,7 @@ def contour_check(
     #planes[2][:, :, :, 2] = info['dz']*numpy.random.randint(0, info['nz'], size = (nplanes))[:, numpy.newaxis, numpy.newaxis]
     coordname = ['yz', 'zx', 'xy']
     for i in range(1):
-        result = libTDB.getData(.1, planes[i],
+        result = lJHTDB.getData(.1, planes[i],
             sinterp = 0, tinterp = 0,
             data_set = info['name'], getFunction = 'getVelocityAndPressureSoap')
         fig = plt.figure(figsize = (10.24,10.24))
@@ -255,30 +258,68 @@ def contour_check(
         fig.savefig('plane_' + coordname[i] + '_0.png', format = 'png', dpi = 100)
     return None
 
-def main():
-    # load shared library
-    lTDB = pyJHTDB.libTDB(libname = 'libTDB',
-                        libdir = 'turblib',
-                        auth_token = 'edu.jhu.pha.turbulence.testing-201302')
-    #initialize webservices
-    lTDB.initialize()
+def clean_2D_field(
+        field_2D,
+        dpi = 100,
+        figname = 'tst',
+        cmap = cm.jet,
+        img_type = 'pdf'):
+    fig = plt.figure(
+                figsize=(field_2D.shape[1]*1./dpi,
+                         field_2D.shape[0]*1./dpi))
+    ax = fig.add_axes([.0, .0, 1., 1.], frameon=False)
+    ax.set_axis_off()
+    im = ax.imshow(field_2D,
+            interpolation='none',
+            cmap = cmap)
+    fig.savefig(
+            figname + '.' + img_type,
+            dpi = dpi,
+            format = img_type)
+    return None
 
-    spectra_check(libTDB = lTDB)
-    contour_check(libTDB = lTDB,
+def test_cutout():
+    pyJHTDB.cutout.get_big_cutout(
+            t0 = 0, tl = 2,
+            x0 = 243, xl = 32,
+            y0 = 48, yl = 30,
+            z0 = 48, zl = 26,
+            chunk_xdim = 16,
+            chunk_ydim = 15,
+            chunk_zdim = 13,
+            data_set = 'mhd1024',
+            data_type = 'ub',
+            filename = 'tmp',
+            base_website = 'turbulence.pha.jhu.edu')
+    data = h5py.File('tmp.h5', mode = 'r')
+    energy = (data['u00000'][0, :, :, 0]**2
+            + data['u00000'][0, :, :, 1]**2
+            + data['u00000'][0, :, :, 2]**2)
+    clean_2D_field(energy, figname = 'tst_0yx')
+    energy = (data['u00000'][:, 0, :, 0]**2
+            + data['u00000'][:, 0, :, 1]**2
+            + data['u00000'][:, 0, :, 2]**2)
+    clean_2D_field(energy, figname = 'tst_z0x')
+    energy = (data['u00000'][:, :, 0, 0]**2
+            + data['u00000'][:, :, 0, 1]**2
+            + data['u00000'][:, :, 0, 2]**2)
+    clean_2D_field(energy, figname = 'tst_zy0')
+    return None
+
+def test_misc():
+    # load shared library
+    lJHTDB = pyJHTDB.libJHTDB()
+    #initialize webservices
+    lJHTDB.initialize()
+
+    spectra_check(lJHTDB = lJHTDB)
+    contour_check(lJHTDB = lJHTDB,
                   info = pyJHTDB.dbinfo.channel)
 
     #finalize webservices
-    lTDB.finalize()
+    lJHTDB.finalize()
     return None
 
-#import cProfile
-#import pstats
-
 if __name__ == '__main__':
-    turbc_clone()
-    #main()
-    #cProfile.run('main()', 'profile')
-    #p = pstats.Stats('profile')
-    #p.sort_stats('time').print_stats(10)
-    #p.sort_stats('cumulative').print_stats(10)
+    test_plain()
 

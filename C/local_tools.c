@@ -10,16 +10,20 @@
 #include <math.h>
 #include <hdf5.h>
 
-#include "turblib.h"
+#include <turblib.h>
 
 // relative error of single precision numbers
 float float_error = 1e-6;
 
+/* TODO:
+ * uncomment this function when turblib is updated on the website
+ *
 int free_threshold_array(ThresholdInfo *data)
 {
     free(data);
     return 0;
 }
+*/
 
 int getBline(
         char *authToken,
@@ -412,6 +416,85 @@ int getCustomPosition(
     return 0;
 }
 
+int interpolateBoxFilter(
+        char *authToken,
+        char *dataset, char *field, float time, float filterwidth,
+        int count, float datain[][3], float dataout[][3])
+{
+    extern set_info DataSets[8];
+    float cell_nodes[8*count][3];
+    float cellvalues[8*count][3];
+    int p;
+    float xx, yy, zz;
+    TurbDataset dataset_ = getDataSet(dataset);
+    float dx = DataSets[dataset_].dx;
+    for (p = 0; p < count; p++)
+    {
+        // corner 000
+        cell_nodes[8*p][0] = dx*floor(datain[p][0]/dx);
+        cell_nodes[8*p][1] = dx*floor(datain[p][1]/dx);
+        cell_nodes[8*p][2] = dx*floor(datain[p][2]/dx);
+        // corner 001
+        cell_nodes[8*p + 1][0] = cell_nodes[8*p][0] + dx;
+        cell_nodes[8*p + 1][1] = cell_nodes[8*p][1]     ;
+        cell_nodes[8*p + 1][2] = cell_nodes[8*p][2]     ;
+        // corner 010
+        cell_nodes[8*p + 2][0] = cell_nodes[8*p][0]     ;
+        cell_nodes[8*p + 2][1] = cell_nodes[8*p][1] + dx;
+        cell_nodes[8*p + 2][2] = cell_nodes[8*p][2]     ;
+        // corner 011
+        cell_nodes[8*p + 3][0] = cell_nodes[8*p][0] + dx;
+        cell_nodes[8*p + 3][1] = cell_nodes[8*p][1] + dx;
+        cell_nodes[8*p + 3][2] = cell_nodes[8*p][2]     ;
+        // corner 100
+        cell_nodes[8*p + 4][0] = cell_nodes[8*p][0]     ;
+        cell_nodes[8*p + 4][1] = cell_nodes[8*p][1]     ;
+        cell_nodes[8*p + 4][2] = cell_nodes[8*p][2] + dx;
+        // corner 101
+        cell_nodes[8*p + 5][0] = cell_nodes[8*p][0] + dx;
+        cell_nodes[8*p + 5][1] = cell_nodes[8*p][1]     ;
+        cell_nodes[8*p + 5][2] = cell_nodes[8*p][2] + dx;
+        // corner 110
+        cell_nodes[8*p + 6][0] = cell_nodes[8*p][0]     ;
+        cell_nodes[8*p + 6][1] = cell_nodes[8*p][1] + dx;
+        cell_nodes[8*p + 6][2] = cell_nodes[8*p][2] + dx;
+        // corner 111
+        cell_nodes[8*p + 7][0] = cell_nodes[8*p][0] + dx;
+        cell_nodes[8*p + 7][1] = cell_nodes[8*p][1] + dx;
+        cell_nodes[8*p + 7][2] = cell_nodes[8*p][2] + dx;
+    }
+    getBoxFilter(
+            authToken,
+            dataset,
+            field,
+            time,
+            filterwidth,
+            8*count,
+            cell_nodes,
+            cellvalues);
+    for (p = 0; p < count; p++)
+    {
+        // get fractions
+        xx = (datain[p][0] - cell_nodes[8*p][0]) / dx;
+        yy = (datain[p][1] - cell_nodes[8*p][1]) / dx;
+        zz = (datain[p][2] - cell_nodes[8*p][2]) / dx;
+        // not most efficient way of writing the formula, but the most clear
+        dataout[p][0] = (((cellvalues[8*p  ][0]*(1-xx) + cellvalues[8*p+1][0]*xx)*(1-yy)
+                        + (cellvalues[8*p+2][0]*(1-xx) + cellvalues[8*p+3][0]*xx)* yy   )*(1-zz)
+                        +((cellvalues[8*p+4][0]*(1-xx) + cellvalues[8*p+5][0]*xx)*(1-yy)
+                        + (cellvalues[8*p+6][0]*(1-xx) + cellvalues[8*p+7][0]*xx)* yy   )* zz);
+        dataout[p][1] = (((cellvalues[8*p  ][1]*(1-xx) + cellvalues[8*p+1][1]*xx)*(1-yy)
+                        + (cellvalues[8*p+2][1]*(1-xx) + cellvalues[8*p+3][1]*xx)* yy   )*(1-zz)
+                        +((cellvalues[8*p+4][1]*(1-xx) + cellvalues[8*p+5][1]*xx)*(1-yy)
+                        + (cellvalues[8*p+6][1]*(1-xx) + cellvalues[8*p+7][1]*xx)* yy   )* zz);
+        dataout[p][2] = (((cellvalues[8*p  ][2]*(1-xx) + cellvalues[8*p+1][2]*xx)*(1-yy)
+                        + (cellvalues[8*p+2][2]*(1-xx) + cellvalues[8*p+3][2]*xx)* yy   )*(1-zz)
+                        +((cellvalues[8*p+4][2]*(1-xx) + cellvalues[8*p+5][2]*xx)*(1-yy)
+                        + (cellvalues[8*p+6][2]*(1-xx) + cellvalues[8*p+7][2]*xx)* yy   )* zz);
+    }
+    return 0;
+}
+
 int getFilteredPosition(
         char *authToken,
         char *dataset,
@@ -438,7 +521,7 @@ int getFilteredPosition(
     time = startTime;
     for (tcounter = 0; tcounter < nsteps; tcounter++)
     {
-        getBoxFilter(
+        interpolateBoxFilter(
                 authToken,
                 dataset,
                 "velocity",
@@ -454,7 +537,7 @@ int getFilteredPosition(
             y[p][2] = dataout[p][2] + dt * vel0[p][2];
         }
         time += dt;
-        getBoxFilter(
+        interpolateBoxFilter(
                 authToken,
                 dataset,
                 "velocity",
@@ -481,7 +564,6 @@ int isBLocal(
         int time)
 {
     TurbDataset d = getDataSet(data_set);
-    fprintf(stderr, "%d %d %d %d\n", time, x, y, z);
     return isDataComplete(
             d,
             2,

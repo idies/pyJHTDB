@@ -8,7 +8,8 @@ import numpy as np
 import h5py
 import ctypes
 import inspect
-import platform
+
+import pyJHTDB
 
 class ThresholdInfo(ctypes.Structure):
     _fields_ = [('x', ctypes.c_int),
@@ -16,14 +17,12 @@ class ThresholdInfo(ctypes.Structure):
                 ('z', ctypes.c_int),
                 ('value', ctypes.c_float)]
 
-class libTDB(object):
+class libJHTDB(object):
     def __init__(self,
-            libname = 'libTDB',
-            srcdir = '.',
-            auth_token = 'edu.jhu.pha.turbulence.testing-201302'):
-        self.libname = libname
-        self.srcdir = srcdir
-        self.generate_shared_library()
+            auth_token = pyJHTDB.auth_token):
+        self.libname = 'libJHTDB'
+        lib_location = os.path.dirname(inspect.getfile(pyJHTDB))
+        self.lib = np.ctypeslib.load_library(self.libname, os.path.abspath(os.path.join(lib_location, os.path.pardir)))
         self.authToken = ctypes.c_char_p(auth_token)
         self.connection_on = False
         self.hdf5_file_list = []
@@ -225,8 +224,7 @@ class libTDB(object):
         result_array = np.empty((npoints, 3), dtype=np.float32)
         traj_array = np.empty((steps_to_keep+1, npoints, 3), dtype = np.float32)
         traj_array[0] = point_coords
-        time_array = np.empty((steps_to_keep+1), dtype = np.float32)
-        integration_time = (endtime - starttime) / steps_to_keep
+        time_array = np.linspace(starttime, endtime, steps_to_keep+1).astype(np.float32)
         time_array[0] = starttime
         evolver = self.lib.getPosition
         if data_set == 'custom':
@@ -238,15 +236,14 @@ class libTDB(object):
             evolver(
                     self.authToken,
                     ctypes.c_char_p(data_set),
-                    ctypes.c_float(starttime + (tstep - 1)*integration_time),
-                    ctypes.c_float(starttime +  tstep     *integration_time),
+                    ctypes.c_float(time_array[tstep-1]),
+                    ctypes.c_float(time_array[tstep  ]),
                     ctypes.c_float(dt),
                     ctypes.c_int(sinterp), ctypes.c_int(npoints),
                     pcoords.ctypes.data_as(ctypes.POINTER(ctypes.POINTER(ctypes.c_float))),
                     result_array.ctypes.data_as(ctypes.POINTER(ctypes.POINTER(ctypes.c_float))))
             print 'got next position for time step {0}'.format(tstep)
             traj_array[tstep] = result_array
-            time_array[tstep] = starttime + tstep * integration_time
         return traj_array, time_array
     def getFilteredPosition(self,
             starttime = 0.0,
@@ -404,39 +401,6 @@ class libTDB(object):
                 data_set = data_set,
                 out_of_domain = out_of_domain)
         return np.concatenate((l1[::-1], l0[1:]), axis = 0)
-    def generate_shared_library(self):
-        repo_dir = os.path.dirname(inspect.getfile(libTDB))
-        compile_command = ('gcc -O3 -fPIC -Wall -c '
-                         + '-DCUTOUT_SUPPORT '
-                         + '-I' + self.srcdir + ' ')
-        for fname in [repo_dir + '/local_tools.',
-                      self.srcdir + '/stdsoap2.',
-                      self.srcdir + '/soapC.',
-                      self.srcdir + '/soapClient.',
-                      self.srcdir + '/turblib.']:
-            mtimec = os.path.getmtime(fname + 'c')
-            if os.path.exists(fname + 'o'):
-                mtimeo = os.path.getmtime(fname + 'o')
-            else:
-                mtimeo = mtimec - 1
-            if mtimec > mtimeo:
-                os.system(compile_command
-                        + fname + 'c -o '
-                        + fname + 'o')
-        if platform.system() == 'Linux':
-            linkcommand = 'gcc -shared '
-        else:
-            linkcommand = 'gcc -dynamiclib '
-        linkcommand += (self.srcdir + '/stdsoap2.o '
-                      + self.srcdir + '/soapC.o '
-                      + self.srcdir + '/soapClient.o '
-                      + self.srcdir + '/turblib.o '
-                      + repo_dir + '/local_tools.o '
-                      + '-o ' + repo_dir + '/' + self.libname + '.so '
-                      + '-lhdf5 ')
-        os.system(linkcommand)
-        self.lib = np.ctypeslib.load_library(self.libname, repo_dir)
-        return None
     def getBlineAlt(self,
             time, nsteps, ds,
             x0,
