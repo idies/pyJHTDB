@@ -14,8 +14,8 @@ TURBLIB_VERSION = '20140606'
 ########################################################################
 #
 # define version for pyJHTDB
-# TODO: how to do this correctly? the date should come from checking
-# when the sources were last modified.
+# TODO: the version should come from checking
+#      when the sources were last modified.
 #
 import datetime
 now = datetime.datetime.now()
