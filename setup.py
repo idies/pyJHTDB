@@ -106,5 +106,6 @@ setup(
                                     'data/channel_zgrid.npy']},
         install_requires = 'numpy>=1.8',
         ext_modules = [libJHTDB]
+        description = 'Python wrapper for the turbulence database library',
         )
 
