@@ -26,6 +26,11 @@
 # some global settings
 #
 TURBLIB_VERSION = '20140606'
+GROUP_URL = 'http://turbulence.pha.jhu.edu/'
+GROUP_EMAIL = 'turbulence@pha.jhu.edu'
+GROUP_NAME  = 'Johns Hopkins Turbulence Database Group'
+AUTHOR = GROUP_NAME
+AUTHOR_EMAIL = GROUP_EMAIL
 #
 ########################################################################
 
@@ -62,6 +67,7 @@ if not os.path.isdir('turblib-' + TURBLIB_VERSION):
     turblib = tarfile.open('turblib-' + TURBLIB_VERSION + '.tar.gz')
     turblib.extractall()
     turblib.close()
+open('MANIFEST.in', 'w').write('graft turblib-' + TURBLIB_VERSION)
 #
 ########################################################################
 
@@ -104,8 +110,24 @@ setup(
         package_data = {'pyJHTDB': ['data/channel_xgrid.npy',
                                     'data/channel_ygrid.npy',
                                     'data/channel_zgrid.npy']},
-        install_requires = 'numpy>=1.8',
-        ext_modules = [libJHTDB]
-        description = 'Python wrapper for the turbulence database library',
+        install_requires = ['numpy>=1.8'],
+        ext_modules = [libJHTDB],
+
+        #### package description stuff goes here
+        description = 'Python wrapper for the Johns Hopkins turbulence database library',
+        author = AUTHOR,
+        author_email = AUTHOR_EMAIL,
+        license = 'Apache Version 2.0',
+        url = GROUP_URL,
+        classifiers = [
+            'Development Status :: 4 - Beta',
+            'Environment :: Console',
+            'Intended Audience :: Science/Research',
+            'License :: OSI Approved :: Apache Software License',
+            'Natural Language :: English',
+            'Programming Language :: Python',
+            'Topic :: Scientific/Engineering :: Mathematics',
+            'Topic :: Scientific/Engineering :: Physics',
+            ],
         )
 
