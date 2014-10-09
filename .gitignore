@@ -2,6 +2,7 @@
 build/
 dist/
 pyJHTDB.egg-info/
+MANIFEST.in
 # turblib stuff
 turblib-*.tar.gz
 turblib-*/
