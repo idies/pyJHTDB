@@ -41,10 +41,10 @@ try:
 except ImportError:
     print 'h5py is needed for working with cutouts.'
     h5py = None
+    import pyJHTDB.cutout
 
 import pyJHTDB
 import pyJHTDB.dbinfo
-import pyJHTDB.cutout
 
 def test_plain(N=10):
     #time = 0.364
@@ -298,31 +298,32 @@ def clean_2D_field(
     return None
 
 def test_cutout():
-    pyJHTDB.cutout.get_big_cutout(
-            t0 = 0, tl = 2,
-            x0 = 243, xl = 32,
-            y0 = 48, yl = 30,
-            z0 = 48, zl = 26,
-            chunk_xdim = 16,
-            chunk_ydim = 15,
-            chunk_zdim = 13,
-            data_set = 'mhd1024',
-            data_type = 'ub',
-            filename = 'tmp',
-            base_website = 'turbulence.pha.jhu.edu')
-    data = h5py.File('tmp.h5', mode = 'r')
-    energy = (data['u00000'][0, :, :, 0]**2
-            + data['u00000'][0, :, :, 1]**2
-            + data['u00000'][0, :, :, 2]**2)
-    clean_2D_field(energy, figname = 'tst_0yx')
-    energy = (data['u00000'][:, 0, :, 0]**2
-            + data['u00000'][:, 0, :, 1]**2
-            + data['u00000'][:, 0, :, 2]**2)
-    clean_2D_field(energy, figname = 'tst_z0x')
-    energy = (data['u00000'][:, :, 0, 0]**2
-            + data['u00000'][:, :, 0, 1]**2
-            + data['u00000'][:, :, 0, 2]**2)
-    clean_2D_field(energy, figname = 'tst_zy0')
+    if h5py:
+        pyJHTDB.cutout.get_big_cutout(
+                t0 = 0, tl = 2,
+                x0 = 243, xl = 32,
+                y0 = 48, yl = 30,
+                z0 = 48, zl = 26,
+                chunk_xdim = 16,
+                chunk_ydim = 15,
+                chunk_zdim = 13,
+                data_set = 'mhd1024',
+                data_type = 'ub',
+                filename = 'tmp',
+                base_website = 'turbulence.pha.jhu.edu')
+        data = h5py.File('tmp.h5', mode = 'r')
+        energy = (data['u00000'][0, :, :, 0]**2
+                + data['u00000'][0, :, :, 1]**2
+                + data['u00000'][0, :, :, 2]**2)
+        clean_2D_field(energy, figname = 'tst_0yx')
+        energy = (data['u00000'][:, 0, :, 0]**2
+                + data['u00000'][:, 0, :, 1]**2
+                + data['u00000'][:, 0, :, 2]**2)
+        clean_2D_field(energy, figname = 'tst_z0x')
+        energy = (data['u00000'][:, :, 0, 0]**2
+                + data['u00000'][:, :, 0, 1]**2
+                + data['u00000'][:, :, 0, 2]**2)
+        clean_2D_field(energy, figname = 'tst_zy0')
     return None
 
 def test_misc():
