@@ -462,8 +462,6 @@ int isBLocal(
             time);
 }
 
-#endif//CUTOUT_SUPPORT
-
 int interpolateBoxFilter(
         char *authToken,
         char *dataset, char *field, float time, float filterwidth,
@@ -542,6 +540,8 @@ int interpolateBoxFilter(
     }
     return 0;
 }
+
+#endif//CUTOUT_SUPPORT
 
 int getFilteredPosition(
         char *authToken,
