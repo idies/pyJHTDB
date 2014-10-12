@@ -38,10 +38,10 @@ except ImportError:
 
 try:
     import h5py
+    import pyJHTDB.cutout
 except ImportError:
     print 'h5py is needed for working with cutouts.'
     h5py = None
-    import pyJHTDB.cutout
 
 import pyJHTDB
 import pyJHTDB.dbinfo
