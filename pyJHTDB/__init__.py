@@ -43,7 +43,6 @@ import os
 import os.path
 import sys
 import numpy as np
-import h5py
 import ctypes
 import inspect
 import platform
@@ -75,6 +74,11 @@ if os.path.isfile(homefolder + '/JHTDB_user_token.txt'):
     tokenfile = open(homefolder + '/JHTDB_user_token.txt', 'r')
     auth_token = tokenfile.readline().split()[0]
     tokenfile.close()
+
+try:
+    import h5py
+except ImportError:
+    print 'h5py not found. cutout functionality not available.'
 
 from libJHTDB import *
 from test import test_plain, test_misc, test_cutout
