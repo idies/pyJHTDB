@@ -28,7 +28,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+
+#ifdef CUTOUT_SUPPORT
+
 #include <hdf5.h>
+
+#endif//CUTOUT_SUPPORT
 
 #include <turblib.h>
 
@@ -343,6 +348,7 @@ int getSphericalBoundedBlineDebug(
     return 0;
 }
 
+#ifdef CUTOUT_SUPPORT
 int set_custom_dataset_description(float dx, float dt, int size)
 {
     extern set_info DataSets[8];
@@ -434,6 +440,26 @@ int getCustomPosition(
         time += dt;
     }
     return 0;
+}
+
+int isBLocal(
+        const char *data_set,
+        int x,
+        int y,
+        int z,
+        int time)
+{
+    TurbDataset d = getDataSet(data_set);
+    return isDataComplete(
+            d,
+            2,
+            x - 16,
+            y - 16,
+            z - 16,
+            32,
+            32,
+            32,
+            time);
 }
 
 int interpolateBoxFilter(
@@ -576,23 +602,5 @@ int getFilteredPosition(
     return 0;
 }
 
-int isBLocal(
-        const char *data_set,
-        int x,
-        int y,
-        int z,
-        int time)
-{
-    TurbDataset d = getDataSet(data_set);
-    return isDataComplete(
-            d,
-            2,
-            x - 16,
-            y - 16,
-            z - 16,
-            32,
-            32,
-            32,
-            time);
-}
+#endif//CUTOUT_SUPPORT
 

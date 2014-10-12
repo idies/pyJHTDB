@@ -1,0 +1,18 @@
+  In theory setuptools should take care of everything so that the
+package is installed properly, but I noticed that it doesn't.
+
+What worked on ubuntu 14.04 (with internet access available):
+  sudo apt-get install build-essential
+  sudo apt-get install gfortran
+  sudo apt-get install python-setuptools
+  sudo easy_install numpy
+  sudo python setup.py install
+
+  I haven't tested the installation on any other system, but I think
+very small variations on the above should work for the minimal
+installation on all unix systems (i.e. for MacOS as well).
+  If you manage to get it working (i.e. you import test_plain like the
+README says and you can run it), please let me know what steps you
+needed to take for your system, so I can append the instructions to
+this file.
+

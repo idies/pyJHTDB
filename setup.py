@@ -115,10 +115,12 @@ setup(
 
         #### package description stuff goes here
         description = 'Python wrapper for the Johns Hopkins turbulence database library',
+        long_description = open('README.rst', 'r').read(),
         author = AUTHOR,
         author_email = AUTHOR_EMAIL,
         license = 'Apache Version 2.0',
         url = GROUP_URL,
+        download_url = 'https://github.com/chichilalescu/pyJHTDB',
         classifiers = [
             'Development Status :: 4 - Beta',
             'Environment :: Console',

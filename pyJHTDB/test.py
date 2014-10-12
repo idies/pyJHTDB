@@ -38,13 +38,13 @@ except ImportError:
 
 try:
     import h5py
+    import pyJHTDB.cutout
 except ImportError:
     print 'h5py is needed for working with cutouts.'
     h5py = None
 
 import pyJHTDB
 import pyJHTDB.dbinfo
-import pyJHTDB.cutout
 
 def test_plain(N=10):
     #time = 0.364
@@ -277,53 +277,57 @@ def contour_check(
         fig.savefig('plane_' + coordname[i] + '_0.png', format = 'png', dpi = 100)
     return None
 
-def clean_2D_field(
-        field_2D,
-        dpi = 100,
-        figname = 'tst',
-        cmap = cm.jet,
-        img_type = 'pdf'):
-    fig = plt.figure(
-                figsize=(field_2D.shape[1]*1./dpi,
-                         field_2D.shape[0]*1./dpi))
-    ax = fig.add_axes([.0, .0, 1., 1.], frameon=False)
-    ax.set_axis_off()
-    im = ax.imshow(field_2D,
-            interpolation='none',
-            cmap = cmap)
-    fig.savefig(
-            figname + '.' + img_type,
-            dpi = dpi,
-            format = img_type)
-    return None
+if plt and cm:
 
-def test_cutout():
-    pyJHTDB.cutout.get_big_cutout(
-            t0 = 0, tl = 2,
-            x0 = 243, xl = 32,
-            y0 = 48, yl = 30,
-            z0 = 48, zl = 26,
-            chunk_xdim = 16,
-            chunk_ydim = 15,
-            chunk_zdim = 13,
-            data_set = 'mhd1024',
-            data_type = 'ub',
-            filename = 'tmp',
-            base_website = 'turbulence.pha.jhu.edu')
-    data = h5py.File('tmp.h5', mode = 'r')
-    energy = (data['u00000'][0, :, :, 0]**2
-            + data['u00000'][0, :, :, 1]**2
-            + data['u00000'][0, :, :, 2]**2)
-    clean_2D_field(energy, figname = 'tst_0yx')
-    energy = (data['u00000'][:, 0, :, 0]**2
-            + data['u00000'][:, 0, :, 1]**2
-            + data['u00000'][:, 0, :, 2]**2)
-    clean_2D_field(energy, figname = 'tst_z0x')
-    energy = (data['u00000'][:, :, 0, 0]**2
-            + data['u00000'][:, :, 0, 1]**2
-            + data['u00000'][:, :, 0, 2]**2)
-    clean_2D_field(energy, figname = 'tst_zy0')
-    return None
+    def clean_2D_field(
+            field_2D,
+            dpi = 100,
+            figname = 'tst',
+            cmap = cm.jet,
+            img_type = 'pdf'):
+        fig = plt.figure(
+                    figsize=(field_2D.shape[1]*1./dpi,
+                             field_2D.shape[0]*1./dpi))
+        ax = fig.add_axes([.0, .0, 1., 1.], frameon=False)
+        ax.set_axis_off()
+        im = ax.imshow(field_2D,
+                interpolation='none',
+                cmap = cmap)
+        fig.savefig(
+                figname + '.' + img_type,
+                dpi = dpi,
+                format = img_type)
+        return None
+
+if h5py:
+
+    def test_cutout():
+        pyJHTDB.cutout.get_big_cutout(
+                t0 = 0, tl = 2,
+                x0 = 243, xl = 32,
+                y0 = 48, yl = 30,
+                z0 = 48, zl = 26,
+                chunk_xdim = 16,
+                chunk_ydim = 15,
+                chunk_zdim = 13,
+                data_set = 'mhd1024',
+                data_type = 'ub',
+                filename = 'tmp',
+                base_website = 'turbulence.pha.jhu.edu')
+        data = h5py.File('tmp.h5', mode = 'r')
+        energy = (data['u00000'][0, :, :, 0]**2
+                + data['u00000'][0, :, :, 1]**2
+                + data['u00000'][0, :, :, 2]**2)
+        clean_2D_field(energy, figname = 'tst_0yx')
+        energy = (data['u00000'][:, 0, :, 0]**2
+                + data['u00000'][:, 0, :, 1]**2
+                + data['u00000'][:, 0, :, 2]**2)
+        clean_2D_field(energy, figname = 'tst_z0x')
+        energy = (data['u00000'][:, :, 0, 0]**2
+                + data['u00000'][:, :, 0, 1]**2
+                + data['u00000'][:, :, 0, 2]**2)
+        clean_2D_field(energy, figname = 'tst_zy0')
+        return None
 
 def test_misc():
     # load shared library
