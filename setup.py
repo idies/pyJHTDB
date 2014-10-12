@@ -26,6 +26,7 @@
 # some global settings
 #
 TURBLIB_VERSION = '20140606'
+HDF5_ON = True
 GROUP_URL = 'http://turbulence.pha.jhu.edu/'
 GROUP_EMAIL = 'turbulence@pha.jhu.edu'
 GROUP_NAME  = 'Johns Hopkins Turbulence Database Group'
@@ -39,12 +40,18 @@ AUTHOR_EMAIL = GROUP_EMAIL
 ########################################################################
 #
 # define version for pyJHTDB
-# TODO: the version should come from checking
-#      when the sources were last modified.
+# TODO:
+#   1. VERSION should come from checkingwhen the sources were last
+#      modified.
+#   2. VERSION should contain information on whether or not it depends
+#      on the hdf5 library.
 #
 import datetime
 now = datetime.datetime.now()
 date_name = '{0:0>4}{1:0>2}{2:0>2}'.format(now.year, now.month, now.day)
+VERSION = date_name
+#if HDF5_ON:
+#    VERSION += '-hdf5'
 #
 ########################################################################
 
@@ -87,7 +94,7 @@ h5cc_present = not (h5cc_executable == None)
 
 libraries = []
 macros = []
-if h5cc_present:
+if h5cc_present and HDF5_ON:
     libraries.append('hdf5')
     macros.append(('CUTOUT_SUPPORT', '1'))
 
@@ -105,7 +112,7 @@ libJHTDB = Extension(
 
 setup(
         name = 'pyJHTDB',
-        version = date_name,
+        version = VERSION,
         packages = ['pyJHTDB'],
         package_data = {'pyJHTDB': ['data/channel_xgrid.npy',
                                     'data/channel_ygrid.npy',
