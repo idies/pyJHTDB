@@ -277,28 +277,31 @@ def contour_check(
         fig.savefig('plane_' + coordname[i] + '_0.png', format = 'png', dpi = 100)
     return None
 
-def clean_2D_field(
-        field_2D,
-        dpi = 100,
-        figname = 'tst',
-        cmap = cm.jet,
-        img_type = 'pdf'):
-    fig = plt.figure(
-                figsize=(field_2D.shape[1]*1./dpi,
-                         field_2D.shape[0]*1./dpi))
-    ax = fig.add_axes([.0, .0, 1., 1.], frameon=False)
-    ax.set_axis_off()
-    im = ax.imshow(field_2D,
-            interpolation='none',
-            cmap = cmap)
-    fig.savefig(
-            figname + '.' + img_type,
-            dpi = dpi,
-            format = img_type)
-    return None
+if plt and cm:
 
-def test_cutout():
-    if h5py:
+    def clean_2D_field(
+            field_2D,
+            dpi = 100,
+            figname = 'tst',
+            cmap = cm.jet,
+            img_type = 'pdf'):
+        fig = plt.figure(
+                    figsize=(field_2D.shape[1]*1./dpi,
+                             field_2D.shape[0]*1./dpi))
+        ax = fig.add_axes([.0, .0, 1., 1.], frameon=False)
+        ax.set_axis_off()
+        im = ax.imshow(field_2D,
+                interpolation='none',
+                cmap = cmap)
+        fig.savefig(
+                figname + '.' + img_type,
+                dpi = dpi,
+                format = img_type)
+        return None
+
+if h5py:
+
+    def test_cutout():
         pyJHTDB.cutout.get_big_cutout(
                 t0 = 0, tl = 2,
                 x0 = 243, xl = 32,
@@ -324,7 +327,7 @@ def test_cutout():
                 + data['u00000'][:, :, 0, 1]**2
                 + data['u00000'][:, :, 0, 2]**2)
         clean_2D_field(energy, figname = 'tst_zy0')
-    return None
+        return None
 
 def test_misc():
     # load shared library
