@@ -541,8 +541,6 @@ int interpolateBoxFilter(
     return 0;
 }
 
-#endif//CUTOUT_SUPPORT
-
 int getFilteredPosition(
         char *authToken,
         char *dataset,
@@ -603,4 +601,6 @@ int getFilteredPosition(
     }
     return 0;
 }
+
+#endif//CUTOUT_SUPPORT
 
