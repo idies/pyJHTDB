@@ -78,8 +78,11 @@ if os.path.isfile(homefolder + '/JHTDB_user_token.txt'):
 try:
     import h5py
 except ImportError:
+    h5py = None
     print 'h5py not found. cutout functionality not available.'
 
 from libJHTDB import *
-from test import test_plain, test_misc, test_cutout
+from test import test_plain, test_misc
+if h5py:
+    from test import test_cutout
 
