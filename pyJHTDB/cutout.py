@@ -20,7 +20,12 @@
 ###############################################################################
 
 import os
-import urllib.request, urllib.parse, urllib.error
+import sys
+if sys.version_info[0] == 2:
+    import urllib
+elif sys.version_info[0] == 3:
+    import urllib.request, urllib.parse, urllib.error
+
 import numpy as np
 import h5py
 
@@ -51,7 +56,10 @@ def get_cutout(
     print('Retrieving h5 file, size {0} MB = {1} MiB.'.format(
             xl*yl*zl*ncomponents * 4. / 10**6,
             xl*yl*zl*ncomponents * 4. / 2**20))
-    urllib.request.urlretrieve(url, filename + '.h5')
+    if sys.verion_info[0] == 2:
+        urllib.urlretrieve(url, filename + '.h5')
+    elif sys.version_info[0] == 3:
+        urllib.request.urlretrieve(url, filename + '.h5')
     # check if file downloaded ok
     data = h5py.File(filename + '.h5', mode = 'r')
     data.close()
