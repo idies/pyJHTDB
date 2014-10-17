@@ -39,7 +39,7 @@ class libJHTDB(object):
         self.libname = 'libJHTDB'
         lib_location = os.path.dirname(inspect.getfile(pyJHTDB))
         self.lib = np.ctypeslib.load_library(self.libname, os.path.abspath(os.path.join(lib_location, os.path.pardir)))
-        self.authToken = ctypes.c_char_p(auth_token)
+        self.authToken = ctypes.c_char_p(auth_token.encode('ascii'))
         self.connection_on = False
         self.hdf5_file_list = []
         self.hdf5_file_desc = {}
@@ -65,7 +65,7 @@ class libJHTDB(object):
             for key in ['_contents', '_dataset', '_size', '_start']:
                 self.hdf5_file_desc[filename][key] = data[key][:]
             data.close()
-            return self.lib.turblibAddLocalSource(ctypes.c_char_p(filename + '.h5'))
+            return self.lib.turblibAddLocalSource(ctypes.c_char_p((filename + '.h5')).encode('ascii'))
         else:
             return 0
     def getData(self,
@@ -82,7 +82,7 @@ class libJHTDB(object):
             sys.exit()
             return None
         if not (point_coords.dtype == np.float32):
-            print 'point coordinates in getData must be floats. stopping.'
+            print('point coordinates in getData must be floats. stopping.')
             sys.exit()
             return None
         npoints = point_coords.shape[0]
@@ -135,15 +135,15 @@ class libJHTDB(object):
                              'getVectorPotentialHessianSoap']:
             result_dim = 18
         else:
-            print ('wrong result type requested in getData\n'
-                 + 'maybe it\'s just missing from the list?')
+            print(('wrong result type requested in getData\n'
+                 + 'maybe it\'s just missing from the list?'))
             sys.exit()
             return None
         newshape = list(point_coords.shape[0:len(point_coords.shape)-1])
         newshape.append(result_dim)
         result_array = np.empty(newshape, dtype=np.float32)
         get_data(self.authToken,
-                 ctypes.c_char_p(data_set),
+                 ctypes.c_char_p((data_set).encode('ascii')),
                  ctypes.c_float(time),
                  ctypes.c_int(sinterp), ctypes.c_int(tinterp), ctypes.c_int(npoints),
                  point_coords.ctypes.data_as(ctypes.POINTER(ctypes.POINTER(ctypes.c_float))),
@@ -163,7 +163,7 @@ class libJHTDB(object):
             sys.exit()
             return None
         if not (point_coords.dtype == np.float32):
-            print 'point coordinates in getBoxFilter must be floats. stopping.'
+            print('point coordinates in getBoxFilter must be floats. stopping.')
             sys.exit()
             return None
         npoints = point_coords.shape[0]
@@ -175,8 +175,8 @@ class libJHTDB(object):
             np.mod(pcoords, 2*np.pi, point_coords)
         result_array = point_coords.copy()
         self.lib.getBoxFilter(self.authToken,
-                 ctypes.c_char_p(data_set),
-                 ctypes.c_char_p(field),
+                 ctypes.c_char_p((data_set).encode('ascii')),
+                 ctypes.c_char_p((field).encode('ascii')),
                  ctypes.c_float(time),
                  ctypes.c_float(filter_width),
                  ctypes.c_int(npoints),
@@ -197,8 +197,8 @@ class libJHTDB(object):
         result_size = ctypes.c_int()
         call_result = self.lib.getThreshold(
                 self.authToken,
-                ctypes.c_char_p(data_set),
-                ctypes.c_char_p(field),
+                ctypes.c_char_p((data_set).encode('ascii')),
+                ctypes.c_char_p((field).encode('ascii')),
                 ctypes.c_float(time),
                 ctypes.c_float(threshold),
                 ctypes.c_int32(sinterp),
@@ -245,20 +245,20 @@ class libJHTDB(object):
         evolver = self.lib.getPosition
         if data_set == 'custom':
             evolver = self.lib.getCustomPosition
-        print 'starting integration loop, dataset is ', data_set
+        print('starting integration loop, dataset is ', data_set)
         for tstep in range(1, steps_to_keep + 1):
-            print 'at time step {0} out of {1}'.format(tstep, steps_to_keep)
+            print('at time step {0} out of {1}'.format(tstep, steps_to_keep))
             pcoords = traj_array[tstep - 1].copy()
             evolver(
                     self.authToken,
-                    ctypes.c_char_p(data_set),
+                    ctypes.c_char_p(data_set.encode('ascii')),
                     ctypes.c_float(time_array[tstep-1]),
                     ctypes.c_float(time_array[tstep  ]),
                     ctypes.c_float(dt),
                     ctypes.c_int(sinterp), ctypes.c_int(npoints),
                     pcoords.ctypes.data_as(ctypes.POINTER(ctypes.POINTER(ctypes.c_float))),
                     result_array.ctypes.data_as(ctypes.POINTER(ctypes.POINTER(ctypes.c_float))))
-            print 'got next position for time step {0}'.format(tstep)
+            print('got next position for time step {0}'.format(tstep))
             traj_array[tstep] = result_array
         return traj_array, time_array
     def getFilteredPosition(self,
@@ -286,11 +286,11 @@ class libJHTDB(object):
         time_array[0] = starttime
         evolver = self.lib.getFilteredPosition
         for tstep in range(1, steps_to_keep + 1):
-            print 'at time step {0} out of {1}'.format(tstep, steps_to_keep)
+            print('at time step {0} out of {1}'.format(tstep, steps_to_keep))
             pcoords = traj_array[tstep - 1].copy()
             evolver(
                     self.authToken,
-                    ctypes.c_char_p(data_set),
+                    ctypes.c_char_p(data_set.encode('ascii')),
                     ctypes.c_float(starttime + (tstep - 1)*integration_time),
                     ctypes.c_float(starttime +  tstep     *integration_time),
                     ctypes.c_float(dt),
@@ -330,7 +330,7 @@ class libJHTDB(object):
         def getBunit(point_coords):
             get_data(
                     self.authToken,
-                    ctypes.c_char_p(data_set),
+                    ctypes.c_char_p(data_set.encode('ascii')),
                     ctypes.c_float(time),
                     ctypes.c_int(sinterp), ctypes.c_int(tinterp), ctypes.c_int(npoints),
                     point_coords.ctypes.data_as(ctypes.POINTER(ctypes.POINTER(ctypes.c_float))),
@@ -372,7 +372,7 @@ class libJHTDB(object):
             #print point_coords
             get_data(
                     self.authToken,
-                    ctypes.c_char_p(data_set),
+                    ctypes.c_char_p(data_set.encode('ascii')),
                     ctypes.c_float(time),
                     ctypes.c_int(sinterp), ctypes.c_int(tinterp), ctypes.c_int(1),
                     point_coords.ctypes.data_as(ctypes.POINTER(ctypes.POINTER(ctypes.c_float))),
@@ -427,7 +427,7 @@ class libJHTDB(object):
             print('you didn\'t connect to the database')
             sys.exit()
         if not (x0.shape[1] == 3 and len(x0.shape) == 2):
-            print ('wrong shape of initial condition in getBlineAlt, ', x0.shape)
+            print(('wrong shape of initial condition in getBlineAlt, ', x0.shape))
             sys.exit()
             return None
         npoints = x0.shape[0]
@@ -435,7 +435,7 @@ class libJHTDB(object):
         result_array[0] = x0
         self.lib.getBline(
                 self.authToken,
-                ctypes.c_char_p(data_set),
+                ctypes.c_char_p(data_set.encode('ascii')),
                 ctypes.c_float(time),
                 ctypes.c_int(nsteps),
                 ctypes.c_float(ds),
@@ -457,7 +457,7 @@ class libJHTDB(object):
             print('you didn\'t connect to the database')
             sys.exit()
         if not (x0.shape[1] == 3 and len(x0.shape) == 2):
-            print ('wrong shape of initial condition in getBlineAlt, ', x0.shape)
+            print(('wrong shape of initial condition in getBlineAlt, ', x0.shape))
             sys.exit()
             return None
         nsteps = int(S / abs(ds))
@@ -467,7 +467,7 @@ class libJHTDB(object):
         result_array[:, 0] = x0
         self.lib.getSphericalBoundedBline(
                 self.authToken,
-                ctypes.c_char_p(data_set),
+                ctypes.c_char_p(data_set.encode('ascii')),
                 ctypes.c_float(time),
                 ctypes.c_int(nsteps),
                 ctypes.c_float(ds),
@@ -484,7 +484,7 @@ class libJHTDB(object):
             result_array[:, 0] = x0
             self.lib.getSphericalBoundedBline(
                     self.authToken,
-                    ctypes.c_char_p(data_set),
+                    ctypes.c_char_p(data_set.encode('ascii')),
                     ctypes.c_float(time),
                     ctypes.c_int(nsteps),
                     ctypes.c_float(-ds),
@@ -513,7 +513,7 @@ class libJHTDB(object):
             print('you didn\'t connect to the database')
             sys.exit()
         if not (x0.shape[1] == 3 and len(x0.shape) == 2):
-            print ('wrong shape of initial condition in getBlineAlt, ', x0.shape)
+            print(('wrong shape of initial condition in getBlineAlt, ', x0.shape))
             sys.exit()
             return None
         nsteps = int(S / abs(ds))
@@ -523,7 +523,7 @@ class libJHTDB(object):
         result_array[:, 0] = x0
         self.lib.getSphericalBoundedBlineDebug(
                 self.authToken,
-                ctypes.c_char_p(data_set),
+                ctypes.c_char_p(data_set.encode('ascii')),
                 ctypes.c_float(time),
                 ctypes.c_int(nsteps),
                 ctypes.c_float(ds),
@@ -540,7 +540,7 @@ class libJHTDB(object):
             result_array[:, 0] = x0
             self.lib.getSphericalBoundedBlineDebug(
                     self.authToken,
-                    ctypes.c_char_p(data_set),
+                    ctypes.c_char_p(data_set.encode('ascii')),
                     ctypes.c_float(time),
                     ctypes.c_int(nsteps),
                     ctypes.c_float(-ds),
@@ -570,7 +570,7 @@ class libJHTDB(object):
             print('you didn\'t connect to the database')
             sys.exit()
         if not (x0.shape[1] == 3 and len(x0.shape) == 2):
-            print ('wrong shape of initial condition in getBlineAlt, ', x0.shape)
+            print(('wrong shape of initial condition in getBlineAlt, ', x0.shape))
             sys.exit()
             return None
         nsteps = int(S / abs(ds))
@@ -580,7 +580,7 @@ class libJHTDB(object):
         result_array[:, 0] = x0
         self.lib.getRectangularBoundedBline(
                 self.authToken,
-                ctypes.c_char_p(data_set),
+                ctypes.c_char_p(data_set.encode('ascii')),
                 ctypes.c_float(time),
                 ctypes.c_int(nsteps),
                 ctypes.c_float(ds),
@@ -596,7 +596,7 @@ class libJHTDB(object):
             result_array[:, 0] = x0
             self.lib.getRectangularBoundedBline(
                     self.authToken,
-                    ctypes.c_char_p(data_set),
+                    ctypes.c_char_p(data_set.encode('ascii')),
                     ctypes.c_float(time),
                     ctypes.c_int(nsteps),
                     ctypes.c_float(-ds),

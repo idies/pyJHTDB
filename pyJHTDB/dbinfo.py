@@ -27,27 +27,27 @@ package_dir, package_filename = os.path.split(__file__)
 isotropic1024coarse = {'name'   : 'isotropic1024coarse'}
 
 for coord in ['x', 'y', 'z']:
-    isotropic1024coarse[coord + 'nodes'] = (np.pi/512)*np.array(range(1024), dtype = np.float32)
+    isotropic1024coarse[coord + 'nodes'] = (np.pi/512)*np.array(list(range(1024)), dtype = np.float32)
     isotropic1024coarse['n' + coord] = 1024
     isotropic1024coarse['l' + coord] = 2*np.pi
     isotropic1024coarse['d' + coord] = np.pi/512
     isotropic1024coarse[coord + 'periodic'] = True
     isotropic1024coarse[coord + 'uniform'] = True
-isotropic1024coarse['time'] = np.array(range(1024), dtype = np.float32) * 2.048 / 1024
+isotropic1024coarse['time'] = np.array(list(range(1024)), dtype = np.float32) * 2.048 / 1024
 
 mhd1024 = {}
-for key in isotropic1024coarse.keys():
+for key in list(isotropic1024coarse.keys()):
     mhd1024[key] = isotropic1024coarse[key]
 mhd1024['name'] = 'mhd1024'
 
 for coord in ['x', 'y', 'z']:
-    mhd1024[coord + 'nodes'] = (np.pi/512)*np.array(range(1024), dtype = np.float32)
+    mhd1024[coord + 'nodes'] = (np.pi/512)*np.array(list(range(1024)), dtype = np.float32)
     mhd1024['n' + coord] = 1024
     mhd1024['l' + coord] = 2*np.pi
     mhd1024['d' + coord] = np.pi/512
     mhd1024[coord + 'periodic'] = True
     mhd1024[coord + 'uniform'] = True
-mhd1024['time'] = np.array(range(1024), dtype = np.float32) * 2.56 / 1024
+mhd1024['time'] = np.array(list(range(1024)), dtype = np.float32) * 2.56 / 1024
 mhd1024['nu']  = 1.1e-4
 mhd1024['eta'] = 1.1e-4
 mhd1024['diss_u'] = 1.1e-2
