@@ -1,23 +1,43 @@
-###############################################################################
+########################################################################
 #
-#    Copyright 2014 Johns Hopkins University
+#  Copyright 2014 Johns Hopkins University
 #
-#   Licensed under the Apache License, Version 2.0 (the "License");
-#   you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-#       http://www.apache.org/licenses/LICENSE-2.0
+#     http://www.apache.org/licenses/LICENSE-2.0
 #
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 #
-#   Contact: turbulence@pha.jhu.edu
-#   Website: http://turbulence.pha.jhu.edu/
+# Contact: turbulence@pha.jhu.edu
+# Website: http://turbulence.pha.jhu.edu/
 #
-###############################################################################
+########################################################################
+
+"""
+Python tools and wrappers for the Johns Hopkins Turbulence Database
+Cluster C library.
+Contact: turbulence@pha.jhu.edu
+Website: http://turbulence.pha.jhu.edu/
+
+Although this particular Python wrapper is still a work in progress, it
+is mature enough to be used in production work.
+
+On first contact with this library, we recommend that you first run
+"test_plain". To be more specific::
+
+  >>> from pyJHTDB import test_plain
+  >>> test_plain()
+
+The code that is executed can be found in "test.py", and it's the
+simplest example of how to access the turbulence database.
+
+"""
 
 import numpy as np
 import sympy as sp
