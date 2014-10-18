@@ -247,6 +247,7 @@ def plot_generic_weight_functions(
             neighbours = n)
     tst0.compute_derivs()
     tst0.compute_beta()
+    tst0.compute_fast_beta()
     xval = []
     for i in range(x.shape[0]-1):
         xtmp = [x[i] + k*.1*(x[i+1] - x[i])
@@ -260,7 +261,7 @@ def plot_generic_weight_functions(
         y = np.zeros(x.shape, x.dtype)
         y[i] = 1
         tst0.put_yvals(y)
-        f = tst0.compute(xval)
+        f = np.array([tst0(xvar) for xvar in xval])
         ax.plot(xval, f)
     fig.savefig('test.pdf', format = 'pdf')
     return None
