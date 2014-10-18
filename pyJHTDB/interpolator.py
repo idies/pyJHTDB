@@ -19,26 +19,6 @@
 #
 ########################################################################
 
-"""
-Python tools and wrappers for the Johns Hopkins Turbulence Database
-Cluster C library.
-Contact: turbulence@pha.jhu.edu
-Website: http://turbulence.pha.jhu.edu/
-
-Although this particular Python wrapper is still a work in progress, it
-is mature enough to be used in production work.
-
-On first contact with this library, we recommend that you first run
-"test_plain". To be more specific::
-
-  >>> from pyJHTDB import test_plain
-  >>> test_plain()
-
-The code that is executed can be found in "test.py", and it's the
-simplest example of how to access the turbulence database.
-
-"""
-
 import numpy as np
 import os
 import pickle
