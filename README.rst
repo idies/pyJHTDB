@@ -15,15 +15,18 @@ ubuntu 14.04
 ------------
 
 Bare-bone installation::
+
     sudo apt-get install build-essential gfortran
     sudo apt-get install python-setuptools
     sudo apt-get install python-dev
     sudo easy_install numpy
     sudo python setup.py install
+
 Note that doing this should, in principle, also install ``sympy`` on your
 system, since it's used by ``pyJHTDB``.
 
 Happy fun installation::
+
     sudo apt-get install build-essential gfortran
     sudo apt-get install python-setuptools
     sudo apt-get install python-dev
@@ -33,6 +36,7 @@ Happy fun installation::
     sudo easy_install h5py
     sudo easy_install matplotlib
     sudo python setup.py install
+
 Please note that before you run ``sudo python setup.py install``, you
 will need to edit the ``turblib-20140606/turblib.c`` file: on line 53,
 please add a comma after the closing curly brace, before the ``//``.
