@@ -56,7 +56,7 @@ def get_cutout(
     print('Retrieving h5 file, size {0} MB = {1} MiB.'.format(
             xl*yl*zl*ncomponents * 4. / 10**6,
             xl*yl*zl*ncomponents * 4. / 2**20))
-    if sys.verion_info[0] == 2:
+    if sys.version_info[0] == 2:
         urllib.urlretrieve(url, filename + '.h5')
     elif sys.version_info[0] == 3:
         urllib.request.urlretrieve(url, filename + '.h5')
@@ -80,13 +80,13 @@ def get_big_cutout(
         auth_token = 'edu.jhu.pha.turbulence.testing-201302',
         base_website = 'turbulence.pha.jhu.edu'):
     big_data_file = h5py.File(filename + '.h5', mode='w')
-    xchunk_list = [chunk_xdim for n in range(xl / chunk_xdim)]
+    xchunk_list = [chunk_xdim for n in range(int(xl / chunk_xdim))]
     if not (xl % chunk_xdim == 0):
         xchunk_list.append(xl % chunk_xdim)
-    ychunk_list = [chunk_ydim for n in range(yl / chunk_ydim)]
+    ychunk_list = [chunk_ydim for n in range(int(yl / chunk_ydim))]
     if not (yl % chunk_ydim == 0):
         ychunk_list.append(yl % chunk_ydim)
-    zchunk_list = [chunk_zdim for n in range(zl / chunk_zdim)]
+    zchunk_list = [chunk_zdim for n in range(int(zl / chunk_zdim))]
     if not (zl % chunk_zdim == 0):
         zchunk_list.append(zl % chunk_zdim)
     for current_data_type in data_type:
