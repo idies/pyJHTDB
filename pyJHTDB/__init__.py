@@ -83,6 +83,7 @@ except ImportError:
 
 from .libJHTDB import *
 from .test import test_plain, test_misc
+from .generic_splines import main0 as test_gs
 if h5py:
     from .test import test_cutout
 
