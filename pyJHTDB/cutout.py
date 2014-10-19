@@ -1,26 +1,31 @@
-###############################################################################
+########################################################################
 #
-#    Copyright 2014 Johns Hopkins University
+#  Copyright 2014 Johns Hopkins University
 #
-#   Licensed under the Apache License, Version 2.0 (the "License");
-#   you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-#       http://www.apache.org/licenses/LICENSE-2.0
+#     http://www.apache.org/licenses/LICENSE-2.0
 #
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 #
-#   Contact: turbulence@pha.jhu.edu
-#   Website: http://turbulence.pha.jhu.edu/
+# Contact: turbulence@pha.jhu.edu
+# Website: http://turbulence.pha.jhu.edu/
 #
-###############################################################################
+########################################################################
 
 import os
-import urllib
+import sys
+if sys.version_info[0] == 2:
+    import urllib
+elif sys.version_info[0] == 3:
+    import urllib.request, urllib.parse, urllib.error
+
 import numpy as np
 import h5py
 
@@ -41,21 +46,24 @@ def get_cutout(
          + '{0},{1}/'.format(x0, xl)
          + '{0},{1}/'.format(y0, yl)
          + '{0},{1}/'.format(z0, zl))
-    print url
+    print(url)
     if data_type in ['u', 'b', 'a']:
         ncomponents = 3
     elif data_type in ['p']:
         ncomponents = 1
     elif data_type in ['ub']:
         ncomponents = 6
-    print 'Retrieving h5 file, size {0} MB = {1} MiB.'.format(
+    print('Retrieving h5 file, size {0} MB = {1} MiB.'.format(
             xl*yl*zl*ncomponents * 4. / 10**6,
-            xl*yl*zl*ncomponents * 4. / 2**20)
-    urllib.urlretrieve(url, filename + '.h5')
+            xl*yl*zl*ncomponents * 4. / 2**20))
+    if sys.version_info[0] == 2:
+        urllib.urlretrieve(url, filename + '.h5')
+    elif sys.version_info[0] == 3:
+        urllib.request.urlretrieve(url, filename + '.h5')
     # check if file downloaded ok
     data = h5py.File(filename + '.h5', mode = 'r')
     data.close()
-    print 'Data downloaded and ' + filename + '.h5 written successfuly.'
+    print('Data downloaded and ' + filename + '.h5 written successfuly.')
     return None
 
 def get_big_cutout(
@@ -72,13 +80,13 @@ def get_big_cutout(
         auth_token = 'edu.jhu.pha.turbulence.testing-201302',
         base_website = 'turbulence.pha.jhu.edu'):
     big_data_file = h5py.File(filename + '.h5', mode='w')
-    xchunk_list = [chunk_xdim for n in range(xl / chunk_xdim)]
+    xchunk_list = [chunk_xdim for n in range(int(xl / chunk_xdim))]
     if not (xl % chunk_xdim == 0):
         xchunk_list.append(xl % chunk_xdim)
-    ychunk_list = [chunk_ydim for n in range(yl / chunk_ydim)]
+    ychunk_list = [chunk_ydim for n in range(int(yl / chunk_ydim))]
     if not (yl % chunk_ydim == 0):
         ychunk_list.append(yl % chunk_ydim)
-    zchunk_list = [chunk_zdim for n in range(zl / chunk_zdim)]
+    zchunk_list = [chunk_zdim for n in range(int(zl / chunk_zdim))]
     if not (zl % chunk_zdim == 0):
         zchunk_list.append(zl % chunk_zdim)
     for current_data_type in data_type:
@@ -97,7 +105,8 @@ def get_big_cutout(
             for cy in range(len(ychunk_list)):
                 for cx in range(len(xchunk_list)):
                     for time in range(t0, t0 + tl):
-                        tmp_filename = filename + '_{0:0>2x}{1:0>2x}{2:0>2x}_{3}'.format(cz, cy, cx, current_data_type)
+                        tmp_filename = (filename
+                                      + '_{0:0>2x}{1:0>2x}{2:0>2x}_{3}'.format(cz, cy, cx, current_data_type))
                         if not os.path.exists(tmp_filename + '.h5'):
                             get_cutout(
                                     tmp_filename,
@@ -152,7 +161,7 @@ def main():
             data_set = 'mhd1024',
             data_type = data_type)
         f0 = h5py.File('tst.h5', mode='r')
-        print(data_type, f0['_contents'][:])
+        print((data_type, f0['_contents'][:]))
         f0.close()
     return None
 

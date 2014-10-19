@@ -1,23 +1,23 @@
-###############################################################################
+########################################################################
 #
-#    Copyright 2014 Johns Hopkins University
+#  Copyright 2014 Johns Hopkins University
 #
-#   Licensed under the Apache License, Version 2.0 (the "License");
-#   you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-#       http://www.apache.org/licenses/LICENSE-2.0
+#     http://www.apache.org/licenses/LICENSE-2.0
 #
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 #
-#   Contact: turbulence@pha.jhu.edu
-#   Website: http://turbulence.pha.jhu.edu/
+# Contact: turbulence@pha.jhu.edu
+# Website: http://turbulence.pha.jhu.edu/
 #
-###############################################################################
+########################################################################
 
 import numpy as np
 import os
@@ -88,13 +88,13 @@ class spline_interpolator:
         xfrac = (points[:, 0] - self.info['xnodes'][xgrid])/self.info['dx']
         for p in range(points.shape[0]):
             field_points[p, :, :, :, 0] = (self.info['xnodes'][xgrid[p]]
-                    + np.array(range(-self.n, self.n+2))*self.info['dx'])[np.newaxis, np.newaxis, :]
+                    + np.array(list(range(-self.n, self.n+2)))*self.info['dx'])[np.newaxis, np.newaxis, :]
         if self.info['yperiodic']:
             ygrid = np.floor(points[:, 1] / self.info['dy']).astype(np.int) % self.info['ny']
             yfrac = (points[:, 1] - self.info['ynodes'][ygrid])/self.info['dy']
             for p in range(points.shape[0]):
                 field_points[p, :, :, :, 1] = (self.info['ynodes'][ygrid[p]]
-                        + np.array(range(-self.n, self.n+2))*self.info['dy'])[np.newaxis, :, np.newaxis]
+                        + np.array(list(range(-self.n, self.n+2)))*self.info['dy'])[np.newaxis, :, np.newaxis]
         else:
             ygrid = np.searchsorted(self.info['ynodes'], points[:, 1]).astype(np.int) - 1
             yfrac = (points[:, 1] - self.info['ynodes'][ygrid])/self.info['dy'][ygrid]
@@ -111,8 +111,8 @@ class spline_interpolator:
         zfrac = (points[:, 2] - self.info['znodes'][zgrid])/self.info['dz']
         for p in range(points.shape[0]):
             field_points[p, :, :, :, 2] = (self.info['znodes'][zgrid[p]]
-                    + np.array(range(-self.n, self.n+2))*self.info['dz'])[:, np.newaxis, np.newaxis]
-        print 'computed points where field is needed, now getting values from DB'
+                    + np.array(list(range(-self.n, self.n+2)))*self.info['dz'])[:, np.newaxis, np.newaxis]
+        print('computed points where field is needed, now getting values from DB')
         ## I could in principle call getRaw[...] for each point,
         ## but that would mean a lot of calls to the DB,
         ## and we should avoid that due to the latency.
@@ -121,7 +121,7 @@ class spline_interpolator:
                 sinterp = 0, tinterp = 0,
                 data_set = self.info['name'],
                 getFunction = getFunction)
-        print 'got values from DB, now interpolating'
+        print('got values from DB, now interpolating')
         result = np.zeros((len(dorder), points.shape[0], field_values.shape[-1]), dtype = np.float32)
         bxi = 0
         if self.info['yperiodic']:

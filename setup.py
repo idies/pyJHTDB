@@ -1,24 +1,24 @@
 #! /usr/bin/env python
-###############################################################################
+########################################################################
 #
-#    Copyright 2014 Johns Hopkins University
+#  Copyright 2014 Johns Hopkins University
 #
-#   Licensed under the Apache License, Version 2.0 (the "License");
-#   you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-#       http://www.apache.org/licenses/LICENSE-2.0
+#     http://www.apache.org/licenses/LICENSE-2.0
 #
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 #
-#   Contact: turbulence@pha.jhu.edu
-#   Website: http://turbulence.pha.jhu.edu/
+# Contact: turbulence@pha.jhu.edu
+# Website: http://turbulence.pha.jhu.edu/
 #
-###############################################################################
+########################################################################
 
 
 ########################################################################
@@ -26,6 +26,7 @@
 # some global settings
 #
 TURBLIB_VERSION = '20140606'
+HDF5_ON = True
 GROUP_URL = 'http://turbulence.pha.jhu.edu/'
 GROUP_EMAIL = 'turbulence@pha.jhu.edu'
 GROUP_NAME  = 'Johns Hopkins Turbulence Database Group'
@@ -39,12 +40,18 @@ AUTHOR_EMAIL = GROUP_EMAIL
 ########################################################################
 #
 # define version for pyJHTDB
-# TODO: the version should come from checking
-#      when the sources were last modified.
+# TODO:
+#   1. VERSION should come from checkingwhen the sources were last
+#      modified.
+#   2. VERSION should contain information on whether or not it depends
+#      on the hdf5 library.
 #
 import datetime
 now = datetime.datetime.now()
 date_name = '{0:0>4}{1:0>2}{2:0>2}'.format(now.year, now.month, now.day)
+VERSION = date_name
+#if HDF5_ON:
+#    VERSION += '-hdf5'
 #
 ########################################################################
 
@@ -87,7 +94,7 @@ h5cc_present = not (h5cc_executable == None)
 
 libraries = []
 macros = []
-if h5cc_present:
+if h5cc_present and HDF5_ON:
     libraries.append('hdf5')
     macros.append(('CUTOUT_SUPPORT', '1'))
 
@@ -105,13 +112,14 @@ libJHTDB = Extension(
 
 setup(
         name = 'pyJHTDB',
-        version = date_name,
+        version = VERSION,
         packages = ['pyJHTDB'],
         package_data = {'pyJHTDB': ['data/channel_xgrid.npy',
                                     'data/channel_ygrid.npy',
                                     'data/channel_zgrid.npy']},
-        install_requires = ['numpy>=1.8'],
+        install_requires = ['numpy>=1.8', 'sympy>=0.7.4.1'],
         ext_modules = [libJHTDB],
+        test_suite = 'tests',
 
         #### package description stuff goes here
         description = 'Python wrapper for the Johns Hopkins turbulence database library',

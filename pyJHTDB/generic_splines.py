@@ -1,23 +1,23 @@
-###############################################################################
+########################################################################
 #
-#    Copyright 2014 Johns Hopkins University
+#  Copyright 2014 Johns Hopkins University
 #
-#   Licensed under the Apache License, Version 2.0 (the "License");
-#   you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-#       http://www.apache.org/licenses/LICENSE-2.0
+#     http://www.apache.org/licenses/LICENSE-2.0
 #
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 #
-#   Contact: turbulence@pha.jhu.edu
-#   Website: http://turbulence.pha.jhu.edu/
+# Contact: turbulence@pha.jhu.edu
+# Website: http://turbulence.pha.jhu.edu/
 #
-###############################################################################
+########################################################################
 
 import numpy as np
 import sympy as sp
@@ -247,22 +247,35 @@ def plot_generic_weight_functions(
             neighbours = n)
     tst0.compute_derivs()
     tst0.compute_beta()
+    tst0.compute_fast_beta()
     xval = []
     for i in range(x.shape[0]-1):
         xtmp = [x[i] + k*.1*(x[i+1] - x[i])
                          for k in range(10)]
         xval += xtmp
     xval = np.array(xval)
-    fig = plt.figure(figsize=(12, 6))
-    ax = fig.add_axes([.1, .1, .8, .8])
-    ax.set_title('Weight functions for {0} neighbours and {1} continuous derivatives'.format(n, m))
-    for i in range(n+1):
-        y = np.zeros(x.shape, x.dtype)
-        y[i] = 1
-        tst0.put_yvals(y)
-        f = tst0.compute(xval)
-        ax.plot(xval, f)
-    fig.savefig('test.pdf', format = 'pdf')
+    if plt:
+        fig = plt.figure(figsize=(12, 6))
+        ax = fig.add_axes([.1, .1, .8, .8])
+        ax.set_title('Weight functions for {0} neighbours and {1} continuous derivatives'.format(n, m))
+        for i in range(n+1):
+            y = np.zeros(x.shape, x.dtype)
+            y[i] = 1
+            tst0.put_yvals(y)
+            f = np.array([tst0(xvar) for xvar in xval])
+            ax.plot(xval, f)
+        fig.savefig('test.pdf', format = 'pdf')
+    else:
+        print('didn\'t find matplotlib, so I\'m just gonna print out the weight functions.')
+        print('here are the points where I\'m computing them.')
+        print(xval)
+        print('and here are the weight functions.')
+        for i in range(n+1):
+            y = np.zeros(x.shape, x.dtype)
+            y[i] = 1
+            tst0.put_yvals(y)
+            f = np.array([tst0(xvar) for xvar in xval])
+            print(f)
     return None
 
 def main0():

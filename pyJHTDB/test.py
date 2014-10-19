@@ -1,23 +1,23 @@
-###############################################################################
+########################################################################
 #
-#    Copyright 2014 Johns Hopkins University
+#  Copyright 2014 Johns Hopkins University
 #
-#   Licensed under the Apache License, Version 2.0 (the "License");
-#   you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-#       http://www.apache.org/licenses/LICENSE-2.0
+#     http://www.apache.org/licenses/LICENSE-2.0
 #
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 #
-#   Contact: turbulence@pha.jhu.edu
-#   Website: http://turbulence.pha.jhu.edu/
+# Contact: turbulence@pha.jhu.edu
+# Website: http://turbulence.pha.jhu.edu/
 #
-###############################################################################
+########################################################################
 
 import os
 import sys
@@ -25,26 +25,21 @@ import ctypes
 import math
 import numpy
 
-homefolder = os.path.expanduser('~')
-
-try:
-    import matplotlib.pyplot as plt
-    import matplotlib.cm as cm
-except ImportError:
-    print 'matplotlib is needed for contour plots.'
-    print 'You should be able to find installation instructions at http://matplotlib.sourceforge.net'
-    plt = None
-    cm  = None
-
-try:
-    import h5py
-    import pyJHTDB.cutout
-except ImportError:
-    print 'h5py is needed for working with cutouts.'
-    h5py = None
-
 import pyJHTDB
 import pyJHTDB.dbinfo
+
+if pyJHTDB.found_matplotlib:
+    import matplotlib.pyplot as plt
+    import matplotlib.cm as cm
+else:
+    print('matplotlib is needed for contour plots.'
+        + 'You should be able to find installation instructions at http://matplotlib.sourceforge.net')
+
+if pyJHTDB.found_h5py:
+    import h5py
+    import pyJHTDB.cutout
+else:
+    print('h5py is needed for working with cutouts.')
 
 def test_plain(N=10):
     #time = 0.364
@@ -63,74 +58,74 @@ def test_plain(N=10):
     endTime = startTime + 0.012
     lag_dt = 0.0004
 
-    print 'Coordinates of {0} points where variables are requested:'.format(N)
+    print('Coordinates of {0} points where variables are requested:'.format(N))
     for p in range(N):
-        print p, points[p]
-    print 'Data is requested at time {0}'.format(time)
+        print(p, points[p])
+    print('Data is requested at time {0}'.format(time))
 
     # load shared library
     lTDB = pyJHTDB.libJHTDB()
     #initialize webservices
     lTDB.initialize()
 
-    print 'Requesting velocity at {0} points...'.format(N)
+    print('Requesting velocity at {0} points...'.format(N))
     result = lTDB.getData(time, points,
             sinterp = spatialInterp, tinterp = temporalInterp,
             getFunction = 'getVelocitySoap')
     for p in range(N):
-        print p, result[p]
-    print 'Requesting forcing at {0} points...'.format(N)
+        print(p, result[p])
+    print('Requesting forcing at {0} points...'.format(N))
     result = lTDB.getData(time, points,
             sinterp = spatialInterp, tinterp = temporalInterp,
             getFunction = 'getForce')
     for p in range(N):
-        print p, result[p]
-    print 'Requesting velocity and pressure at {0} points...'.format(N)
+        print(p, result[p])
+    print('Requesting velocity and pressure at {0} points...'.format(N))
     result = lTDB.getData(time, points,
             sinterp = spatialInterp, tinterp = temporalInterp,
             getFunction = 'getVelocityAndPressureSoap')
     for p in range(N):
-        print p, result[p][0:2], 'p = {0}'.format(result[p][3])
-    print 'Requesting velocity gradient at {0} points...'.format(N)
+        print(p, result[p][0:2], 'p = {0}'.format(result[p][3]))
+    print('Requesting velocity gradient at {0} points...'.format(N))
     result = lTDB.getData(time, points,
             sinterp = FD4Lag4, tinterp = temporalInterp,
             getFunction = 'getVelocityGradientSoap')
     for p in range(N):
-        print ('{0}: duxdx = {1}, duxdy = {2}, duxdz = {3}, '.format(p, result[p][0], result[p][1], result[p][2])
-                  + 'duydx = {0}, duydy = {1}, duydz = {2}, '.format(result[p][3], result[p][4], result[p][5])
-                  + 'duzdx = {0}, duzdy = {1}, duzdz = {2}'.format(result[p][6], result[p][7], result[p][8]))
-    print 'Requesting velocity hessian at {0} points...'.format(N)
+        print('{0}: duxdx = {1}, duxdy = {2}, duxdz = {3}, '.format(p, result[p][0], result[p][1], result[p][2])
+                 + 'duydx = {0}, duydy = {1}, duydz = {2}, '.format(result[p][3], result[p][4], result[p][5])
+                 + 'duzdx = {0}, duzdy = {1}, duzdz = {2}'.format(result[p][6], result[p][7], result[p][8]))
+    print('Requesting velocity hessian at {0} points...'.format(N))
     result = lTDB.getData(time, points,
             sinterp = FD4Lag4, tinterp = temporalInterp,
             getFunction = 'getVelocityHessianSoap')
     for p in range(N):
-        print ('{0}: '.format(p)
+        print('{0}: '.format(p)
             + 'd2uxdxdx = {0}, d2uxdxdy = {1}, d2uxdxdz = {2}, '.format(result[p][ 0], result[p][ 1], result[p][ 2])
             + 'd2uxdydy = {0}, d2uxdydz = {1}, d2uxdzdz = {2}, '.format(result[p][ 3], result[p][ 4], result[p][ 5])
             + 'd2uydxdx = {0}, d2uydxdy = {1}, d2uydxdz = {2}, '.format(result[p][ 6], result[p][ 7], result[p][ 8])
             + 'd2uydydy = {0}, d2uydydz = {1}, d2uydzdz = {2}, '.format(result[p][ 9], result[p][10], result[p][11])
             + 'd2uzdxdx = {0}, d2uzdxdy = {1}, d2uzdxdz = {2}, '.format(result[p][12], result[p][13], result[p][14])
             + 'd2uzdydy = {0}, d2uzdydz = {1}, d2uzdzdz = {2}, '.format(result[p][15], result[p][16], result[p][17]))
-    print 'Requesting velocity laplacian at {0} points...'.format(N)
+    print('Requesting velocity laplacian at {0} points...'.format(N))
     result = lTDB.getData(time, points,
             sinterp = FD4Lag4, tinterp = temporalInterp,
             getFunction = 'getVelocityLaplacianSoap')
     for p in range(N):
-        print ('{0}: '.format(p)
+        print('{0}: '.format(p)
             + 'grad2ux = {0}, grad2uy = {1}, grad2uz = {2}, '.format(result[p][0], result[p][1], result[p][2]))
-    print 'Requesting pressure gradient at {0} points...'.format(N)
+    print('Requesting pressure gradient at {0} points...'.format(N))
     result = lTDB.getData(time, points,
             sinterp = FD4Lag4, tinterp = temporalInterp,
             getFunction = 'getPressureGradientSoap')
     for p in range(N):
-        print ('{0}: '.format(p)
+        print('{0}: '.format(p)
             + 'dpdx = {0}, dpdy = {1}, dpdz = {2}, '.format(result[p][0], result[p][1], result[p][2]))
-    print 'Requesting pressure hessian at {0} points...'.format(N)
+    print('Requesting pressure hessian at {0} points...'.format(N))
     result = lTDB.getData(time, points,
             sinterp = FD4Lag4, tinterp = temporalInterp,
             getFunction = 'getVelocityHessianSoap')
     for p in range(N):
-        print ('{0}: '.format(p)
+        print('{0}: '.format(p)
             + 'd2pdxdx = {0}, d2pdxdy = {1}, d2pdxdz = {2}, '.format(result[p][0], result[p][1], result[p][2])
             + 'd2pdydy = {0}, d2pdydz = {1}, d2pdzdz = {2}, '.format(result[p][3], result[p][4], result[p][5]))
 
@@ -143,8 +138,8 @@ def test_plain(N=10):
 #    for p in range(N):
 #        print p, result[p]
 
-    ##  only if matplotlib is present (i.e. plt is not None)
-    if plt:
+    ##  only if matplotlib is present
+    if pyJHTDB.found_matplotlib:
         ken_contours(
                 'kin_en_contours',
                 lTDB,
@@ -207,9 +202,9 @@ def spectra_check(
         print ('no library given')
         return None
     nlines = 32
-    print (nlines, info['nx'], 3)
-    print (nlines, info['ny'], 3)
-    print (nlines, info['nz'], 3)
+    print(nlines, info['nx'], 3)
+    print(nlines, info['ny'], 3)
+    print(nlines, info['nz'], 3)
     lines  = [numpy.zeros((nlines, info['nx'], 3), dtype = numpy.float32),
               numpy.zeros((nlines, info['ny'], 3), dtype = numpy.float32),
               numpy.zeros((nlines, info['nz'], 3), dtype = numpy.float32)]
@@ -277,7 +272,7 @@ def contour_check(
         fig.savefig('plane_' + coordname[i] + '_0.png', format = 'png', dpi = 100)
     return None
 
-if plt and cm:
+if pyJHTDB.found_matplotlib:
 
     def clean_2D_field(
             field_2D,
@@ -299,7 +294,7 @@ if plt and cm:
                 format = img_type)
         return None
 
-if h5py:
+if pyJHTDB.found_h5py:
 
     def test_cutout():
         pyJHTDB.cutout.get_big_cutout(
