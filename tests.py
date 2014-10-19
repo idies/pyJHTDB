@@ -19,7 +19,11 @@
 #
 ########################################################################
 
-from pyJHTDB import test_plain, test_gs
+import pyJHTDB
 
-test_plain()
-test_gs()
+pyJHTDB.test_plain()
+pyJHTDB.test_gs()
+
+if pyJHTDB.h5py:
+    pyJHTDB.test_cutout()
+
