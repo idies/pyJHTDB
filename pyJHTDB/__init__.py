@@ -77,13 +77,21 @@ if os.path.isfile(homefolder + '/JHTDB_user_token.txt'):
 
 try:
     import h5py
+    found_h5py = True
 except ImportError:
-    h5py = None
+    found_h5py = False
     print('h5py not found. cutout functionality not available.')
+
+try:
+    import matplotlib
+    found_matplotlib = True
+except ImportError:
+    found_matplotlib = False
+    print('matplotlib not found. plotting functionality not available.')
 
 from .libJHTDB import *
 from .test import test_plain, test_misc
 from .generic_splines import main0 as test_gs
-if h5py:
+if found_h5py:
     from .test import test_cutout
 

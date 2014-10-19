@@ -25,26 +25,21 @@ import ctypes
 import math
 import numpy
 
-homefolder = os.path.expanduser('~')
-
-try:
-    import matplotlib.pyplot as plt
-    import matplotlib.cm as cm
-except ImportError:
-    print('matplotlib is needed for contour plots.'
-        + 'You should be able to find installation instructions at http://matplotlib.sourceforge.net')
-    plt = None
-    cm  = None
-
-try:
-    import h5py
-    import pyJHTDB.cutout
-except ImportError:
-    print('h5py is needed for working with cutouts.')
-    h5py = None
-
 import pyJHTDB
 import pyJHTDB.dbinfo
+
+if pyJHTDB.found_matplotlib:
+    import matplotlib.pyplot as plt
+    import matplotlib.cm as cm
+else:
+    print('matplotlib is needed for contour plots.'
+        + 'You should be able to find installation instructions at http://matplotlib.sourceforge.net')
+
+if pyJHTDB.found_h5py:
+    import h5py
+    import pyJHTDB.cutout
+else:
+    print('h5py is needed for working with cutouts.')
 
 def test_plain(N=10):
     #time = 0.364
@@ -143,8 +138,8 @@ def test_plain(N=10):
 #    for p in range(N):
 #        print p, result[p]
 
-    ##  only if matplotlib is present (i.e. plt is not None)
-    if plt:
+    ##  only if matplotlib is present
+    if pyJHTDB.found_matplotlib:
         ken_contours(
                 'kin_en_contours',
                 lTDB,
@@ -277,7 +272,7 @@ def contour_check(
         fig.savefig('plane_' + coordname[i] + '_0.png', format = 'png', dpi = 100)
     return None
 
-if plt and cm:
+if pyJHTDB.found_matplotlib:
 
     def clean_2D_field(
             field_2D,
@@ -299,7 +294,7 @@ if plt and cm:
                 format = img_type)
         return None
 
-if h5py:
+if pyJHTDB.found_h5py:
 
     def test_cutout():
         pyJHTDB.cutout.get_big_cutout(

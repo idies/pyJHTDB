@@ -58,7 +58,7 @@ class libJHTDB(object):
         self.connection_on = False
         return None
     def add_hdf5_file(self, filename):
-        if pyJHTDB.h5py and (not filename in self.hdf5_file_list):
+        if pyJHTDB.found_h5py and (not filename in self.hdf5_file_list):
             self.hdf5_file_list.append(filename)
             data = pyJHTDB.h5py.File(filename + '.h5', mode = 'r')
             self.hdf5_file_desc[filename] = {}

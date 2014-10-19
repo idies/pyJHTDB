@@ -24,6 +24,6 @@ import pyJHTDB
 pyJHTDB.test_plain()
 pyJHTDB.test_gs()
 
-if pyJHTDB.h5py:
+if pyJHTDB.found_h5py:
     pyJHTDB.test_cutout()
 
