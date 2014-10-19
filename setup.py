@@ -119,6 +119,7 @@ setup(
                                     'data/channel_zgrid.npy']},
         install_requires = ['numpy>=1.8', 'sympy>=0.7.4.1'],
         ext_modules = [libJHTDB],
+        test_suite = 'tests',
 
         #### package description stuff goes here
         description = 'Python wrapper for the Johns Hopkins turbulence database library',
