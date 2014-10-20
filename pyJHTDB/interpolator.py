@@ -144,8 +144,8 @@ class spline_interpolator:
         else:
             for p in range(points.shape[0]):
                 xb = np.zeros((len(dorder), len(self.bx[     bxi][dorder[0][0]])), field_values.dtype)
-                yb = np.zeros((len(dorder), len(self.bx[ygrid[p]][dorder[0][1]])), field_values.dtype)
-                zb = np.zeros((len(dorder), len(self.bx[     bxi][dorder[0][2]])), field_values.dtype)
+                yb = np.zeros((len(dorder), len(self.by[ygrid[p]][dorder[0][1]])), field_values.dtype)
+                zb = np.zeros((len(dorder), len(self.bz[     bxi][dorder[0][2]])), field_values.dtype)
                 for o in range(len(dorder)):
                     xb[o] = np.array([self.bx[     bxi][dorder[o][0]][k](xfrac[p])
                                    for k in range(len(self.bx[     bxi][dorder[o][0]]))]).astype(field_values.dtype)
