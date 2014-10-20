@@ -408,15 +408,18 @@ def Lagrange_err_histograms(
     return None
 
 def estimate_interpolation_error(
-        lTDB, info,
+        lTDB,
+        info,
         npoints = 2**5,
         randseeds = range(2),
         dir_name = 'test',
         xfixed = None,
         yfixed = None,
-        zfixed = None):
+        zfixed = None,
+        nmax = 7,
+        mmax = 2):
     generate_interpolation_points(
-            lTDB, info,
+            info,
             npoints = npoints,
             randseeds = randseeds,
             dir_name = dir_name,
@@ -443,37 +446,53 @@ def estimate_interpolation_error(
 
 def test_interp(
         nbatches = 4,
-        npoints = 2**5):
+        npoints = 2**5,
+        isotropic1024coarse = False,
+        mhd1024 = False,
+        channel = False,
+        nmax = 7,
+        mmax = 2):
     # load shared library
     lJHTDB = pyJHTDB.libJHTDB()
     #initialize webservices
     lJHTDB.initialize()
 
-    estimate_interpolation_error(
-            lJHTDB,
-            pyJHTDB.dbinfo.isotropic1024coarse,
-            npoints = npoints,
-            randseeds = range(nbatches))
-    estimate_interpolation_error(
-            lJHTDB,
-            pyJHTDB.dbinfo.mhd1024,
-            npoints = npoints,
-            randseeds = range(nbatches))
-    estimate_interpolation_error(
-            lTDB,
-            pyJHTDB.dbinfo.channel,
-            npoints = npoints,
-            randseeds = range(nbatches),
-            dir_name = 'random')
-    for ynode in [0, 64, 128, 192, 256]:
-        yval = pyJHTDB.dbinfo.channel['ynodes'][ynode] + pyJHTDB.dbinfo.channel['dy'][ynode]/2
+    if isotropic1024coarse:
         estimate_interpolation_error(
-                lTDB,
+                lJHTDB,
+                pyJHTDB.dbinfo.isotropic1024coarse,
+                npoints = npoints,
+                randseeds = range(nbatches),
+                nmax = nmax,
+                mmax = mmax)
+    if mhd1024:
+        estimate_interpolation_error(
+                lJHTDB,
+                pyJHTDB.dbinfo.mhd1024,
+                npoints = npoints,
+                randseeds = range(nbatches),
+                nmax = nmax,
+                mmax = mmax)
+    if channel:
+        estimate_interpolation_error(
+                lJHTDB,
                 pyJHTDB.dbinfo.channel,
                 npoints = npoints,
                 randseeds = range(nbatches),
-                dir_name = 'ynode_{0:0>3x}'.format(ynode),
-                yfixed = yval)
+                dir_name = 'random',
+                nmax = nmax,
+                mmax = mmax)
+        for ynode in [0, 64, 128, 192, 256]:
+            yval = pyJHTDB.dbinfo.channel['ynodes'][ynode] + pyJHTDB.dbinfo.channel['dy'][ynode]/2
+            estimate_interpolation_error(
+                    lJHTDB,
+                    pyJHTDB.dbinfo.channel,
+                    npoints = npoints,
+                    randseeds = range(nbatches),
+                    dir_name = 'ynode_{0:0>3x}'.format(ynode),
+                    yfixed = yval,
+                    nmax = nmax,
+                    mmax = mmax)
 
     #finalize webservices
     lJHTDB.finalize()
