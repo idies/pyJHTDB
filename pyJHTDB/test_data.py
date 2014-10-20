@@ -428,8 +428,8 @@ def estimate_interpolation_error(
             zfixed = zfixed)
     spline_error(
             lTDB, info,
-            nmax = 7,
-            mmax = 2,
+            nmax = nmax,
+            mmax = mmax,
             npoints = npoints,
             randseeds = randseeds,
             dir_name = dir_name,
