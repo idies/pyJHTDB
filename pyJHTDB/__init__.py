@@ -89,6 +89,13 @@ except ImportError:
     found_matplotlib = False
     print('matplotlib not found. plotting functionality not available.')
 
+try:
+    import scipy
+    found_scipy = True
+except ImportError:
+    found_scipy = False
+    print('scipy not found. not all interpolation functionality available')
+
 from .libJHTDB import *
 from .test import test_plain, test_misc
 from .generic_splines import main0 as test_gs
