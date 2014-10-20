@@ -85,6 +85,11 @@ def interpolate_spline(
         spline_continuity = 2,
         randseeds = [1],
         dir_name = 'test'):
+    print(('just entered interpolate_spline, dataset is {0}, '
+         + 'and (n, m) are ({1}, {2})').format(
+             info['name'],
+             spline_neighbours,
+             spline_continuity))
     dir_name = info['name'] + '_' + dir_name + '/'
     s = None
     result_list = []
