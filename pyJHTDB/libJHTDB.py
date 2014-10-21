@@ -65,7 +65,7 @@ class libJHTDB(object):
             for key in ['_contents', '_dataset', '_size', '_start']:
                 self.hdf5_file_desc[filename][key] = data[key][:]
             data.close()
-            return self.lib.turblibAddLocalSource(ctypes.c_char_p((filename + '.h5')).encode('ascii'))
+            return self.lib.turblibAddLocalSource(ctypes.c_char_p((filename + '.h5').encode('ascii')))
         else:
             return 0
     def getData(self,
