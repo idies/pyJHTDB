@@ -65,7 +65,7 @@ class libJHTDB(object):
             for key in ['_contents', '_dataset', '_size', '_start']:
                 self.hdf5_file_desc[filename][key] = data[key][:]
             data.close()
-            return self.lib.turblibAddLocalSource(ctypes.c_char_p((filename + '.h5')).encode('ascii'))
+            return self.lib.turblibAddLocalSource(ctypes.c_char_p((filename + '.h5').encode('ascii')))
         else:
             return 0
     def getData(self,
@@ -143,7 +143,7 @@ class libJHTDB(object):
         newshape.append(result_dim)
         result_array = np.empty(newshape, dtype=np.float32)
         get_data(self.authToken,
-                 ctypes.c_char_p((data_set).encode('ascii')),
+                 ctypes.c_char_p(data_set.encode('ascii')),
                  ctypes.c_float(time),
                  ctypes.c_int(sinterp), ctypes.c_int(tinterp), ctypes.c_int(npoints),
                  point_coords.ctypes.data_as(ctypes.POINTER(ctypes.POINTER(ctypes.c_float))),
@@ -175,8 +175,8 @@ class libJHTDB(object):
             np.mod(pcoords, 2*np.pi, point_coords)
         result_array = point_coords.copy()
         self.lib.getBoxFilter(self.authToken,
-                 ctypes.c_char_p((data_set).encode('ascii')),
-                 ctypes.c_char_p((field).encode('ascii')),
+                 ctypes.c_char_p(data_set.encode('ascii')),
+                 ctypes.c_char_p(field.encode('ascii')),
                  ctypes.c_float(time),
                  ctypes.c_float(filter_width),
                  ctypes.c_int(npoints),
@@ -197,8 +197,8 @@ class libJHTDB(object):
         result_size = ctypes.c_int()
         call_result = self.lib.getThreshold(
                 self.authToken,
-                ctypes.c_char_p((data_set).encode('ascii')),
-                ctypes.c_char_p((field).encode('ascii')),
+                ctypes.c_char_p(data_set.encode('ascii')),
+                ctypes.c_char_p(field.encode('ascii')),
                 ctypes.c_float(time),
                 ctypes.c_float(threshold),
                 ctypes.c_int32(sinterp),
