@@ -128,7 +128,7 @@ setup(
         author_email = AUTHOR_EMAIL,
         license = 'Apache Version 2.0',
         url = GROUP_URL,
-        download_url = 'https://github.com/chichilalescu/pyJHTDB',
+        download_url = 'https://github.com/idies/pyJHTDB',
         classifiers = [
             'Development Status :: 4 - Beta',
             'Environment :: Console',
