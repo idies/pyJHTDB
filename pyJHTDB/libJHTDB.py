@@ -103,36 +103,19 @@ class libJHTDB(object):
                            'getVelocityLaplacian',
                            'getMagneticFieldLaplacian',
                            'getVectorPotentialLaplacian',
-                           'getPressureGradient',
-                           'getVelocitySoap',
-                           'getForceSoap',
-                           'getMagneticFieldSoap',
-                           'getVectorPotentialSoap',
-                           'getPressureGradientSoap',
-                           'getVelocityLaplacianSoap',
-                           'getMagneticFieldLaplacianSoap',
-                           'getVectorPotentialLaplacianSoap',
-                           'getPressureGradientSoap']:
+                           'getPressureGradient']:
             result_dim = 3
-        elif getFunction in ['getVelocityAndPressure',
-                             'getVelocityAndPressureSoap']:
+        elif getFunction in ['getVelocityAndPressure']:
             result_dim = 4
-        elif getFunction in ['getPressureHessian',
-                             'getPressureHessianSoap']:
+        elif getFunction in ['getPressureHessian']:
             result_dim = 6
         elif getFunction in ['getVelocityGradient',
                              'getMagneticFieldGradient',
-                             'getVectorPotentialGradient',
-                             'getVelocityGradientSoap',
-                             'getMagneticFieldGradientSoap',
-                             'getVectorPotentialGradientSoap']:
+                             'getVectorPotentialGradient']:
             result_dim = 9
         elif getFunction in ['getVelocityHessian',
                              'getMagneticFieldHessian',
-                             'getVectorPotentialHessian',
-                             'getVelocityHessianSoap',
-                             'getMagneticFieldHessianSoap',
-                             'getVectorPotentialHessianSoap']:
+                             'getVectorPotentialHessian']:
             result_dim = 18
         else:
             print(('wrong result type requested in getData\n'
