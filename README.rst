@@ -49,3 +49,18 @@ README says and you can run it), please let me know what steps you
 needed to take for your system, so I can append the instructions to
 this file.
 
+Basic usage
+===========
+
+Although this particular Python wrapper is still a work in progress, it
+is mature enough to be used in production work.
+
+On first contact with this library, we recommend that you first run
+"test_plain". To be more specific::
+
+  >>> from pyJHTDB import test_plain
+  >>> test_plain()
+
+The code that is executed can be found in "pyJHTDB/test.py", and it's
+the simplest example of how to access the turbulence database.
+
