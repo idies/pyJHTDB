@@ -25,7 +25,6 @@
 #
 # some global settings
 #
-TURBLIB_VERSION = '20140606'
 HDF5_ON = True
 GROUP_URL = 'http://turbulence.pha.jhu.edu/'
 GROUP_EMAIL = 'turbulence@pha.jhu.edu'
@@ -44,7 +43,7 @@ AUTHOR_EMAIL = GROUP_EMAIL
 #   1. VERSION should come from checkingwhen the sources were last
 #      modified.
 #   2. VERSION should contain information on whether or not it depends
-#      on the hdf5 library.
+#      on the hdf5 library, since that can't be installed through pip.
 #
 import datetime
 now = datetime.datetime.now()
@@ -52,29 +51,6 @@ date_name = '{0:0>4}{1:0>2}{2:0>2}'.format(now.year, now.month, now.day)
 VERSION = date_name
 #if HDF5_ON:
 #    VERSION += '-hdf5'
-#
-########################################################################
-
-
-
-########################################################################
-#
-# get the turbulence library
-#
-import os
-if not os.path.isdir('turblib-' + TURBLIB_VERSION):
-    import urllib
-    urllib.urlretrieve('http://turbulence.pha.jhu.edu/download/turblib-'
-                                + TURBLIB_VERSION
-                                + '.tar.gz',
-                             'turblib-'
-                                + TURBLIB_VERSION
-                                + '.tar.gz')
-    import tarfile
-    turblib = tarfile.open('turblib-' + TURBLIB_VERSION + '.tar.gz')
-    turblib.extractall()
-    turblib.close()
-open('MANIFEST.in', 'w').write('graft turblib-' + TURBLIB_VERSION)
 #
 ########################################################################
 
@@ -92,6 +68,18 @@ h5cc_present = not (h5cc_executable == None)
 
 
 
+########################################################################
+#
+# generate MANIFEST.in
+#
+open('MANIFEST.in',
+     'w').write(
+             'graft turblib')
+#
+########################################################################
+
+
+
 libraries = []
 macros = []
 if h5cc_present and HDF5_ON:
@@ -102,11 +90,11 @@ from setuptools import setup, Extension
 libJHTDB = Extension(
         'libJHTDB',
         sources = ['C/local_tools.c',
-                   'turblib-' + TURBLIB_VERSION + '/turblib.c',
-                   'turblib-' + TURBLIB_VERSION + '/soapC.c',
-                   'turblib-' + TURBLIB_VERSION + '/soapClient.c',
-                   'turblib-' + TURBLIB_VERSION + '/stdsoap2.c'],
-        include_dirs = ['turblib-' + TURBLIB_VERSION],
+                   'turblib/turblib.c',
+                   'turblib/soapC.c',
+                   'turblib/soapClient.c',
+                   'turblib/stdsoap2.c'],
+        include_dirs = ['turblib'],
         define_macros = macros,
         libraries = libraries)
 
