@@ -71,7 +71,7 @@ def test_plain(N=10):
     print('Requesting velocity at {0} points...'.format(N))
     result = lTDB.getData(time, points,
             sinterp = spatialInterp, tinterp = temporalInterp,
-            getFunction = 'getVelocitySoap')
+            getFunction = 'getVelocity')
     for p in range(N):
         print(p, result[p])
     print('Requesting forcing at {0} points...'.format(N))
@@ -83,13 +83,13 @@ def test_plain(N=10):
     print('Requesting velocity and pressure at {0} points...'.format(N))
     result = lTDB.getData(time, points,
             sinterp = spatialInterp, tinterp = temporalInterp,
-            getFunction = 'getVelocityAndPressureSoap')
+            getFunction = 'getVelocityAndPressure')
     for p in range(N):
         print(p, result[p][0:2], 'p = {0}'.format(result[p][3]))
     print('Requesting velocity gradient at {0} points...'.format(N))
     result = lTDB.getData(time, points,
             sinterp = FD4Lag4, tinterp = temporalInterp,
-            getFunction = 'getVelocityGradientSoap')
+            getFunction = 'getVelocityGradient')
     for p in range(N):
         print('{0}: duxdx = {1}, duxdy = {2}, duxdz = {3}, '.format(p, result[p][0], result[p][1], result[p][2])
                  + 'duydx = {0}, duydy = {1}, duydz = {2}, '.format(result[p][3], result[p][4], result[p][5])
@@ -97,7 +97,7 @@ def test_plain(N=10):
     print('Requesting velocity hessian at {0} points...'.format(N))
     result = lTDB.getData(time, points,
             sinterp = FD4Lag4, tinterp = temporalInterp,
-            getFunction = 'getVelocityHessianSoap')
+            getFunction = 'getVelocityHessian')
     for p in range(N):
         print('{0}: '.format(p)
             + 'd2uxdxdx = {0}, d2uxdxdy = {1}, d2uxdxdz = {2}, '.format(result[p][ 0], result[p][ 1], result[p][ 2])
@@ -109,21 +109,21 @@ def test_plain(N=10):
     print('Requesting velocity laplacian at {0} points...'.format(N))
     result = lTDB.getData(time, points,
             sinterp = FD4Lag4, tinterp = temporalInterp,
-            getFunction = 'getVelocityLaplacianSoap')
+            getFunction = 'getVelocityLaplacian')
     for p in range(N):
         print('{0}: '.format(p)
             + 'grad2ux = {0}, grad2uy = {1}, grad2uz = {2}, '.format(result[p][0], result[p][1], result[p][2]))
     print('Requesting pressure gradient at {0} points...'.format(N))
     result = lTDB.getData(time, points,
             sinterp = FD4Lag4, tinterp = temporalInterp,
-            getFunction = 'getPressureGradientSoap')
+            getFunction = 'getPressureGradient')
     for p in range(N):
         print('{0}: '.format(p)
             + 'dpdx = {0}, dpdy = {1}, dpdz = {2}, '.format(result[p][0], result[p][1], result[p][2]))
     print('Requesting pressure hessian at {0} points...'.format(N))
     result = lTDB.getData(time, points,
             sinterp = FD4Lag4, tinterp = temporalInterp,
-            getFunction = 'getVelocityHessianSoap')
+            getFunction = 'getVelocityHessian')
     for p in range(N):
         print('{0}: '.format(p)
             + 'd2pdxdx = {0}, d2pdxdy = {1}, d2pdxdz = {2}, '.format(result[p][0], result[p][1], result[p][2])
@@ -182,7 +182,7 @@ def ken_contours(
 
     result = lTDB.getData(time, points,
             sinterp = spatialInterp, tinterp = temporalInterp,
-            getFunction = 'getVelocitySoap')
+            getFunction = 'getVelocity')
 
     energy = .5*(numpy.sqrt(result[:,:,0]**2 + result[:,:,1]**2 + result[:,:,2]**2)).transpose()
     fig = plt.figure(figsize=(6.,6.))
@@ -224,7 +224,7 @@ def spectra_check(
     for i in range(3):
         result = lJHTDB.getData(.0, lines[i],
             sinterp = 0, tinterp = 0,
-            data_set = info['name'], getFunction = 'getVelocityAndPressureSoap')
+            data_set = info['name'], getFunction = 'getVelocityAndPressure')
         spec = numpy.fft.rfft(
                 numpy.sum(result[:, :, :3]**2, axis = 2), axis = 1)
         axu.plot(numpy.average(numpy.abs(spec), axis = 0), label = '$i = ' + coordname[i] + '$')
@@ -264,7 +264,7 @@ def contour_check(
     for i in range(1):
         result = lJHTDB.getData(.1, planes[i],
             sinterp = 0, tinterp = 0,
-            data_set = info['name'], getFunction = 'getVelocityAndPressureSoap')
+            data_set = info['name'], getFunction = 'getVelocityAndPressure')
         fig = plt.figure(figsize = (10.24,10.24))
         ax = fig.add_axes([0, 0, 1, 1], frameon = False)
         ax.set_axis_off()
