@@ -34,9 +34,7 @@ import pyJHTDB
 import pyJHTDB.dbinfo
 info = pyJHTDB.dbinfo.isotropic1024coarse
 
-lTDB = pyJHTDB.libTDB(
-        libname = 'libTDB',
-        srcdir = '/home/chichi/ext_src/turblib/turbdev')
+lTDB = pyJHTDB.libJHTDB()
 
 ################################################################################
 # `plotter` class.
