@@ -5,8 +5,7 @@ pyJHTDB.egg-info/
 MANIFEST.in
 .tox
 # turblib stuff
-turblib-*.tar.gz
-turblib-*/
+turblib/
 #compiled files
 *.pyc
 *.o

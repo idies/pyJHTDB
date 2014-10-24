@@ -34,8 +34,8 @@ On first contact with this library, we recommend that you first run
   >>> from pyJHTDB import test_plain
   >>> test_plain()
 
-The code that is executed can be found in "test.py", and it's the
-simplest example of how to access the turbulence database.
+The code that is executed can be found in "pyJHTDB/test.py", and it's
+the simplest example of how to access the turbulence database.
 
 """
 
@@ -88,6 +88,13 @@ try:
 except ImportError:
     found_matplotlib = False
     print('matplotlib not found. plotting functionality not available.')
+
+try:
+    import scipy
+    found_scipy = True
+except ImportError:
+    found_scipy = False
+    print('scipy not found. not all interpolation functionality available')
 
 from .libJHTDB import *
 from .test import test_plain, test_misc
