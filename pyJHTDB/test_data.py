@@ -121,7 +121,7 @@ def interpolate_spline(
                                (0, 2, 0),  # hessian  3
                                (0, 1, 1),  # hessian  4
                                (0, 0, 2)], # hessian  5
-                     getFunction = 'getVelocityAndPressureSoap')
+                     getFunction = 'getVelocityAndPressure')
             np.save(file_name, ress)
         else:
             ress = np.load(file_name + '.npy')
@@ -256,7 +256,7 @@ def Lagrange_err_histograms(
                     points,
                     sinterp = 4, tinterp = 0,
                     data_set = info['name'],
-                    getFunction = 'getVelocityAndPressureSoap'))
+                    getFunction = 'getVelocityAndPressure'))
             np.save(fnames[0], res4[-1])
         else:
             res4.append(np.load(fnames[0] + '.npy'))
@@ -265,7 +265,7 @@ def Lagrange_err_histograms(
                     points,
                     sinterp = 6, tinterp = 0,
                     data_set = info['name'],
-                    getFunction = 'getVelocityAndPressureSoap'))
+                    getFunction = 'getVelocityAndPressure'))
             np.save(fnames[1], res6[-1])
         else:
             res6.append(np.load(fnames[1] + '.npy'))
@@ -274,7 +274,7 @@ def Lagrange_err_histograms(
                     points,
                     sinterp = 8, tinterp = 0,
                     data_set = info['name'],
-                    getFunction = 'getVelocityAndPressureSoap'))
+                    getFunction = 'getVelocityAndPressure'))
             np.save(fnames[2], res8[-1])
         else:
             res8.append(np.load(fnames[2] + '.npy'))
@@ -283,7 +283,7 @@ def Lagrange_err_histograms(
                     points,
                     sinterp = 44, tinterp = 0,
                     data_set = info['name'],
-                    getFunction = 'getVelocityGradientSoap'))
+                    getFunction = 'getVelocityGradient'))
             np.save(fnames[3], grad[-1])
         else:
             grad.append(np.load(fnames[3] + '.npy'))
@@ -292,7 +292,7 @@ def Lagrange_err_histograms(
                     points,
                     sinterp = 44, tinterp = 0,
                     data_set = info['name'],
-                    getFunction = 'getPressureHessianSoap'))
+                    getFunction = 'getPressureHessian'))
             np.save(fnames[4], hess[-1])
         else:
             hess.append(np.load(fnames[4] + '.npy'))

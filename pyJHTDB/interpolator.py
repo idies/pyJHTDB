@@ -81,7 +81,7 @@ class spline_interpolator:
             points = np.zeros((1,3)),
             dorder = [(0, 0, 0)],
             lTDB = None,
-            getFunction = 'getVelocityAndPressureSoap'):
+            getFunction = 'getVelocityAndPressure'):
         if (not len(points.shape) == 2):
             return None
         field_points = np.zeros((points.shape[0], 2*self.n+2, 2*self.n+2, 2*self.n+2, 3), dtype = np.float32)
