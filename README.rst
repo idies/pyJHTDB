@@ -56,10 +56,12 @@ Although this particular Python wrapper is still a work in progress, it
 is mature enough to be used in production work.
 
 On first contact with this library, we recommend that you first run
-"test_plain". To be more specific::
+"test_plain". To be more specific:
 
-  >>> from pyJHTDB import test_plain
-  >>> test_plain()
+.. code:: python
+
+    >>> from pyJHTDB import test_plain
+    >>> test_plain()
 
 The code that is executed can be found in "pyJHTDB/test.py", and it's
 the simplest example of how to access the turbulence database.
