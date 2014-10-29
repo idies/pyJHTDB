@@ -23,8 +23,9 @@
 import os
 
 if not os.path.isdir('turblib'):
-    os.system('svn checkout https://github.com/idies/Turbulence/trunk/turblib')
+    os.system('git clone https://github.com/idies/turblib')
 else:
     os.chdir('turblib')
-    os.system('svn update')
+    os.system('git pull')
     os.chdir('..')
+
