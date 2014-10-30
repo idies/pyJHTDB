@@ -60,7 +60,7 @@ def test_plain(N=10):
 
     print('Coordinates of {0} points where variables are requested:'.format(N))
     for p in range(N):
-        print(p, points[p])
+        print('{0}: {1}'.format(p, points[p]))
     print('Data is requested at time {0}'.format(time))
 
     # load shared library
@@ -73,19 +73,19 @@ def test_plain(N=10):
             sinterp = spatialInterp, tinterp = temporalInterp,
             getFunction = 'getVelocity')
     for p in range(N):
-        print(p, result[p])
+        print('{0}: {1}'.format(p, result[p]))
     print('Requesting forcing at {0} points...'.format(N))
     result = lTDB.getData(time, points,
             sinterp = spatialInterp, tinterp = temporalInterp,
             getFunction = 'getForce')
     for p in range(N):
-        print(p, result[p])
+        print('{0}: {1}'.format(p, result[p]))
     print('Requesting velocity and pressure at {0} points...'.format(N))
     result = lTDB.getData(time, points,
             sinterp = spatialInterp, tinterp = temporalInterp,
             getFunction = 'getVelocityAndPressure')
     for p in range(N):
-        print(p, result[p][0:2], 'p = {0}'.format(result[p][3]))
+        print('{0}: v = {1}, p = {2}'.format(p, result[p][0:3], result[p][3]))
     print('Requesting velocity gradient at {0} points...'.format(N))
     result = lTDB.getData(time, points,
             sinterp = FD4Lag4, tinterp = temporalInterp,
