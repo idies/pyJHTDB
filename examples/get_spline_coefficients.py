@@ -27,6 +27,10 @@ def write_coefficients(
                             text_file.write('{0}, {1}'.format(node, i.spline[coord].neighbour_list[node][point]))
                             for c in i.spline[coord].beta[node][order][point].coef:
                                 text_file.write(', {0}'.format(c))
+                            if i.spline[coord].beta[node][order][point].coef.shape[0] < i.m*2 + 2 - order:
+                                for tcounter in range(i.m*2 + 2
+                                        - order - i.spline[coord].beta[node][order][point].coef.shape[0]):
+                                    text_file.write(', 0')
                             text_file.write('\r\n')
             text_file.close()
     return None
