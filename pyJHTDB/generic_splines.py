@@ -168,8 +168,10 @@ class generic_spline_1D:
                 self.deriv_coeff.append(get_fornberg_coeffs(self.x[i], self.x[self.x.shape[0] - self.N + 1:]))
         return None
     def compute_beta(self):
+        self.neighbour_list = []
         if self.periodic:
             for i in range(len(self.deriv_coeff)-1):
+                self.neighbour_list.append(range(i-self.n, i+self.n+2))
                 deltax = np.array([self.dx[i]**l for l in range(self.m + 1)])
                 a0 = self.alpha0_coeff*deltax[:, np.newaxis]
                 a1 = self.alpha1_coeff*deltax[:, np.newaxis]
@@ -186,6 +188,7 @@ class generic_spline_1D:
                                   for j in range(self.m+1)])
         else:
             for i in range(self.n):
+                self.neighbour_list.append(range(2*self.n+2))
                 deltax = np.array([self.dx[i]**l for l in range(self.m + 1)])
                 a0 = self.alpha0_coeff*deltax[:, np.newaxis]
                 a1 = self.alpha1_coeff*deltax[:, np.newaxis]
@@ -199,6 +202,7 @@ class generic_spline_1D:
                                    for k in range(self.N)]
                                   for j in range(self.m+1)])
             for i in range(self.n, len(self.deriv_coeff)-self.n-1):
+                self.neighbour_list.append(range(i-self.n, i+self.n+2))
                 deltax = np.array([self.dx[i]**l for l in range(self.m + 1)])
                 a0 = self.alpha0_coeff*deltax[:, np.newaxis]
                 a1 = self.alpha1_coeff*deltax[:, np.newaxis]
@@ -214,6 +218,7 @@ class generic_spline_1D:
                                    for k in range(self.N)]
                                   for j in range(self.m+1)])
             for i in range(len(self.deriv_coeff)-self.n-1, len(self.deriv_coeff)-1):
+                self.neighbour_list.append(range(len(self.deriv_coeff) - 2*self.n - 1, len(self.deriv_coeff)))
                 deltax = np.array([self.dx[i]**l for l in range(self.m + 1)])
                 a0 = self.alpha0_coeff*deltax[:, np.newaxis]
                 a1 = self.alpha1_coeff*deltax[:, np.newaxis]
