@@ -240,6 +240,42 @@ class generic_spline_1D:
                                     for k in range(len(self.beta[i][j]))]
                                    for j in range(self.m + 1)])
         return None
+    def write_cfunction(
+            self,
+            base_cname = None):
+        src_txt = 'int ' + base_cname + '('
+        if not self.periodic:
+            src_txt += 'int cell, ' # which cell are we in?
+        src_txt += (
+                'int diff, '        # which derivative should we use?
+                + 'float x, '
+                + 'float *bval)'   # array where to place the values of the beta polynomials
+                + '\n{\n')
+        # sanity check
+        src_txt += 'assert(diff >= 0 && diff <= {0});\n'.format(self.m)
+        if self.periodic:
+            src_txt += (
+                    'switch (diff)\n{\n')
+            for diff in range(self.m+1):
+                src_txt += 'case {0}:\n'.format(diff)
+                for i in range(-self.n, self.n + 2):
+                    src_txt += 'bval[{0}] = '.format(i+self.n)
+                    end_paranthesis = ''
+                    for k in range(self.beta[0][diff][i+self.n].coef.shape[0] - 1):
+                        src_txt += '({0}) + x*('.format(self.beta[0][diff][i+self.n].coef[k])
+                        end_paranthesis += ')'
+                    src_txt += '{0}'.format(self.beta[0][diff][i+self.n].coef[-1])
+                    src_txt += end_paranthesis + ';\n'
+            src_txt += '\n}\n'      # end diff switch
+        else:
+            src_txt += (
+                    'switch (cell)\n{\n')
+            for cell in range(len(self.beta)):
+                src_txt += 'case {0}:\n'.format(cell)
+            src_txt += ('\n}\n')    # end cell switch
+        # end and return 0
+        src_txt += 'return EXIT_SUCCESS;\n}\n'
+        return src_txt
 
 def plot_generic_weight_functions(
         n = 4,

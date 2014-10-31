@@ -187,6 +187,26 @@ class spline_interpolator:
                                 text_file.write('\r\n')
                 text_file.close()
         return None
+    def write_cfile(
+            self,
+            cfile_name = None,  #'spline_m{0}q{1:0>2}'.format(self.m, self.n*2 + 2),
+            base_cname = None): #'m{0}q{1:0>2}'.format(self.m, self.n*2 + 2)):
+        if type(cfile_name) == type(None):
+            cfile_name = 'spline_m{0}q{1:0>2}'.format(self.m, self.n*2 + 2)
+        if type(base_cname) == type(None):
+            base_cname = 'm{0}q{1:0>2}'.format(self.m, self.n*2 + 2)
+        self.cfile_name = cfile_name
+        self.base_cname = base_cname
+        cfile = open(self.info['name'] + '_' + self.cfile_name + '.c', 'w')
+        ### headers
+        cfile.write('#include <assert.h>\n')
+        ### write 1D interpolations
+        for coord in ['x', 'y', 'z']:
+            ## beta polynomial implementation
+            cfile.write(self.spline[coord].write_cfunction(base_cname = coord + 'beta_' + self.base_cname))
+        ### write 3D interpolation
+        cfile.close()
+        return None
     if pyJHTDB.found_scipy:
         def refine_grid(
                 self,
