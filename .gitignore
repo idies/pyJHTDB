@@ -13,5 +13,7 @@ turblib/
 *.so
 #big files
 *.eps
+*.csv
+*.gz
 #temporary files
 .*.swp
