@@ -158,6 +158,35 @@ class spline_interpolator:
                     #print ['{0:6}'.format(field_values[p, 0, k, 0, 1]) for k in range(2*self.n + 2)]
                 result[:, p] = np.einsum('okjil,oi,oj,ok->ol', field_values[None, p], xb, yb, zb)
         return result
+    def write_coefficients(self):
+        for coord in ['x', 'y', 'z']:
+            for order in range(self.m+1):
+                text_file = open(
+                        (self.info['name']
+                        + '_' + coord
+                        + 'spline_m{0}q{1:0>2}_d{2}_coeff.csv'.format(self.m, self.n*2 + 2, order)),
+                        'w')
+                if self.info[coord + 'periodic']:
+                    for point in range(len(self.spline[coord].beta[0][order])):
+                        text_file.write('0, {0}'.format(self.spline[coord].neighbour_list[0][point]))
+                        for c in self.spline[coord].beta[0][order][point].coef:
+                            text_file.write(', {0}'.format(c))
+                        text_file.write('\r\n')
+                else:
+                    for node in range(len(self.spline[coord].beta)):
+                        for point in range(len(self.spline[coord].beta[node][order])):
+                            if (self.spline[coord].beta[node][order][point].coef.shape[0] > 1
+                                 or (not (self.spline[coord].beta[node][order][point].coef[0] == 0.0))):
+                                text_file.write('{0}, {1}'.format(node, self.spline[coord].neighbour_list[node][point]))
+                                for c in self.spline[coord].beta[node][order][point].coef:
+                                    text_file.write(', {0}'.format(c))
+                                if self.spline[coord].beta[node][order][point].coef.shape[0] < self.m*2 + 2 - order:
+                                    for tcounter in range(self.m*2 + 2
+                                            - order - self.spline[coord].beta[node][order][point].coef.shape[0]):
+                                        text_file.write(', 0')
+                                text_file.write('\r\n')
+                text_file.close()
+        return None
     if pyJHTDB.found_scipy:
         def refine_grid(
                 self,
