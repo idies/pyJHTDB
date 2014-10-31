@@ -199,12 +199,18 @@ class spline_interpolator:
         self.base_cname = base_cname
         cfile = open(self.info['name'] + '_' + self.cfile_name + '.c', 'w')
         ### headers
-        cfile.write('#include <assert.h>\n')
-        ### write 1D interpolations
+        cfile.write(
+                '#include <assert.h>\n'
+              + '#include <stdlib.h>\n\n')
+        ### functions to compute beta polynomials
         for coord in ['x', 'y', 'z']:
             ## beta polynomial implementation
-            cfile.write(self.spline[coord].write_cfunction(base_cname = coord + 'beta_' + self.base_cname))
+            cfile.write(
+                    self.spline[coord].write_cfunction(
+                        base_cname = coord + 'beta_' + self.base_cname)
+                    + '\n')
         ### write 3D interpolation
+#        cfile.write('int interpolate_' + base_cname + '')
         cfile.close()
         return None
     if pyJHTDB.found_scipy:
