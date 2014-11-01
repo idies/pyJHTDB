@@ -195,6 +195,12 @@ class spline_interpolator:
             cfile_name = 'spline_m{0}q{1:0>2}'.format(self.m, self.n*2 + 2)
         if type(base_cname) == type(None):
             base_cname = 'm{0}q{1:0>2}'.format(self.m, self.n*2 + 2)
+        def write_interp1D(bname, fname):
+            tmp_txt  = '('
+            for i in range(self.n*2+1):
+                tmp_txt += '\n' + bname[i] + '*' + fname[i] + ' + '
+            tmp_txt += '\n' + bname[self.n*2+1] + '*' + fname[self.n*2+1] + ')'
+            return tmp_txt
         self.cfile_name = cfile_name
         self.base_cname = base_cname
         cfile = open(self.info['name'] + '_' + self.cfile_name + '.c', 'w')
@@ -210,7 +216,62 @@ class spline_interpolator:
                         base_cname = coord + 'beta_' + self.base_cname)
                     + '\n')
         ### write 3D interpolation
-#        cfile.write('int interpolate_' + base_cname + '')
+        src_txt = (
+                'int interpolate_' + base_cname + '('
+              + 'float *fractions, '
+              + 'int *nodes, '
+              + 'int npoints, '
+              + 'int *diff, '
+              + 'float *field, '
+              + 'int *field_offset, '
+              + 'int *field_size, '
+              + 'int field_components, '
+              + 'float *result)\n')
+        src_txt += '{\n'
+        # various variables
+        src_txt += (
+                'int point;\n' +
+                'int component;\n' +
+                'int i0, i1, i2;\n' +
+                'float bx[{0}], by[{0}], bz[{0}];\n'.format(self.n*2+2))
+        # loop over points
+        src_txt += 'for (point = 0; point < npoints; point++)\n{\n'
+        # get polynomials
+        src_txt += 'xbeta_' + self.base_cname + '(diff[0], fractions[point*3+0], bx);\n'
+        if self.info['yperiodic']:
+            src_txt += 'ybeta_' + self.base_cname + '(diff[1], fractions[point*3+1], by);\n'
+        else:
+            src_txt += 'ybeta_' + self.base_cname + '(nodes[3*point+1], diff[1], fractions[point*3+1], by);\n'
+        src_txt += 'zbeta_' + self.base_cname + '(diff[2], fractions[point*3+2], bz);\n'
+        # loop over components
+        src_txt += 'for (component = 0; component < field_components; component++)\n{\n'
+        bx = ['bx[{0}]'.format(i) for i in range(self.n*2 + 2)]
+        by = ['by[{0}]'.format(i) for i in range(self.n*2 + 2)]
+        bz = ['bz[{0}]'.format(i) for i in range(self.n*2 + 2)]
+        src_txt += (
+                'i0 = nodes[3*point + 0] - field_offset[0];\n'
+                'i1 = nodes[3*point + 1] - field_offset[1];\n'
+                'i2 = nodes[3*point + 2] - field_offset[2];\n')
+        fzname = []
+        for i in range(self.n*2 + 2):
+            fyname = []
+            for j in range(self.n*2 + 2):
+                fxname = []
+                for k in range(self.n*2 + 2):
+                    fxname.append(
+                           ('field[(((i0{0:+})*field_size[1]' +
+                            ' + (i1{1:+}))*field_size[2]' +
+                            ' + (i2{2:+}))*field_components + component]').format(
+                                                                                i - self.n,
+                                                                                j - self.n,
+                                                                                k - self.n))
+                fyname.append(write_interp1D(bx, fxname) + '\n')
+            fzname.append(write_interp1D(by, fyname) + '\n')
+        src_txt += 'result[field_components*point + component] = ' + write_interp1D(bz, fzname) + ';\n'
+        src_txt += '}\n'                                            # close component loop
+        src_txt += '}\n'                                            # close point loop
+        src_txt += 'return EXIT_SUCCESS;\n}\n'                      # close function
+        cfile.write(src_txt)
         cfile.close()
         return None
     if pyJHTDB.found_scipy:
