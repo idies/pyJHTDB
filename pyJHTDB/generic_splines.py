@@ -240,6 +240,71 @@ class generic_spline_1D:
                                     for k in range(len(self.beta[i][j]))]
                                    for j in range(self.m + 1)])
         return None
+    def write_cfunction(
+            self,
+            cprefix = None,
+            csuffix = None,
+            data_type = 'float'):
+        src_txt = 'int ' + cprefix + 'beta' + csuffix + '('
+        if not self.periodic:
+            src_txt += 'int cell, '  # which cell are we in?
+        src_txt += (
+                'int diff, ' +       # which derivative should we use?
+                data_type + ' t, ' +
+                data_type + ' *bval)' +     # array where to place the values of the beta polynomials
+                '\n{\n')
+        # sanity check
+        src_txt += 'assert(diff >= 0 && diff <= {0});\n'.format(self.m)
+        def beta_cformulas(node):
+            tmp_txt = (
+                    'switch (diff)\n{\n')
+            for diff in range(self.m+1):
+                tmp_txt += 'case {0}:\n'.format(diff)
+                for i in range(-self.n, self.n + 2):
+                    tmp_txt += 'bval[{0}] = '.format(i+self.n)
+                    end_paranthesis = ''
+                    for k in range(self.beta[node][diff][i+self.n].coef.shape[0] - 1):
+                        tmp_txt += '({0}) + t*('.format(self.beta[node][diff][i+self.n].coef[k])
+                        end_paranthesis += ')'
+                    tmp_txt += '{0}'.format(self.beta[node][diff][i+self.n].coef[-1])
+                    tmp_txt += end_paranthesis + ';\n'
+                tmp_txt += 'break;\n'
+            tmp_txt += '\n}\n'      # end diff switch
+            return tmp_txt
+        if self.periodic:
+            src_txt += beta_cformulas(0)
+        else:
+            src_txt += (
+                    'switch (cell)\n{\n')
+            for cell in range(len(self.beta)):
+                src_txt += 'case {0}:\n'.format(cell)
+                src_txt += beta_cformulas(cell)
+                src_txt += 'break;\n'
+            src_txt += ('\n}\n')    # end cell switch
+        # end and return 0
+        src_txt += 'return EXIT_SUCCESS;\n}\n'
+        src_txt += 'int ' + cprefix + 'indices' + csuffix + '('
+        src_txt += 'int cell, '     # which cell are we in?
+        src_txt += (
+                ' int *index)' +    # array where to place the values of the beta polynomials
+                '\n{\n')
+        if self.periodic:
+            for i in range(self.n*2 + 2):
+                src_txt += 'index[{0}] = {1};\n'.format(i, i-self.n)
+        else:
+            src_txt += (
+                    'switch (cell)\n{\n')
+            for cell in range(len(self.beta)):
+                src_txt += 'case {0}:\n'.format(cell)
+                for i in range(len(self.neighbour_list[cell])):
+                    src_txt += 'index[{0}] = {1};\n'.format(i, self.neighbour_list[cell][i] - cell)
+                if len(self.neighbour_list[cell]) < self.n*2+2:
+                    src_txt += 'index[{0}] = {1};\n'.format(self.n*2+1, self.neighbour_list[cell][-1] - cell)
+                src_txt += 'break;\n'
+            src_txt += ('\n}\n')    # end cell switch
+        # end and return 0
+        src_txt += 'return EXIT_SUCCESS;\n}\n'
+        return src_txt
 
 def plot_generic_weight_functions(
         n = 4,

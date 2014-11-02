@@ -92,6 +92,8 @@ class libJHTDB(object):
             pcoords = np.zeros(point_coords.shape, np.float64)
             pcoords[:] = point_coords
             np.mod(pcoords, 2*np.pi, point_coords)
+        if not getFunction[0:3] == 'get':
+            getFunction = 'get' + getFunction
         get_data = getattr(self.lib, getFunction)
         if getFunction in ['getVelocity',
                            'getForce',
@@ -131,6 +133,41 @@ class libJHTDB(object):
                  ctypes.c_int(sinterp), ctypes.c_int(tinterp), ctypes.c_int(npoints),
                  point_coords.ctypes.data_as(ctypes.POINTER(ctypes.POINTER(ctypes.c_float))),
                  result_array.ctypes.data_as(ctypes.POINTER(ctypes.POINTER(ctypes.c_float))))
+        return result_array
+    def getRawData(
+            self,
+            time,
+            start = np.array([0, 0, 0], dtype = np.int),
+            size  = np.array([8, 8, 8], dtype = np.int),
+            data_set = 'channel',
+            getFunction = 'Velocity'):
+        if not self.connection_on:
+            print('you didn\'t connect to the database')
+            sys.exit()
+        if getFunction in ['Velocity',
+                           'MagneticField',
+                           'VectorPotential']:
+            result_dim = 3
+        elif getFunction in ['Pressure']:
+            result_dim = 1
+        else:
+            print(('wrong result type requested in getRawData\n'
+                 + 'maybe it\'s just missing from the list?'))
+            sys.exit()
+            return None
+        getFunction = 'getRaw' + getFunction
+        get_data = getattr(self.lib, getFunction)
+        result_array = np.empty(tuple(list(size[::-1]) + [result_dim]), dtype=np.float32)
+        get_data(self.authToken,
+                 ctypes.c_char_p(data_set.encode('ascii')),
+                 ctypes.c_float(time),
+                 ctypes.c_int(start[0]),
+                 ctypes.c_int(start[1]),
+                 ctypes.c_int(start[2]),
+                 ctypes.c_int(size[0]),
+                 ctypes.c_int(size[1]),
+                 ctypes.c_int(size[2]),
+                 result_array.ctypes.data_as(ctypes.POINTER(ctypes.c_char)))
         return result_array
     def getBoxFilter(self,
             time, point_coords,

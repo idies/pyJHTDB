@@ -23,6 +23,12 @@ import numpy as np
 import os
 import pickle
 import gzip
+import ctypes as ct
+import distutils
+import distutils.command
+import distutils.command.build_ext
+import distutils.core
+import distutils.dist
 
 import pyJHTDB
 import pyJHTDB.generic_splines as gs
@@ -158,6 +164,191 @@ class spline_interpolator:
                     #print ['{0:6}'.format(field_values[p, 0, k, 0, 1]) for k in range(2*self.n + 2)]
                 result[:, p] = np.einsum('okjil,oi,oj,ok->ol', field_values[None, p], xb, yb, zb)
         return result
+    def write_coefficients(self):
+        for coord in ['x', 'y', 'z']:
+            for order in range(self.m+1):
+                text_file = open(
+                        (self.info['name']
+                        + '_' + coord
+                        + 'spline_m{0}q{1:0>2}_d{2}_coeff.csv'.format(self.m, self.n*2 + 2, order)),
+                        'w')
+                if self.info[coord + 'periodic']:
+                    for point in range(len(self.spline[coord].beta[0][order])):
+                        text_file.write('0, {0}'.format(self.spline[coord].neighbour_list[0][point]))
+                        for c in self.spline[coord].beta[0][order][point].coef:
+                            text_file.write(', {0}'.format(c))
+                        text_file.write('\r\n')
+                else:
+                    for node in range(len(self.spline[coord].beta)):
+                        for point in range(len(self.spline[coord].beta[node][order])):
+                            if (self.spline[coord].beta[node][order][point].coef.shape[0] > 1
+                                 or (not (self.spline[coord].beta[node][order][point].coef[0] == 0.0))):
+                                text_file.write('{0}, {1}'.format(node, self.spline[coord].neighbour_list[node][point]))
+                                for c in self.spline[coord].beta[node][order][point].coef:
+                                    text_file.write(', {0}'.format(c))
+                                if self.spline[coord].beta[node][order][point].coef.shape[0] < self.m*2 + 2 - order:
+                                    for tcounter in range(self.m*2 + 2
+                                            - order - self.spline[coord].beta[node][order][point].coef.shape[0]):
+                                        text_file.write(', 0')
+                                text_file.write('\r\n')
+                text_file.close()
+        return None
+    def generate_clib(
+            self,
+            cfile_name = None):
+        self.write_cfile(cfile_name = cfile_name)
+        builder = distutils.command.build_ext.build_ext(
+                distutils.dist.Distribution({'name' : self.cfile_name}))
+        builder.extensions = [
+                distutils.core.Extension(
+                    'lib' + self.cfile_name,
+                    sources = [self.cfile_name + '.c'])]
+        builder.build_lib = '.'
+        builder.swig_opts = []
+        builder.verbose = True
+        builder.run()
+        self.clib = np.ctypeslib.load_library('lib' + self.cfile_name, '.')
+        return None
+    def cinterpolate(
+            self,
+            x = None,
+            f = None,
+            diff = [0, 0, 0],
+            field_offset = [0, 0, 0]):
+        diff = np.array(diff).astype(np.int32)
+        field_offset = np.array(field_offset).astype(np.int32)
+        field_size   = np.array(f.shape[:-1]).astype(np.int32)
+        assert(diff.shape[0] == 3 and
+               len(diff.shape) == 1)
+        assert(field_offset.shape[0] == 3 and
+               len(field_offset.shape) == 1)
+        assert(f.flags['C_CONTIGUOUS'] and
+               f.dtype == np.float32)
+        y = np.ascontiguousarray(x.reshape(-1, 3), np.float32)
+        y[:, 0] = np.mod(y[:, 0], self.info['xnodes'][-1])
+        if self.info['yperiodic']:
+            y[:, 1] = np.mod(y[:, 1], self.info['ynodes'][-1])
+        y[:, 2] = np.mod(y[:, 2], self.info['znodes'][-1])
+        node_array = np.zeros(y.shape, np.int32)
+        node_array[:, 0] = np.searchsorted(self.info['xnodes'], y[:, 0], side = 'right') - 1
+        node_array[:, 1] = np.searchsorted(self.info['ynodes'], y[:, 1], side = 'right') - 1
+        node_array[:, 2] = np.searchsorted(self.info['znodes'], y[:, 2], side = 'right') - 1
+        frac_array = y.copy()
+        frac_array[:, 0] = (y[:, 0] - self.info['xnodes'][node_array[:, 0]]) / self.info['dx']
+        if self.info['yperiodic']:
+            frac_array[:, 1] = (y[:, 1] - self.info['ynodes'][node_array[:, 1]]) / self.info['dy']
+        else:
+            frac_array[:, 1] = (y[:, 1] - self.info['ynodes'][node_array[:, 1]]) / self.info['dy'][node_array[:, 1]]
+        frac_array[:, 2] = (y[:, 2] - self.info['znodes'][node_array[:, 2]]) / self.info['dz']
+        s = np.ascontiguousarray(np.zeros((y.shape[0], f.shape[-1]), np.float32))
+        getattr(self.clib, 'interpolate_' + self.base_cname)(
+                frac_array.ctypes.data_as(ct.POINTER(ct.c_float)),
+                node_array.ctypes.data_as(ct.POINTER(ct.c_int)),
+                ct.c_int(y.shape[0]),
+                diff.ctypes.data_as(ct.POINTER(ct.c_int)),
+                f.ctypes.data_as(ct.POINTER(ct.c_float)),
+                field_offset.ctypes.data_as(ct.POINTER(ct.c_int)),
+                field_size.ctypes.data_as(ct.POINTER(ct.c_int)),
+                ct.c_int(f.shape[-1]),
+                s.ctypes.data_as(ct.POINTER(ct.c_float)))
+        return s.reshape(tuple(list(x.shape[:-1]) + [f.shape[-1]]))
+    def write_cfile(
+            self,
+            cfile_name = None,  #'spline_m{0}q{1:0>2}'.format(self.m, self.n*2 + 2),
+            base_cname = None): #'m{0}q{1:0>2}'.format(self.m, self.n*2 + 2)):
+        if type(cfile_name) == type(None):
+            cfile_name = self.info['name'] + '_' + 'spline_m{0}q{1:0>2}'.format(self.m, self.n*2 + 2)
+        if type(base_cname) == type(None):
+            base_cname = 'm{0}q{1:0>2}'.format(self.m, self.n*2 + 2)
+        def write_interp1D(bname, fname):
+            tmp_txt  = '('
+            for i in range(self.n*2+1):
+                tmp_txt += '\n' + bname[i] + '*' + fname[i] + ' + '
+            tmp_txt += '\n' + bname[self.n*2+1] + '*' + fname[self.n*2+1] + ')'
+            return tmp_txt
+        self.cfile_name = cfile_name
+        self.base_cname = base_cname
+        cfile = open(self.cfile_name + '.c', 'w')
+        ### headers
+        cfile.write(
+                '#include <assert.h>\n' +
+                '#include <stdlib.h>\n' +
+                '#include <stdio.h>\n' +
+                '\n')
+        ### functions to compute beta polynomials
+        for coord in ['x', 'y', 'z']:
+            ## beta polynomial implementation
+            cfile.write(
+                    self.spline[coord].write_cfunction(
+                        cprefix = coord,
+                        csuffix = '_' + self.base_cname)
+                    + '\n')
+        ### write 3D interpolation
+        src_txt = (
+                'int interpolate_' + self.base_cname + '('
+              + 'float *fractions, '
+              + 'int *nodes, '
+              + 'int npoints, '
+              + 'int *diff, '
+              + 'float *field, '
+              + 'int *field_offset, '
+              + 'int *field_size, '
+              + 'int field_components, '
+              + 'float *result)\n')
+        src_txt += '{\n'
+        # various variables
+        src_txt += (
+#                'fprintf(stderr, "entering interpolate\\n");\n'
+                'int point;\n' +
+                'int component;\n' +
+                'int i0, i1, i2;\n' +
+                'float bx[{0}], by[{0}], bz[{0}];\n'.format(self.n*2+2) +
+                'int ix[{0}], iy[{0}], iz[{0}];\n'.format(self.n*2+2))
+        # loop over points
+        src_txt += 'for (point = 0; point < npoints; point++)\n{\n'
+#        src_txt += 'fprintf(stderr, "inside point loop, point is %d\\n", point);\n'
+        # get polynomials
+        src_txt += 'xbeta_' + self.base_cname + '(diff[0], fractions[point*3+0], bx);\n'
+        if self.info['yperiodic']:
+            src_txt += 'ybeta_' + self.base_cname + '(diff[1], fractions[point*3+1], by);\n'
+        else:
+            src_txt += 'ybeta_' + self.base_cname + '(nodes[3*point+1], diff[1], fractions[point*3+1], by);\n'
+        src_txt += 'zbeta_' + self.base_cname + '(diff[2], fractions[point*3+2], bz);\n'
+        src_txt += 'xindices_' + self.base_cname + '(nodes[3*point+0], ix);\n'
+        src_txt += 'yindices_' + self.base_cname + '(nodes[3*point+1], iy);\n'
+        src_txt += 'zindices_' + self.base_cname + '(nodes[3*point+2], iz);\n'
+        # loop over components
+        src_txt += 'for (component = 0; component < field_components; component++)\n{\n'
+#        src_txt += 'fprintf(stderr, "inside component loop, component is %d\\n", component);\n'
+        bx = ['bx[{0}]'.format(i) for i in range(self.n*2 + 2)]
+        by = ['by[{0}]'.format(i) for i in range(self.n*2 + 2)]
+        bz = ['bz[{0}]'.format(i) for i in range(self.n*2 + 2)]
+        src_txt += (
+                'i0 = nodes[3*point + 0] - field_offset[0];\n'
+                'i1 = nodes[3*point + 1] - field_offset[1];\n'
+                'i2 = nodes[3*point + 2] - field_offset[2];\n')
+        fzname = []
+        for i in range(self.n*2 + 2):
+            fyname = []
+            for j in range(self.n*2 + 2):
+                fxname = []
+                for k in range(self.n*2 + 2):
+                    fxname.append(
+                           ('field[(((i2+iz[{0}])*field_size[1]' +
+                            ' + (i1+iy[{1}]))*field_size[2]' +
+                            ' + (i0+ix[{2}]))*field_components + component]').format(
+                                                                                i,
+                                                                                j,
+                                                                                k))
+                fyname.append(write_interp1D(bx, fxname) + '\n')
+            fzname.append(write_interp1D(by, fyname) + '\n')
+        src_txt += 'result[field_components*point + component] = ' + write_interp1D(bz, fzname) + ';\n'
+        src_txt += '}\n'                                            # close component loop
+        src_txt += '}\n'                                            # close point loop
+        src_txt += 'return EXIT_SUCCESS;\n}\n'                      # close function
+        cfile.write(src_txt)
+        cfile.close()
+        return None
     if pyJHTDB.found_scipy:
         def refine_grid(
                 self,
