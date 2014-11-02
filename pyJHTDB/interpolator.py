@@ -241,8 +241,6 @@ class spline_interpolator:
             frac_array[:, 1] = (y[:, 1] - self.info['ynodes'][node_array[:, 1]]) / self.info['dy'][node_array[:, 1]]
         frac_array[:, 2] = (y[:, 2] - self.info['znodes'][node_array[:, 2]]) / self.info['dz']
         s = np.ascontiguousarray(np.zeros((y.shape[0], f.shape[-1]), np.float32))
-        print frac_array
-        print node_array
         getattr(self.clib, 'interpolate_' + self.base_cname)(
                 frac_array.ctypes.data_as(ct.POINTER(ct.c_float)),
                 node_array.ctypes.data_as(ct.POINTER(ct.c_int)),
@@ -253,7 +251,7 @@ class spline_interpolator:
                 field_size.ctypes.data_as(ct.POINTER(ct.c_int)),
                 ct.c_int(f.shape[-1]),
                 s.ctypes.data_as(ct.POINTER(ct.c_float)))
-        return s
+        return s.reshape(tuple(list(x.shape[:-1]) + [f.shape[-1]]))
     def write_cfile(
             self,
             cfile_name = None,  #'spline_m{0}q{1:0>2}'.format(self.m, self.n*2 + 2),
@@ -282,7 +280,8 @@ class spline_interpolator:
             ## beta polynomial implementation
             cfile.write(
                     self.spline[coord].write_cfunction(
-                        base_cname = coord + 'beta_' + self.base_cname)
+                        cprefix = coord,
+                        csuffix = '_' + self.base_cname)
                     + '\n')
         ### write 3D interpolation
         src_txt = (
@@ -303,7 +302,8 @@ class spline_interpolator:
                 'int point;\n' +
                 'int component;\n' +
                 'int i0, i1, i2;\n' +
-                'float bx[{0}], by[{0}], bz[{0}];\n'.format(self.n*2+2))
+                'float bx[{0}], by[{0}], bz[{0}];\n'.format(self.n*2+2) +
+                'int ix[{0}], iy[{0}], iz[{0}];\n'.format(self.n*2+2))
         # loop over points
         src_txt += 'for (point = 0; point < npoints; point++)\n{\n'
 #        src_txt += 'fprintf(stderr, "inside point loop, point is %d\\n", point);\n'
@@ -314,6 +314,9 @@ class spline_interpolator:
         else:
             src_txt += 'ybeta_' + self.base_cname + '(nodes[3*point+1], diff[1], fractions[point*3+1], by);\n'
         src_txt += 'zbeta_' + self.base_cname + '(diff[2], fractions[point*3+2], bz);\n'
+        src_txt += 'xindices_' + self.base_cname + '(nodes[3*point+0], ix);\n'
+        src_txt += 'yindices_' + self.base_cname + '(nodes[3*point+1], iy);\n'
+        src_txt += 'zindices_' + self.base_cname + '(nodes[3*point+2], iz);\n'
         # loop over components
         src_txt += 'for (component = 0; component < field_components; component++)\n{\n'
 #        src_txt += 'fprintf(stderr, "inside component loop, component is %d\\n", component);\n'
@@ -321,9 +324,9 @@ class spline_interpolator:
         by = ['by[{0}]'.format(i) for i in range(self.n*2 + 2)]
         bz = ['bz[{0}]'.format(i) for i in range(self.n*2 + 2)]
         src_txt += (
-                'i0 = nodes[3*point + 0] - field_offset[0];\n'
+                'i0 = nodes[3*point + 2] - field_offset[2];\n'
                 'i1 = nodes[3*point + 1] - field_offset[1];\n'
-                'i2 = nodes[3*point + 2] - field_offset[2];\n')
+                'i2 = nodes[3*point + 0] - field_offset[0];\n')
         fzname = []
         for i in range(self.n*2 + 2):
             fyname = []
@@ -331,12 +334,12 @@ class spline_interpolator:
                 fxname = []
                 for k in range(self.n*2 + 2):
                     fxname.append(
-                           ('field[(((i0{0:+})*field_size[1]' +
-                            ' + (i1{1:+}))*field_size[2]' +
-                            ' + (i2{2:+}))*field_components + component]').format(
-                                                                                i - self.n,
-                                                                                j - self.n,
-                                                                                k - self.n))
+                           ('field[(((i0+iz[{0}])*field_size[1]' +
+                            ' + (i1+iy[{1}]))*field_size[2]' +
+                            ' + (i2+ix[{2}]))*field_components + component]').format(
+                                                                                i,
+                                                                                j,
+                                                                                k))
                 fyname.append(write_interp1D(bx, fxname) + '\n')
             fzname.append(write_interp1D(by, fyname) + '\n')
         src_txt += 'result[field_components*point + component] = ' + write_interp1D(bz, fzname) + ';\n'

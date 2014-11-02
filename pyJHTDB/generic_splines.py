@@ -242,15 +242,17 @@ class generic_spline_1D:
         return None
     def write_cfunction(
             self,
-            base_cname = None):
-        src_txt = 'int ' + base_cname + '('
+            cprefix = None,
+            csuffix = None,
+            data_type = 'float'):
+        src_txt = 'int ' + cprefix + 'beta' + csuffix + '('
         if not self.periodic:
-            src_txt += 'int cell, ' # which cell are we in?
+            src_txt += 'int cell, '  # which cell are we in?
         src_txt += (
-                'int diff, '        # which derivative should we use?
-                + 'float t, '
-                + 'float *bval)'   # array where to place the values of the beta polynomials
-                + '\n{\n')
+                'int diff, ' +       # which derivative should we use?
+                data_type + ' t, ' +
+                data_type + ' *bval)' +     # array where to place the values of the beta polynomials
+                '\n{\n')
         # sanity check
         src_txt += 'assert(diff >= 0 && diff <= {0});\n'.format(self.m)
         def beta_cformulas(node):
@@ -277,6 +279,27 @@ class generic_spline_1D:
             for cell in range(len(self.beta)):
                 src_txt += 'case {0}:\n'.format(cell)
                 src_txt += beta_cformulas(cell)
+                src_txt += 'break;\n'
+            src_txt += ('\n}\n')    # end cell switch
+        # end and return 0
+        src_txt += 'return EXIT_SUCCESS;\n}\n'
+        src_txt += 'int ' + cprefix + 'indices' + csuffix + '('
+        src_txt += 'int cell, '     # which cell are we in?
+        src_txt += (
+                ' int *index)' +    # array where to place the values of the beta polynomials
+                '\n{\n')
+        if self.periodic:
+            for i in range(self.n*2 + 2):
+                src_txt += 'index[{0}] = {1};\n'.format(i, i-self.n)
+        else:
+            src_txt += (
+                    'switch (cell)\n{\n')
+            for cell in range(len(self.beta)):
+                src_txt += 'case {0}:\n'.format(cell)
+                for i in range(len(self.neighbour_list[cell])):
+                    src_txt += 'index[{0}] = {1};\n'.format(i, self.neighbour_list[cell][i] - cell)
+                if len(self.neighbour_list[cell]) < self.n*2+2:
+                    src_txt += 'index[{0}] = {1};\n'.format(self.n*2+1, self.neighbour_list[cell][-1] - cell)
                 src_txt += 'break;\n'
             src_txt += ('\n}\n')    # end cell switch
         # end and return 0
