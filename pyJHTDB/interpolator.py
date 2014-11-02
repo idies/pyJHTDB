@@ -215,42 +215,45 @@ class spline_interpolator:
             f = None,
             diff = [0, 0, 0],
             field_offset = [0, 0, 0]):
-        diff = np.array(diff).astype(np.int)
-        field_offset = np.array(field_offset).astype(np.int)
-        field_size   = np.array(field.shape[:-1]).astype(np.int)
+        diff = np.array(diff).astype(np.int32)
+        field_offset = np.array(field_offset).astype(np.int32)
+        field_size   = np.array(f.shape[:-1]).astype(np.int32)
         assert(diff.shape[0] == 3 and
                len(diff.shape) == 1)
         assert(field_offset.shape[0] == 3 and
                len(field_offset.shape) == 1)
         assert(f.flags['C_CONTIGUOUS'] and
                f.dtype == np.float32)
-        y = np.ascontiguousarray(x.reshape(-1, 3), f.dtype)
-        y[:, 0] = np.mod(y[:, 0], info['xnodes'][-1])
-        if info['yperiodic']:
-            y[:, 1] = np.mod(y[:, 1], info['ynodes'][-1])
-        y[:, 2] = np.mod(y[:, 2], info['znodes'][-1])
-        node_array = np.zeros(y.shape, np.int)
-        node_array[:, 0] = np.searchsorted(info['xnodes'], y[:, 0])
-        node_array[:, 1] = np.searchsorted(info['ynodes'], y[:, 1])
-        node_array[:, 2] = np.searchsorted(info['znodes'], y[:, 2])
+        y = np.ascontiguousarray(x.reshape(-1, 3), np.float32)
+        y[:, 0] = np.mod(y[:, 0], self.info['xnodes'][-1])
+        if self.info['yperiodic']:
+            y[:, 1] = np.mod(y[:, 1], self.info['ynodes'][-1])
+        y[:, 2] = np.mod(y[:, 2], self.info['znodes'][-1])
+        node_array = np.zeros(y.shape, np.int32)
+        node_array[:, 0] = np.searchsorted(self.info['xnodes'], y[:, 0], side = 'right') - 1
+        node_array[:, 1] = np.searchsorted(self.info['ynodes'], y[:, 1], side = 'right') - 1
+        node_array[:, 2] = np.searchsorted(self.info['znodes'], y[:, 2], side = 'right') - 1
         frac_array = y.copy()
-        frac_array[:, 0] = (y[:, 0] - info['xnodes'][node_array[:, 0]]) / info['dx']
-        if info['yperiodic']:
-            frac_array[:, 1] = (y[:, 1] - info['ynodes'][node_array[:, 1]]) / info['dy']
+        frac_array[:, 0] = (y[:, 0] - self.info['xnodes'][node_array[:, 0]]) / self.info['dx']
+        if self.info['yperiodic']:
+            frac_array[:, 1] = (y[:, 1] - self.info['ynodes'][node_array[:, 1]]) / self.info['dy']
         else:
-            frac_array[:, 1] = (y[:, 1] - info['ynodes'][node_array[:, 1]]) / info['dy'][node_array[:, 1]]
-        frac_array[:, 2] = (y[:, 2] - info['znodes'][node_array[:, 2]]) / info['dz']
-        s = np.ascontiguousarray(np.zeros(y.shape[0], f.shape[-1]), y.dtype)
+            frac_array[:, 1] = (y[:, 1] - self.info['ynodes'][node_array[:, 1]]) / self.info['dy'][node_array[:, 1]]
+        frac_array[:, 2] = (y[:, 2] - self.info['znodes'][node_array[:, 2]]) / self.info['dz']
+        s = np.ascontiguousarray(np.zeros((y.shape[0], f.shape[-1]), np.float32))
+        print frac_array
+        print node_array
         getattr(self.clib, 'interpolate_' + self.base_cname)(
                 frac_array.ctypes.data_as(ct.POINTER(ct.c_float)),
                 node_array.ctypes.data_as(ct.POINTER(ct.c_int)),
+                ct.c_int(y.shape[0]),
                 diff.ctypes.data_as(ct.POINTER(ct.c_int)),
                 f.ctypes.data_as(ct.POINTER(ct.c_float)),
                 field_offset.ctypes.data_as(ct.POINTER(ct.c_int)),
                 field_size.ctypes.data_as(ct.POINTER(ct.c_int)),
                 ct.c_int(f.shape[-1]),
                 s.ctypes.data_as(ct.POINTER(ct.c_float)))
-        return None
+        return s
     def write_cfile(
             self,
             cfile_name = None,  #'spline_m{0}q{1:0>2}'.format(self.m, self.n*2 + 2),
@@ -270,8 +273,10 @@ class spline_interpolator:
         cfile = open(self.cfile_name + '.c', 'w')
         ### headers
         cfile.write(
-                '#include <assert.h>\n'
-              + '#include <stdlib.h>\n\n')
+                '#include <assert.h>\n' +
+                '#include <stdlib.h>\n' +
+                '#include <stdio.h>\n' +
+                '\n')
         ### functions to compute beta polynomials
         for coord in ['x', 'y', 'z']:
             ## beta polynomial implementation
@@ -294,12 +299,14 @@ class spline_interpolator:
         src_txt += '{\n'
         # various variables
         src_txt += (
+#                'fprintf(stderr, "entering interpolate\\n");\n'
                 'int point;\n' +
                 'int component;\n' +
                 'int i0, i1, i2;\n' +
                 'float bx[{0}], by[{0}], bz[{0}];\n'.format(self.n*2+2))
         # loop over points
         src_txt += 'for (point = 0; point < npoints; point++)\n{\n'
+#        src_txt += 'fprintf(stderr, "inside point loop, point is %d\\n", point);\n'
         # get polynomials
         src_txt += 'xbeta_' + self.base_cname + '(diff[0], fractions[point*3+0], bx);\n'
         if self.info['yperiodic']:
@@ -309,6 +316,7 @@ class spline_interpolator:
         src_txt += 'zbeta_' + self.base_cname + '(diff[2], fractions[point*3+2], bz);\n'
         # loop over components
         src_txt += 'for (component = 0; component < field_components; component++)\n{\n'
+#        src_txt += 'fprintf(stderr, "inside component loop, component is %d\\n", component);\n'
         bx = ['bx[{0}]'.format(i) for i in range(self.n*2 + 2)]
         by = ['by[{0}]'.format(i) for i in range(self.n*2 + 2)]
         bz = ['bz[{0}]'.format(i) for i in range(self.n*2 + 2)]
