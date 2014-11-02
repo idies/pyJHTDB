@@ -324,9 +324,9 @@ class spline_interpolator:
         by = ['by[{0}]'.format(i) for i in range(self.n*2 + 2)]
         bz = ['bz[{0}]'.format(i) for i in range(self.n*2 + 2)]
         src_txt += (
-                'i0 = nodes[3*point + 2] - field_offset[2];\n'
+                'i0 = nodes[3*point + 0] - field_offset[0];\n'
                 'i1 = nodes[3*point + 1] - field_offset[1];\n'
-                'i2 = nodes[3*point + 0] - field_offset[0];\n')
+                'i2 = nodes[3*point + 2] - field_offset[2];\n')
         fzname = []
         for i in range(self.n*2 + 2):
             fyname = []
@@ -334,9 +334,9 @@ class spline_interpolator:
                 fxname = []
                 for k in range(self.n*2 + 2):
                     fxname.append(
-                           ('field[(((i0+iz[{0}])*field_size[1]' +
+                           ('field[(((i2+iz[{0}])*field_size[1]' +
                             ' + (i1+iy[{1}]))*field_size[2]' +
-                            ' + (i2+ix[{2}]))*field_components + component]').format(
+                            ' + (i0+ix[{2}]))*field_components + component]').format(
                                                                                 i,
                                                                                 j,
                                                                                 k))
