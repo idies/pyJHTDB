@@ -23,6 +23,12 @@ import numpy as np
 import os
 import pickle
 import gzip
+import ctypes as ct
+import distutils
+import distutils.command
+import distutils.command.build_ext
+import distutils.core
+import distutils.dist
 
 import pyJHTDB
 import pyJHTDB.generic_splines as gs
@@ -187,12 +193,70 @@ class spline_interpolator:
                                 text_file.write('\r\n')
                 text_file.close()
         return None
+    def generate_clib(
+            self,
+            cfile_name = None):
+        self.write_cfile(cfile_name = cfile_name)
+        builder = distutils.command.build_ext.build_ext(
+                distutils.dist.Distribution({'name' : self.cfile_name}))
+        builder.extensions = [
+                distutils.core.Extension(
+                    'lib' + self.cfile_name,
+                    sources = [self.cfile_name + '.c'])]
+        builder.build_lib = '.'
+        builder.swig_opts = []
+        builder.verbose = True
+        builder.run()
+        self.clib = np.ctypeslib.load_library('lib' + self.cfile_name, '.')
+        return None
+    def cinterpolate(
+            self,
+            x = None,
+            f = None,
+            diff = [0, 0, 0],
+            field_offset = [0, 0, 0]):
+        diff = np.array(diff).astype(np.int)
+        field_offset = np.array(field_offset).astype(np.int)
+        field_size   = np.array(field.shape[:-1]).astype(np.int)
+        assert(diff.shape[0] == 3 and
+               len(diff.shape) == 1)
+        assert(field_offset.shape[0] == 3 and
+               len(field_offset.shape) == 1)
+        assert(f.flags['C_CONTIGUOUS'] and
+               f.dtype == np.float32)
+        y = np.ascontiguousarray(x.reshape(-1, 3), f.dtype)
+        y[:, 0] = np.mod(y[:, 0], info['xnodes'][-1])
+        if info['yperiodic']:
+            y[:, 1] = np.mod(y[:, 1], info['ynodes'][-1])
+        y[:, 2] = np.mod(y[:, 2], info['znodes'][-1])
+        node_array = np.zeros(y.shape, np.int)
+        node_array[:, 0] = np.searchsorted(info['xnodes'], y[:, 0])
+        node_array[:, 1] = np.searchsorted(info['ynodes'], y[:, 1])
+        node_array[:, 2] = np.searchsorted(info['znodes'], y[:, 2])
+        frac_array = y.copy()
+        frac_array[:, 0] = (y[:, 0] - info['xnodes'][node_array[:, 0]]) / info['dx']
+        if info['yperiodic']:
+            frac_array[:, 1] = (y[:, 1] - info['ynodes'][node_array[:, 1]]) / info['dy']
+        else:
+            frac_array[:, 1] = (y[:, 1] - info['ynodes'][node_array[:, 1]]) / info['dy'][node_array[:, 1]]
+        frac_array[:, 2] = (y[:, 2] - info['znodes'][node_array[:, 2]]) / info['dz']
+        s = np.ascontiguousarray(np.zeros(y.shape[0], f.shape[-1]), y.dtype)
+        getattr(self.clib, 'interpolate_' + self.base_cname)(
+                frac_array.ctypes.data_as(ct.POINTER(ct.c_float)),
+                node_array.ctypes.data_as(ct.POINTER(ct.c_int)),
+                diff.ctypes.data_as(ct.POINTER(ct.c_int)),
+                f.ctypes.data_as(ct.POINTER(ct.c_float)),
+                field_offset.ctypes.data_as(ct.POINTER(ct.c_int)),
+                field_size.ctypes.data_as(ct.POINTER(ct.c_int)),
+                ct.c_int(f.shape[-1]),
+                s.ctypes.data_as(ct.POINTER(ct.c_float)))
+        return None
     def write_cfile(
             self,
             cfile_name = None,  #'spline_m{0}q{1:0>2}'.format(self.m, self.n*2 + 2),
             base_cname = None): #'m{0}q{1:0>2}'.format(self.m, self.n*2 + 2)):
         if type(cfile_name) == type(None):
-            cfile_name = 'spline_m{0}q{1:0>2}'.format(self.m, self.n*2 + 2)
+            cfile_name = self.info['name'] + '_' + 'spline_m{0}q{1:0>2}'.format(self.m, self.n*2 + 2)
         if type(base_cname) == type(None):
             base_cname = 'm{0}q{1:0>2}'.format(self.m, self.n*2 + 2)
         def write_interp1D(bname, fname):
@@ -203,7 +267,7 @@ class spline_interpolator:
             return tmp_txt
         self.cfile_name = cfile_name
         self.base_cname = base_cname
-        cfile = open(self.info['name'] + '_' + self.cfile_name + '.c', 'w')
+        cfile = open(self.cfile_name + '.c', 'w')
         ### headers
         cfile.write(
                 '#include <assert.h>\n'
@@ -217,7 +281,7 @@ class spline_interpolator:
                     + '\n')
         ### write 3D interpolation
         src_txt = (
-                'int interpolate_' + base_cname + '('
+                'int interpolate_' + self.base_cname + '('
               + 'float *fractions, '
               + 'int *nodes, '
               + 'int npoints, '
