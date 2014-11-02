@@ -437,7 +437,7 @@ def test_interp(
     ax = fig.add_subplot(121)
     c = ax.contour(res0[:, :, 0])
     ax.clabel(c)
-    ax.set_title('Lag4 result from database')
+    ax.set_title('Lag8 result from database')
     ax = fig.add_subplot(122)
     c = ax.contour(res1[:, :, 0], c.levels)
     ax.clabel(c)
