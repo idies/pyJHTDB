@@ -27,6 +27,7 @@ import numpy
 
 import pyJHTDB
 import pyJHTDB.dbinfo
+import pyJHTDB.interpolator
 
 if pyJHTDB.found_matplotlib:
     import matplotlib.pyplot as plt
@@ -336,6 +337,112 @@ def test_misc():
 
     #finalize webservices
     lJHTDB.finalize()
+    return None
+
+def test_rawData(
+        info = pyJHTDB.dbinfo.channel,
+        npoints = 256):
+
+    start = numpy.array([0, 0, 0], dtype = numpy.int)
+    width = numpy.array([npoints, npoints, 1], dtype = numpy.int)
+
+    xg = info['xnodes'][0:width[0]]
+    yg = info['ynodes'][0:width[1]]
+    zg = info['znodes'][0:width[2]]
+    x = numpy.zeros((npoints, npoints, 3), numpy.float32)
+    x[:, :, 0] = xg[None, :]
+    x[:, :, 1] = yg[:, None]
+    x[:, :, 2] = zg[0]
+
+    lJHTDB = pyJHTDB.libJHTDB()
+    lJHTDB.initialize()
+    res4 = lJHTDB.getData(
+            0,
+            x,
+            sinterp = 4,
+            tinterp = 0,
+            data_set = info['name'],
+            getFunction = 'Velocity')
+    res0 = lJHTDB.getRawData(
+            0,
+            start = start,
+            size  = width,
+            data_set = info['name'],
+            getFunction = 'Velocity')
+    lJHTDB.finalize()
+
+    print res0.shape
+    print res4.shape
+
+    fig = plt.figure(figsize=(12,6))
+    ax = fig.add_subplot(121)
+    c = ax.contour(res4[:, :, 0])
+    ax.clabel(c)
+    ax.set_title('Lag4 result from database')
+    ax = fig.add_subplot(122)
+    c = ax.contour(res0[:, :, 0, 0])
+    ax.clabel(c)
+    ax.set_title('rawData result from database')
+    fig.savefig('tst.pdf', format = 'pdf')
+    return None
+
+def test_interp(
+        info = pyJHTDB.dbinfo.channel,
+        m = 1,
+        q = 4,
+        npoints = 256):
+
+    start = numpy.array([0, 0, 0], dtype = numpy.int)
+    width = numpy.array([91, 67, 11], dtype = numpy.int)
+
+    i = pyJHTDB.interpolator.spline_interpolator(
+            info = info,
+            n = (q - 2)/2,
+            m = m)
+    i.generate_clib()
+
+    xg = numpy.linspace(info['xnodes'][i.n], info['xnodes'][width[0] - i.n], npoints)
+    if info['yperiodic']:
+        yg = numpy.linspace(info['ynodes'][i.n], info['ynodes'][width[1] - i.n], npoints)
+    else:
+        yg = numpy.linspace(info['ynodes'][0], info['ynodes'][width[1] - i.n], npoints)
+    zg = numpy.linspace(info['znodes'][i.n], info['znodes'][width[2] - i.n], npoints)
+    x = numpy.zeros((npoints, npoints, 3), numpy.float32)
+    x[:, :, 0] = xg[None, :]
+    x[:, :, 1] = yg[:, None]
+    x[:, :, 2] = zg[:, None]
+
+    lJHTDB = pyJHTDB.libJHTDB()
+    lJHTDB.initialize()
+    # get Lag4 velocity
+    res0 = lJHTDB.getData(
+            0,
+            x,
+            sinterp = 8,
+            tinterp = 0,
+            data_set = info['name'],
+            getFunction = 'getVelocity')
+    # now get locally interpolated velocity
+    test_field = lJHTDB.getRawData(
+            0,
+            start = start,
+            size  = width,
+            data_set = info['name'],
+            getFunction = 'Velocity')
+    res1 = i.cinterpolate(
+            x, test_field)
+    lJHTDB.finalize()
+
+    fig = plt.figure(figsize=(12,6))
+    ax = fig.add_subplot(121)
+    c = ax.contour(res0[:, :, 0])
+    ax.clabel(c)
+    ax.set_title('Lag4 result from database')
+    ax = fig.add_subplot(122)
+    c = ax.contour(res1[:, :, 0], c.levels)
+    ax.clabel(c)
+    ax.set_title('local M{0}Q{1:0>2} result'.format(i.m, i.n*2+2))
+    fig.savefig('tst.pdf', format = 'pdf')
     return None
 
 if __name__ == '__main__':
