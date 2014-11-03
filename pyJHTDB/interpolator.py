@@ -225,10 +225,6 @@ class spline_interpolator:
         assert(f.flags['C_CONTIGUOUS'] and
                f.dtype == np.float32)
         y = np.ascontiguousarray(x.reshape(-1, 3), np.float32)
-        y[:, 0] = np.mod(y[:, 0], self.info['xnodes'][-1])
-        if self.info['yperiodic']:
-            y[:, 1] = np.mod(y[:, 1], self.info['ynodes'][-1])
-        y[:, 2] = np.mod(y[:, 2], self.info['znodes'][-1])
         node_array = np.zeros(y.shape, np.int32)
         node_array[:, 0] = np.searchsorted(self.info['xnodes'], y[:, 0], side = 'right') - 1
         node_array[:, 1] = np.searchsorted(self.info['ynodes'], y[:, 1], side = 'right') - 1
