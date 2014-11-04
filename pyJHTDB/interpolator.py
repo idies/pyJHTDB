@@ -226,16 +226,19 @@ class spline_interpolator:
                f.dtype == np.float32)
         y = np.ascontiguousarray(x.reshape(-1, 3), np.float32)
         node_array = np.zeros(y.shape, np.int32)
-        node_array[:, 0] = np.searchsorted(self.info['xnodes'], y[:, 0], side = 'right') - 1
-        node_array[:, 1] = np.searchsorted(self.info['ynodes'], y[:, 1], side = 'right') - 1
-        node_array[:, 2] = np.searchsorted(self.info['znodes'], y[:, 2], side = 'right') - 1
-        frac_array = y.copy()
-        frac_array[:, 0] = (y[:, 0] - self.info['xnodes'][node_array[:, 0]]) / self.info['dx']
+        node_array[:, 0] = np.floor(y[:, 0] / self.info['dx'])
         if self.info['yperiodic']:
-            frac_array[:, 1] = (y[:, 1] - self.info['ynodes'][node_array[:, 1]]) / self.info['dy']
+            node_array[:, 1] = np.floor(y[:, 1] / self.info['dy'])
+        else:
+            node_array[:, 1] = np.searchsorted(self.info['ynodes'], y[:, 1], side = 'right') - 1
+        node_array[:, 2] = np.floor(y[:, 2] / self.info['dz'])
+        frac_array = y.copy()
+        frac_array[:, 0] = y[:, 0] / self.info['dx'] - node_array[:, 0]
+        if self.info['yperiodic']:
+            frac_array[:, 1] = y[:, 1] / self.info['dy'] - node_array[:, 1]
         else:
             frac_array[:, 1] = (y[:, 1] - self.info['ynodes'][node_array[:, 1]]) / self.info['dy'][node_array[:, 1]]
-        frac_array[:, 2] = (y[:, 2] - self.info['znodes'][node_array[:, 2]]) / self.info['dz']
+        frac_array[:, 2] = y[:, 2] / self.info['dz'] - node_array[:, 2]
         s = np.ascontiguousarray(np.zeros((y.shape[0], f.shape[-1]), np.float32))
         getattr(self.clib, 'interpolate_' + self.base_cname)(
                 frac_array.ctypes.data_as(ct.POINTER(ct.c_float)),
@@ -294,7 +297,7 @@ class spline_interpolator:
         src_txt += '{\n'
         # various variables
         src_txt += (
-#                'fprintf(stderr, "entering interpolate\\n");\n'
+                'fprintf(stderr, "entering interpolate %d %d %d\\n", field_offset[0], field_offset[1], field_offset[2]);\n' +
                 'int point;\n' +
                 'int component;\n' +
                 'int i0, i1, i2;\n' +
@@ -320,9 +323,15 @@ class spline_interpolator:
         by = ['by[{0}]'.format(i) for i in range(self.n*2 + 2)]
         bz = ['bz[{0}]'.format(i) for i in range(self.n*2 + 2)]
         src_txt += (
-                'i0 = nodes[3*point + 0] - field_offset[0];\n'
-                'i1 = nodes[3*point + 1] - field_offset[1];\n'
-                'i2 = nodes[3*point + 2] - field_offset[2];\n')
+                'i0 = nodes[3*point + 0] - field_offset[0];\n' +
+                'i1 = nodes[3*point + 1] - field_offset[1];\n' +
+                'i2 = nodes[3*point + 2] - field_offset[2];\n' +
+                'if (i0 < 0 || i1 < 0 || i2 < 0)' +
+                '{\n' +
+                    'fprintf(stderr, "negative indices in interpolate %d %d %d\\n", i0, i1, i2);\n' +
+                    'fprintf(stderr, "exiting interpolate now, results are most likely nonsensical\\n");\n' +
+                    'return EXIT_FAILURE;\n' +
+                '}\n')
         fzname = []
         for i in range(self.n*2 + 2):
             fyname = []
@@ -331,11 +340,8 @@ class spline_interpolator:
                 for k in range(self.n*2 + 2):
                     fxname.append(
                            ('field[(((i2+iz[{0}])*field_size[1]' +
-                            ' + (i1+iy[{1}]))*field_size[2]' +
-                            ' + (i0+ix[{2}]))*field_components + component]').format(
-                                                                                i,
-                                                                                j,
-                                                                                k))
+                                 ' + (i1+iy[{1}]))*field_size[2]' +
+                                 ' + (i0+ix[{2}]))*field_components + component]').format(i, j, k))
                 fyname.append(write_interp1D(bx, fxname) + '\n')
             fzname.append(write_interp1D(by, fyname) + '\n')
         src_txt += 'result[field_components*point + component] = ' + write_interp1D(bz, fzname) + ';\n'
