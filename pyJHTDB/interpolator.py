@@ -297,7 +297,7 @@ class spline_interpolator:
         src_txt += '{\n'
         # various variables
         src_txt += (
-                'fprintf(stderr, "entering interpolate %d %d %d\\n", field_offset[0], field_offset[1], field_offset[2]);\n' +
+#                'fprintf(stderr, "entering interpolate %d %d %d\\n", field_offset[0], field_offset[1], field_offset[2]);\n' +
                 'int point;\n' +
                 'int component;\n' +
                 'int i0, i1, i2;\n' +
