@@ -386,7 +386,115 @@ def test_rawData(
     fig.savefig('tst.pdf', format = 'pdf')
     return None
 
-def test_interp(
+def test_interp_1D(
+        info = pyJHTDB.dbinfo.channel,
+        m = 1,
+        q = 4,
+        npoints = 256):
+
+    start = numpy.array([0, 0, 0], dtype = numpy.int)
+    width = numpy.array([51+q, 37+q, 17+q], dtype = numpy.int)
+
+    i = pyJHTDB.interpolator.spline_interpolator(
+            info = info,
+            n = (q - 2)/2,
+            m = m)
+    i.generate_clib()
+
+    xg = numpy.linspace(info['xnodes'][i.n+1], info['xnodes'][width[0] - i.n - 1], npoints)
+    if info['yperiodic']:
+        yg = numpy.linspace(info['ynodes'][i.n+1], info['ynodes'][width[1] - i.n - 1], npoints)
+    else:
+        yg = numpy.linspace(info['ynodes'][0], info['ynodes'][width[1] - i.n - 1], npoints)
+    zg = numpy.linspace(info['znodes'][i.n+1], info['znodes'][width[2] - i.n - 1], npoints)
+    x = numpy.zeros((npoints, 3), numpy.float32)
+    x[:, 0] = xg[0]
+    x[:, 1] = yg[:]
+    x[:, 2] = zg[0]
+
+    lJHTDB = pyJHTDB.libJHTDB()
+    lJHTDB.initialize()
+    # get raw data to interpolate
+    test_field = lJHTDB.getRawData(
+            0,
+            start = start,
+            size  = width,
+            data_set = info['name'],
+            getFunction = 'Velocity')
+    # get Lag8 velocity
+    res0 = lJHTDB.getData(
+            0,
+            x,
+            sinterp = 8,
+            tinterp = 0,
+            data_set = info['name'],
+            getFunction = 'getVelocity')
+    # get locally interpolated values
+    res1 = i.cinterpolate(
+            x, test_field)
+    # get Lag4 gradient
+    resd0 = lJHTDB.getData(
+            0,
+            x,
+            sinterp = 44,
+            tinterp = 0,
+            data_set = info['name'],
+            getFunction = 'getVelocityGradient')
+    # get locally interpolated gradient
+    resdx1 = i.cinterpolate(
+            x,
+            test_field,
+            diff = [1, 0, 0])
+    resdy1 = i.cinterpolate(
+            x,
+            test_field,
+            diff = [0, 1, 0])
+    resdz1 = i.cinterpolate(
+            x,
+            test_field,
+            diff = [0, 0, 1])
+    resd1 = resd0.copy()
+    resd1[..., 0] = resdx1[..., 0]
+    resd1[..., 1] = resdy1[..., 0]
+    resd1[..., 2] = resdz1[..., 0]
+    resd1[..., 3] = resdx1[..., 1]
+    resd1[..., 4] = resdy1[..., 1]
+    resd1[..., 5] = resdz1[..., 1]
+    resd1[..., 6] = resdx1[..., 2]
+    resd1[..., 7] = resdy1[..., 2]
+    resd1[..., 8] = resdz1[..., 2]
+    del resdx1, resdy1, resdz1
+    lJHTDB.finalize()
+
+    def compare_results(
+            fld0,
+            fld1,
+            figname = 'tst'):
+        fig = plt.figure(figsize=(6,6))
+        ax = fig.add_subplot(111)
+        ax.plot(fld0, color = 'blue')
+        ax.plot(fld1, color = 'red')
+        fig.savefig(figname + '.pdf', format = 'pdf')
+
+    compare_results(
+            res0,
+            res1,
+            figname = 'tst')
+
+    compare_results(
+            resd0,
+            resd1,
+            figname = 'dtst')
+    dist = (numpy.average(numpy.sqrt(numpy.sum((res0 - res1)**2, axis = 1))) /
+            numpy.average(numpy.sqrt(numpy.sum((res0)**2, axis = 1))))
+    print dist
+    ddist = (numpy.average(numpy.sqrt(numpy.sum((resd0 - resd1)**2, axis = 1))) /
+             numpy.average(numpy.sqrt(numpy.sum((resd0)**2, axis = 1))))
+    print ddist
+
+    return res0, res1, resd0, resd1
+
+def test_interp_2D(
         info = pyJHTDB.dbinfo.channel,
         m = 1,
         q = 4,
@@ -408,9 +516,9 @@ def test_interp(
         yg = numpy.linspace(info['ynodes'][0], info['ynodes'][width[1] - i.n - 1], npoints)
     zg = numpy.linspace(info['znodes'][i.n+1], info['znodes'][width[2] - i.n - 1], npoints)
     x = numpy.zeros((npoints, npoints, 3), numpy.float32)
-    x[:, :, 0] = xg[None, :]
+    x[:, :, 0] = xg[0] #None, :]
     x[:, :, 1] = yg[:, None]
-    x[:, :, 2] = zg[:, None]
+    x[:, :, 2] = zg[0] #zg[:, None]
 
     lJHTDB = pyJHTDB.libJHTDB()
     lJHTDB.initialize()
@@ -472,14 +580,25 @@ def test_interp(
             figname = 'tst'):
         fig = plt.figure(figsize=(12,6))
         ax = fig.add_subplot(121)
-        c = ax.contour(fld0)
+        c = ax.contour(
+                #x[:, :, 0],
+                #x[:, :, 1],
+                fld0)
         ax.clabel(c)
         ax.set_title('result from database')
         ax = fig.add_subplot(122)
-        c = ax.contour(fld1) #, c.levels)
+        c = ax.contour(
+                #x[:, :, 0],
+                #x[:, :, 1],
+                fld1, c.levels)
         ax.clabel(c)
         ax.set_title('local M{0}Q{1:0>2} result'.format(i.m, i.n*2+2))
         fig.savefig(figname + '.pdf', format = 'pdf')
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+        ax.plot(fld0[:, 0], color = 'blue')
+        ax.plot(fld1[:, 0], color = 'red')
+        fig.savefig(figname + '_1D.pdf', format = 'pdf')
 
     compare_results(
             res0[:, :, 1],
