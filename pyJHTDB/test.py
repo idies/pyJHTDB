@@ -615,6 +615,87 @@ def test_interp_2D(
 
     return res0, res1, resd0, resd1
 
+def test_divfree(
+        info = pyJHTDB.dbinfo.channel,
+        m = 1,
+        q = 4,
+        npoints = 256):
+
+    start = numpy.array([0, 0, 0], dtype = numpy.int)
+    width = numpy.array([91, 67, 31], dtype = numpy.int)
+
+    i = pyJHTDB.interpolator.spline_interpolator(
+            info = info,
+            n = (q - 2)/2,
+            m = m)
+    i.generate_clib()
+
+    xg = [info['xnodes'][i.n+1], info['xnodes'][width[0] - i.n - 1]]
+    if info['yperiodic']:
+        yg = [info['ynodes'][i.n+1], info['ynodes'][width[1] - i.n - 1]]
+    else:
+        yg = [info['ynodes'][0], info['ynodes'][width[1] - i.n - 1]]
+    zg = [info['znodes'][i.n+1], info['znodes'][width[2] - i.n - 1]]
+    x = numpy.random.random(size = (npoints, 3)).astype(numpy.float32)
+    x[:, 0] = xg[0] + x[:, 0]*(xg[1] - xg[0])
+    x[:, 1] = yg[0] + x[:, 1]*(yg[1] - yg[0])
+    x[:, 2] = zg[0] + x[:, 2]*(zg[1] - zg[0])
+
+    lJHTDB = pyJHTDB.libJHTDB()
+    lJHTDB.initialize()
+    # get raw data to interpolate
+    test_field = lJHTDB.getRawData(
+            0,
+            start = start,
+            size  = width,
+            data_set = info['name'],
+            getFunction = 'Velocity')
+    # get Lag4 gradient
+    resd0 = lJHTDB.getData(
+            0,
+            x,
+            sinterp = 44,
+            tinterp = 0,
+            data_set = info['name'],
+            getFunction = 'getVelocityGradient')
+    # get locally interpolated gradient
+    resdx1 = i.cinterpolate(
+            x,
+            test_field,
+            diff = [1, 0, 0])
+    resdy1 = i.cinterpolate(
+            x,
+            test_field,
+            diff = [0, 1, 0])
+    resdz1 = i.cinterpolate(
+            x,
+            test_field,
+            diff = [0, 0, 1])
+    resd1 = resd0.copy()
+    resd1[..., 0] = resdx1[..., 0]
+    resd1[..., 1] = resdy1[..., 0]
+    resd1[..., 2] = resdz1[..., 0]
+    resd1[..., 3] = resdx1[..., 1]
+    resd1[..., 4] = resdy1[..., 1]
+    resd1[..., 5] = resdz1[..., 1]
+    resd1[..., 6] = resdx1[..., 2]
+    resd1[..., 7] = resdy1[..., 2]
+    resd1[..., 8] = resdz1[..., 2]
+    del resdx1, resdy1, resdz1
+    lJHTDB.finalize()
+
+    dmagnitude = numpy.average(numpy.sqrt(numpy.sum((resd0)**2, axis = 1)))
+    ddist = numpy.average(numpy.sqrt(numpy.sum((resd0 - resd1)**2, axis = 1))) / dmagnitude
+
+    print ('average relative distance between FD4Lag4 and M{0}Q{1} is {2}'.format(m, q, ddist))
+
+    div0 = resd0[:, 0] + resd0[:, 4] + resd0[:, 8]
+    div1 = resd1[:, 0] + resd1[:, 4] + resd1[:, 8]
+    print('average divergence for FD4Lag4 is {0}'.format(numpy.average(div0**2) / dmagnitude))
+    print('average divergence for M{0}Q{1} is {2}'.format(m, q, numpy.average(div1**2) / dmagnitude))
+
+    return None
+
 if __name__ == '__main__':
     test_plain()
 
