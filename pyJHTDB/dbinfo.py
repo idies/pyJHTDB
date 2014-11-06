@@ -75,3 +75,23 @@ channel['dy'] = np.append(channel['dy'], [channel['dy'][0]])
 channel['yperiodic'] = False
 channel['yuniform'] = False
 
+def generate_temp_dbinfo(
+        field):
+    info = {'name': 'temp',
+            'xnodes' : np.arange(0, field.shape[2], 1).astype(np.float32),
+            'ynodes' : np.arange(0, field.shape[1], 1).astype(np.float32),
+            'znodes' : np.arange(0, field.shape[0], 1).astype(np.float32),
+            'xperiodic' : True,
+            'xuniform'  : True,
+            'yperiodic' : True,
+            'yuniform'  : True,
+            'zperiodic' : True,
+            'zuniform'  : True,
+            'dx' : 1.,
+            'dy' : 1.,
+            'dz' : 1.,
+            'lx' : 1.*field.shape[0],
+            'ly' : 1.*field.shape[1],
+            'lz' : 1.*field.shape[2]}
+    return info
+
