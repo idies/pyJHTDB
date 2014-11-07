@@ -791,12 +791,14 @@ def test_local_vs_db_interp(
         print ('average relative distance for ' +
                comp0[i] +
                ' between DB {0} and M{1}Q{2} is {3}'.format(dbinterp[0], m, q, distance))
+        print ('an example point is {0},\nwith the values {1} (DB) and {2} (local interpolation)'.format(x[0], res0[0, i], res1[0, i]))
     for i in range(9):
         magnitude = numpy.average(numpy.abs(resd0[:, i]))
         distance  = numpy.average(numpy.abs(resd0[:, i] - resd1[:, i])) / magnitude
         print ('average relative distance for ' +
                comp1[i] +
                ' between DB {0} and M{1}Q{2} is {3}'.format(dbinterp[1], m, q, distance))
+        print ('an example point is {0},\nwith the values {1} (DB) and {2} (local interpolation)'.format(x[0], resd0[0, i], resd1[0, i]))
     return None
 
 if __name__ == '__main__':
