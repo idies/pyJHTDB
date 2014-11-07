@@ -619,7 +619,8 @@ def test_divfree(
         info = pyJHTDB.dbinfo.channel,
         m = 1,
         q = 4,
-        npoints = 256):
+        npoints = 256,
+        dbinterp = 44):
 
     start = numpy.array([0, 0, 0], dtype = numpy.int)
     width = numpy.array([91, 67, 31], dtype = numpy.int)
@@ -654,7 +655,7 @@ def test_divfree(
     resd0 = lJHTDB.getData(
             0,
             x,
-            sinterp = 44,
+            sinterp = dbinterp,
             tinterp = 0,
             data_set = info['name'],
             getFunction = 'getVelocityGradient')
@@ -687,13 +688,115 @@ def test_divfree(
     dmagnitude = numpy.average(numpy.sqrt(numpy.sum((resd0)**2, axis = 1)))
     ddist = numpy.average(numpy.sqrt(numpy.sum((resd0 - resd1)**2, axis = 1))) / dmagnitude
 
-    print ('average relative distance between FD4Lag4 and M{0}Q{1} is {2}'.format(m, q, ddist))
+    print ('average relative distance between dbinterp and M{0}Q{1} is {2}'.format(m, q, ddist))
 
     div0 = resd0[:, 0] + resd0[:, 4] + resd0[:, 8]
     div1 = resd1[:, 0] + resd1[:, 4] + resd1[:, 8]
-    print('average divergence for FD4Lag4 is {0}'.format(numpy.average(div0**2) / dmagnitude))
+    print('average divergence for dbinterp is {0}'.format(numpy.average(div0**2) / dmagnitude))
     print('average divergence for M{0}Q{1} is {2}'.format(m, q, numpy.average(div1**2) / dmagnitude))
 
+    return None
+
+def test_local_vs_db_interp(
+        info = pyJHTDB.dbinfo.channel,
+        m = 1,
+        q = 4,
+        npoints = 256,
+        dbinterp = [8, 44],
+        start = numpy.array([0, 0, 0], dtype = numpy.int),
+        width = numpy.array([91, 67, 31], dtype = numpy.int)):
+
+    i = pyJHTDB.interpolator.spline_interpolator(
+            info = info,
+            n = (q - 2)/2,
+            m = m)
+    i.generate_clib()
+
+    # build point array
+    xg = [info['xnodes'][i.n+1], info['xnodes'][width[0] - i.n - 1]]
+    if info['yperiodic']:
+        yg = [info['ynodes'][i.n+1], info['ynodes'][width[1] - i.n - 1]]
+    else:
+        yg = [info['ynodes'][0], info['ynodes'][width[1] - i.n - 1]]
+    zg = [info['znodes'][i.n+1], info['znodes'][width[2] - i.n - 1]]
+    x = numpy.random.random(size = (npoints, 3)).astype(numpy.float32)
+    x[:, 0] = xg[0] + x[:, 0]*(xg[1] - xg[0])
+    x[:, 1] = yg[0] + x[:, 1]*(yg[1] - yg[0])
+    x[:, 2] = zg[0] + x[:, 2]*(zg[1] - zg[0])
+
+    lJHTDB = pyJHTDB.libJHTDB()
+    lJHTDB.initialize()
+    # get raw data to interpolate
+    test_field = lJHTDB.getRawData(
+            0,
+            start = start,
+            size  = width,
+            data_set = info['name'],
+            getFunction = 'Velocity')
+    # get DB field
+    res0 = lJHTDB.getData(
+            0,
+            x,
+            sinterp = dbinterp[0],
+            tinterp = 0,
+            data_set = info['name'],
+            getFunction = 'getVelocity')
+    # get DB gradient
+    resd0 = lJHTDB.getData(
+            0,
+            x,
+            sinterp = dbinterp[1],
+            tinterp = 0,
+            data_set = info['name'],
+            getFunction = 'getVelocityGradient')
+    # get locally interpolated field
+    res1 = i.cinterpolate(
+            x,
+            test_field,
+            diff = [0, 0, 0])
+    # get locally interpolated gradient
+    resdx1 = i.cinterpolate(
+            x,
+            test_field,
+            diff = [1, 0, 0])
+    resdy1 = i.cinterpolate(
+            x,
+            test_field,
+            diff = [0, 1, 0])
+    resdz1 = i.cinterpolate(
+            x,
+            test_field,
+            diff = [0, 0, 1])
+    resd1 = resd0.copy()
+    resd1[..., 0] = resdx1[..., 0]
+    resd1[..., 1] = resdy1[..., 0]
+    resd1[..., 2] = resdz1[..., 0]
+    resd1[..., 3] = resdx1[..., 1]
+    resd1[..., 4] = resdy1[..., 1]
+    resd1[..., 5] = resdz1[..., 1]
+    resd1[..., 6] = resdx1[..., 2]
+    resd1[..., 7] = resdy1[..., 2]
+    resd1[..., 8] = resdz1[..., 2]
+    del resdx1, resdy1, resdz1
+    lJHTDB.finalize()
+
+    comp0 = ['ux', 'uy', 'uz']
+    comp1 = ['dxux', 'dyux', 'dzux',
+             'dxuy', 'dyuy', 'dzuy',
+             'dxuz', 'dyuz', 'dzuz']
+
+    for i in range(3):
+        magnitude = numpy.average(numpy.abs(res0[:, i]))
+        distance  = numpy.average(numpy.abs(res0[:, i] - res1[:, i])) / magnitude
+        print ('average relative distance for ' +
+               comp0[i] +
+               ' between DB {0} and M{1}Q{2} is {3}'.format(dbinterp[0], m, q, distance))
+    for i in range(9):
+        magnitude = numpy.average(numpy.abs(resd0[:, i]))
+        distance  = numpy.average(numpy.abs(resd0[:, i] - resd1[:, i])) / magnitude
+        print ('average relative distance for ' +
+               comp1[i] +
+               ' between DB {0} and M{1}Q{2} is {3}'.format(dbinterp[1], m, q, distance))
     return None
 
 if __name__ == '__main__':
