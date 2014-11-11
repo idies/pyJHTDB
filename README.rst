@@ -37,10 +37,6 @@ Happy fun installation::
     sudo easy_install matplotlib
     sudo python setup.py install
 
-Please note that before you run ``sudo python setup.py install``, you
-will need to edit the ``turblib-20140606/turblib.c`` file: on line 53,
-please add a comma after the closing curly brace, before the ``//``.
-
 I haven't tested the installation on any other system, but I think
 reasonable variations on the above should work for the minimal
 installation on all unix systems (i.e. for MacOS as well).
