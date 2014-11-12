@@ -5,11 +5,21 @@ pyJHTDB
 Python wrapper for the JHU Turbulence Database Cluster library.
 More information can be found at http://turbulence.pha.jhu.edu/.
 
-Installing
-==========
+Installing pypi version
+=======================
 
-In theory setuptools should take care of everything so that the
-package is installed properly, but I noticed that it doesn't.
+If you have ``pip``, you can simply do this::
+
+    pip install pyJHTDB
+
+If you're running unix (i.e. some MacOS or GNU/Linux variant), you will
+probably need to have a ``sudo`` in front of the ``pip`` command.
+If you don't have ``pip`` on your system, it is quite easy to get it
+following the instructions at
+http://pip.readthedocs.org/en/latest/installing.html.
+
+Installing from source
+======================
 
 ubuntu 14.04
 ------------
@@ -22,8 +32,8 @@ Bare-bone installation::
     sudo easy_install numpy
     sudo python setup.py install
 
-Note that doing this should, in principle, also install ``sympy`` on your
-system, since it's used by ``pyJHTDB``.
+Note that doing this should, in principle, also install ``sympy`` on
+your system, since it's used by ``pyJHTDB``.
 
 Happy fun installation::
 
