@@ -704,7 +704,8 @@ def test_local_vs_db_interp(
         npoints = 256,
         dbinterp = [8, 44],
         start = numpy.array([0, 0, 0], dtype = numpy.int),
-        width = numpy.array([91, 67, 31], dtype = numpy.int)):
+        width = numpy.array([91, 67, 31], dtype = numpy.int),
+        messages_on = False):
 
     i = pyJHTDB.interpolator.spline_interpolator(
             info = info,
@@ -780,26 +781,27 @@ def test_local_vs_db_interp(
     del resdx1, resdy1, resdz1
     lJHTDB.finalize()
 
-    comp0 = ['ux', 'uy', 'uz']
-    comp1 = ['dxux', 'dyux', 'dzux',
-             'dxuy', 'dyuy', 'dzuy',
-             'dxuz', 'dyuz', 'dzuz']
+    if messages_on:
+        comp0 = ['ux', 'uy', 'uz']
+        comp1 = ['dxux', 'dyux', 'dzux',
+                 'dxuy', 'dyuy', 'dzuy',
+                 'dxuz', 'dyuz', 'dzuz']
 
-    for i in range(3):
-        magnitude = numpy.average(numpy.abs(res0[:, i]))
-        distance  = numpy.average(numpy.abs(res0[:, i] - res1[:, i])) / magnitude
-        print ('average relative distance for ' +
-               comp0[i] +
-               ' between DB {0} and M{1}Q{2} is {3}'.format(dbinterp[0], m, q, distance))
-        print ('an example point is {0},\nwith the values {1} (DB) and {2} (local interpolation)'.format(x[0], res0[0, i], res1[0, i]))
-    for i in range(9):
-        magnitude = numpy.average(numpy.abs(resd0[:, i]))
-        distance  = numpy.average(numpy.abs(resd0[:, i] - resd1[:, i])) / magnitude
-        print ('average relative distance for ' +
-               comp1[i] +
-               ' between DB {0} and M{1}Q{2} is {3}'.format(dbinterp[1], m, q, distance))
-        print ('an example point is {0},\nwith the values {1} (DB) and {2} (local interpolation)'.format(x[0], resd0[0, i], resd1[0, i]))
-    return None
+        for i in range(3):
+            magnitude = numpy.average(numpy.abs(res0[:, i]))
+            distance  = numpy.average(numpy.abs(res0[:, i] - res1[:, i])) / magnitude
+            print ('average relative distance for ' +
+                   comp0[i] +
+                   ' between DB {0} and M{1}Q{2} is {3}'.format(dbinterp[0], m, q, distance))
+            print ('an example point is {0},\nwith the values {1} (DB) and {2} (local interpolation)'.format(x[0], res0[0, i], res1[0, i]))
+        for i in range(9):
+            magnitude = numpy.average(numpy.abs(resd0[:, i]))
+            distance  = numpy.average(numpy.abs(resd0[:, i] - resd1[:, i])) / magnitude
+            print ('average relative distance for ' +
+                   comp1[i] +
+                   ' between DB {0} and M{1}Q{2} is {3}'.format(dbinterp[1], m, q, distance))
+            print ('an example point is {0},\nwith the values {1} (DB) and {2} (local interpolation)'.format(x[0], resd0[0, i], resd1[0, i]))
+    return res0, res1, resd0, resd1
 
 if __name__ == '__main__':
     test_plain()
