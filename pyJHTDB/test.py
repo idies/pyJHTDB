@@ -714,16 +714,19 @@ def test_local_vs_db_interp(
     i.generate_clib()
 
     # build point array
-    xg = [info['xnodes'][i.n+1], info['xnodes'][width[0] - i.n - 1]]
+    xg = [info['xnodes'][start[0] + i.n+1], info['xnodes'][start[0] + width[0] - i.n - 1]]
     if info['yperiodic']:
-        yg = [info['ynodes'][i.n+1], info['ynodes'][width[1] - i.n - 1]]
+        yg = [info['ynodes'][start[1] + i.n+1], info['ynodes'][start[1] + width[1] - i.n - 1]]
     else:
-        yg = [info['ynodes'][0], info['ynodes'][width[1] - i.n - 1]]
-    zg = [info['znodes'][i.n+1], info['znodes'][width[2] - i.n - 1]]
+        yg = [info['ynodes'][start[1]        ], info['ynodes'][start[1] + width[1] - i.n - 1]]
+    zg = [info['znodes'][start[2] + i.n+1], info['znodes'][start[2] + width[2] - i.n - 1]]
     x = numpy.random.random(size = (npoints, 3)).astype(numpy.float32)
     x[:, 0] = xg[0] + x[:, 0]*(xg[1] - xg[0])
     x[:, 1] = yg[0] + x[:, 1]*(yg[1] - yg[0])
     x[:, 2] = zg[0] + x[:, 2]*(zg[1] - zg[0])
+    print xg
+    print yg
+    print zg
 
     lJHTDB = pyJHTDB.libJHTDB()
     lJHTDB.initialize()
@@ -754,20 +757,24 @@ def test_local_vs_db_interp(
     res1 = i.cinterpolate(
             x,
             test_field,
-            diff = [0, 0, 0])
+            diff = [0, 0, 0],
+            field_offset = start)
     # get locally interpolated gradient
     resdx1 = i.cinterpolate(
             x,
             test_field,
-            diff = [1, 0, 0])
+            diff = [1, 0, 0],
+            field_offset = start)
     resdy1 = i.cinterpolate(
             x,
             test_field,
-            diff = [0, 1, 0])
+            diff = [0, 1, 0],
+            field_offset = start)
     resdz1 = i.cinterpolate(
             x,
             test_field,
-            diff = [0, 0, 1])
+            diff = [0, 0, 1],
+            field_offset = start)
     resd1 = resd0.copy()
     resd1[..., 0] = resdx1[..., 0]
     resd1[..., 1] = resdy1[..., 0]
@@ -787,20 +794,21 @@ def test_local_vs_db_interp(
                  'dxuy', 'dyuy', 'dzuy',
                  'dxuz', 'dyuz', 'dzuz']
 
+        print ('printing average relative distance between DB and local')
+        print ('example point is {0}'.format(x[0]))
+        print ('for direct interpolation using (DB) {0} and (local) M{1}Q{2}'.format(dbinterp[0], m, q))
+        print ('printing average((DB) - (local)) / average(DB), (DB) at example point, abs((DB) - (local)) at example point ')
         for i in range(3):
             magnitude = numpy.average(numpy.abs(res0[:, i]))
             distance  = numpy.average(numpy.abs(res0[:, i] - res1[:, i])) / magnitude
-            print ('average relative distance for ' +
-                   comp0[i] +
-                   ' between DB {0} and M{1}Q{2} is {3}'.format(dbinterp[0], m, q, distance))
-            print ('an example point is {0},\nwith the values {1} (DB) and {2} (local interpolation)'.format(x[0], res0[0, i], res1[0, i]))
+            print (comp0[i] + ' ' +
+                   '{0}, {1:+}, {2}'.format(distance, res0[0, i], numpy.abs(res0[0, i] - res1[0, i])))
+        print ('for gradient interpolation using (DB) {0} and (local) M{1}Q{2}'.format(dbinterp[1], m, q))
         for i in range(9):
             magnitude = numpy.average(numpy.abs(resd0[:, i]))
             distance  = numpy.average(numpy.abs(resd0[:, i] - resd1[:, i])) / magnitude
-            print ('average relative distance for ' +
-                   comp1[i] +
-                   ' between DB {0} and M{1}Q{2} is {3}'.format(dbinterp[1], m, q, distance))
-            print ('an example point is {0},\nwith the values {1} (DB) and {2} (local interpolation)'.format(x[0], resd0[0, i], resd1[0, i]))
+            print (comp1[i] + ' ' +
+                   '{0}, {1:+}, {2}'.format(distance, resd0[0, i], numpy.abs(resd0[0, i] - resd1[0, i])))
     return res0, res1, resd0, resd1
 
 if __name__ == '__main__':
