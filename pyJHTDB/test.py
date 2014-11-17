@@ -694,6 +694,7 @@ def test_divfree(
 
 def test_local_vs_db_interp(
         info = pyJHTDB.dbinfo.channel,
+        time = 0.0,
         m = 1,
         q = 4,
         npoints = 256,
@@ -724,14 +725,14 @@ def test_local_vs_db_interp(
     lJHTDB.initialize()
     # get raw data to interpolate
     test_field = lJHTDB.getRawData(
-            0,
+            time,
             start = start,
             size  = width,
             data_set = info['name'],
             getFunction = 'Velocity')
     # get DB field
     res0 = lJHTDB.getData(
-            0,
+            time,
             x,
             sinterp = dbinterp[0],
             tinterp = 0,
@@ -739,7 +740,7 @@ def test_local_vs_db_interp(
             getFunction = 'getVelocity')
     # get DB gradient
     resd0 = lJHTDB.getData(
-            0,
+            time,
             x,
             sinterp = dbinterp[1],
             tinterp = 0,
