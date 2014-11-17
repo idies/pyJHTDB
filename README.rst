@@ -1,3 +1,4 @@
+
 =======
 pyJHTDB
 =======
@@ -58,11 +59,8 @@ this file.
 Basic usage
 ===========
 
-Although this particular Python wrapper is still a work in progress, it
-is mature enough to be used in production work.
-
 On first contact with this library, we recommend that you first run
-"test_plain". To be more specific:
+``test_plain``. To be more specific:
 
 .. code:: python
 
