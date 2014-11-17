@@ -86,49 +86,50 @@ def test_plain(N=10):
             sinterp = spatialInterp, tinterp = temporalInterp,
             getFunction = 'getVelocityAndPressure')
     for p in range(N):
-        print('{0}: v = {1}, p = {2}'.format(p, result[p][0:3], result[p][3]))
+        print('{0}: v = {1}, p = {2:+}'.format(p, result[p][0:3], result[p][3]))
     print('Requesting velocity gradient at {0} points...'.format(N))
     result = lTDB.getData(time, points,
             sinterp = FD4Lag4, tinterp = temporalInterp,
             getFunction = 'getVelocityGradient')
     for p in range(N):
-        print('{0}: duxdx = {1}, duxdy = {2}, duxdz = {3}, '.format(p, result[p][0], result[p][1], result[p][2])
-                 + 'duydx = {0}, duydy = {1}, duydz = {2}, '.format(result[p][3], result[p][4], result[p][5])
-                 + 'duzdx = {0}, duzdy = {1}, duzdz = {2}'.format(result[p][6], result[p][7], result[p][8]))
+        print('{0}: '.format(p) +
+              'duxdx = {0:+e}, duxdy = {1:+e}, duxdz = {2:+e}\n   '.format(result[p][0], result[p][1], result[p][2]) +
+              'duydx = {0:+e}, duydy = {1:+e}, duydz = {2:+e}\n   '.format(result[p][3], result[p][4], result[p][5]) +
+              'duzdx = {0:+e}, duzdy = {1:+e}, duzdz = {2:+e}'.format(result[p][6], result[p][7], result[p][8]))
     print('Requesting velocity hessian at {0} points...'.format(N))
     result = lTDB.getData(time, points,
             sinterp = FD4Lag4, tinterp = temporalInterp,
             getFunction = 'getVelocityHessian')
     for p in range(N):
-        print('{0}: '.format(p)
-            + 'd2uxdxdx = {0}, d2uxdxdy = {1}, d2uxdxdz = {2}, '.format(result[p][ 0], result[p][ 1], result[p][ 2])
-            + 'd2uxdydy = {0}, d2uxdydz = {1}, d2uxdzdz = {2}, '.format(result[p][ 3], result[p][ 4], result[p][ 5])
-            + 'd2uydxdx = {0}, d2uydxdy = {1}, d2uydxdz = {2}, '.format(result[p][ 6], result[p][ 7], result[p][ 8])
-            + 'd2uydydy = {0}, d2uydydz = {1}, d2uydzdz = {2}, '.format(result[p][ 9], result[p][10], result[p][11])
-            + 'd2uzdxdx = {0}, d2uzdxdy = {1}, d2uzdxdz = {2}, '.format(result[p][12], result[p][13], result[p][14])
-            + 'd2uzdydy = {0}, d2uzdydz = {1}, d2uzdzdz = {2}, '.format(result[p][15], result[p][16], result[p][17]))
+        print('{0}: '.format(p) +
+              'd2uxdxdx = {0:+e}, d2uxdxdy = {1:+e}, d2uxdxdz = {2:+e}\n   '.format(result[p][ 0], result[p][ 1], result[p][ 2])
+            + 'd2uxdydy = {0:+e}, d2uxdydz = {1:+e}, d2uxdzdz = {2:+e}\n   '.format(result[p][ 3], result[p][ 4], result[p][ 5])
+            + 'd2uydxdx = {0:+e}, d2uydxdy = {1:+e}, d2uydxdz = {2:+e}\n   '.format(result[p][ 6], result[p][ 7], result[p][ 8])
+            + 'd2uydydy = {0:+e}, d2uydydz = {1:+e}, d2uydzdz = {2:+e}\n   '.format(result[p][ 9], result[p][10], result[p][11])
+            + 'd2uzdxdx = {0:+e}, d2uzdxdy = {1:+e}, d2uzdxdz = {2:+e}\n   '.format(result[p][12], result[p][13], result[p][14])
+            + 'd2uzdydy = {0:+e}, d2uzdydz = {1:+e}, d2uzdzdz = {2:+e}'.format(result[p][15], result[p][16], result[p][17]))
     print('Requesting velocity laplacian at {0} points...'.format(N))
     result = lTDB.getData(time, points,
             sinterp = FD4Lag4, tinterp = temporalInterp,
             getFunction = 'getVelocityLaplacian')
     for p in range(N):
-        print('{0}: '.format(p)
-            + 'grad2ux = {0}, grad2uy = {1}, grad2uz = {2}, '.format(result[p][0], result[p][1], result[p][2]))
+        print('{0}: '.format(p) +
+              'grad2ux = {0:+e}, grad2uy = {1:+e}, grad2uz = {2:+e}, '.format(result[p][0], result[p][1], result[p][2]))
     print('Requesting pressure gradient at {0} points...'.format(N))
     result = lTDB.getData(time, points,
             sinterp = FD4Lag4, tinterp = temporalInterp,
             getFunction = 'getPressureGradient')
     for p in range(N):
         print('{0}: '.format(p)
-            + 'dpdx = {0}, dpdy = {1}, dpdz = {2}, '.format(result[p][0], result[p][1], result[p][2]))
+            + 'dpdx = {0:+e}, dpdy = {1:+e}, dpdz = {2:+e}, '.format(result[p][0], result[p][1], result[p][2]))
     print('Requesting pressure hessian at {0} points...'.format(N))
     result = lTDB.getData(time, points,
             sinterp = FD4Lag4, tinterp = temporalInterp,
             getFunction = 'getVelocityHessian')
     for p in range(N):
-        print('{0}: '.format(p)
-            + 'd2pdxdx = {0}, d2pdxdy = {1}, d2pdxdz = {2}, '.format(result[p][0], result[p][1], result[p][2])
-            + 'd2pdydy = {0}, d2pdydz = {1}, d2pdzdz = {2}, '.format(result[p][3], result[p][4], result[p][5]))
+        print('{0}: '.format(p) +
+              'd2pdxdx = {0:+e}, d2pdxdy = {1:+e}, d2pdxdz = {2:+e}\n   '.format(result[p][0], result[p][1], result[p][2])
+            + 'd2pdydy = {0:+e}, d2pdydz = {1:+e}, d2pdzdz = {2:+e}'.format(result[p][3], result[p][4], result[p][5]))
 
 #    print 'Requesting position at {0} points, starting at time {1} and ending at time {2}...'.format(N, startTime, endTime)
 #    result = pyJHTDB.getPosition(startTime, endTime, lag_dt, points, sinterp = spatialInterp)
