@@ -74,7 +74,9 @@ h5cc_present = not (h5cc_executable == None)
 #
 open('MANIFEST.in',
      'w').write(
-             'graft turblib')
+             'include turblib/*.c\n'
+             'include turblib/*.h\n'
+             'include turblib/*.nsmap')
 #
 ########################################################################
 
