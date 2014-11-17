@@ -86,49 +86,50 @@ def test_plain(N=10):
             sinterp = spatialInterp, tinterp = temporalInterp,
             getFunction = 'getVelocityAndPressure')
     for p in range(N):
-        print('{0}: v = {1}, p = {2}'.format(p, result[p][0:3], result[p][3]))
+        print('{0}: v = {1}, p = {2:+}'.format(p, result[p][0:3], result[p][3]))
     print('Requesting velocity gradient at {0} points...'.format(N))
     result = lTDB.getData(time, points,
             sinterp = FD4Lag4, tinterp = temporalInterp,
             getFunction = 'getVelocityGradient')
     for p in range(N):
-        print('{0}: duxdx = {1}, duxdy = {2}, duxdz = {3}, '.format(p, result[p][0], result[p][1], result[p][2])
-                 + 'duydx = {0}, duydy = {1}, duydz = {2}, '.format(result[p][3], result[p][4], result[p][5])
-                 + 'duzdx = {0}, duzdy = {1}, duzdz = {2}'.format(result[p][6], result[p][7], result[p][8]))
+        print('{0}: '.format(p) +
+              'duxdx = {0:+e}, duxdy = {1:+e}, duxdz = {2:+e}\n   '.format(result[p][0], result[p][1], result[p][2]) +
+              'duydx = {0:+e}, duydy = {1:+e}, duydz = {2:+e}\n   '.format(result[p][3], result[p][4], result[p][5]) +
+              'duzdx = {0:+e}, duzdy = {1:+e}, duzdz = {2:+e}'.format(result[p][6], result[p][7], result[p][8]))
     print('Requesting velocity hessian at {0} points...'.format(N))
     result = lTDB.getData(time, points,
             sinterp = FD4Lag4, tinterp = temporalInterp,
             getFunction = 'getVelocityHessian')
     for p in range(N):
-        print('{0}: '.format(p)
-            + 'd2uxdxdx = {0}, d2uxdxdy = {1}, d2uxdxdz = {2}, '.format(result[p][ 0], result[p][ 1], result[p][ 2])
-            + 'd2uxdydy = {0}, d2uxdydz = {1}, d2uxdzdz = {2}, '.format(result[p][ 3], result[p][ 4], result[p][ 5])
-            + 'd2uydxdx = {0}, d2uydxdy = {1}, d2uydxdz = {2}, '.format(result[p][ 6], result[p][ 7], result[p][ 8])
-            + 'd2uydydy = {0}, d2uydydz = {1}, d2uydzdz = {2}, '.format(result[p][ 9], result[p][10], result[p][11])
-            + 'd2uzdxdx = {0}, d2uzdxdy = {1}, d2uzdxdz = {2}, '.format(result[p][12], result[p][13], result[p][14])
-            + 'd2uzdydy = {0}, d2uzdydz = {1}, d2uzdzdz = {2}, '.format(result[p][15], result[p][16], result[p][17]))
+        print('{0}: '.format(p) +
+              'd2uxdxdx = {0:+e}, d2uxdxdy = {1:+e}, d2uxdxdz = {2:+e}\n   '.format(result[p][ 0], result[p][ 1], result[p][ 2])
+            + 'd2uxdydy = {0:+e}, d2uxdydz = {1:+e}, d2uxdzdz = {2:+e}\n   '.format(result[p][ 3], result[p][ 4], result[p][ 5])
+            + 'd2uydxdx = {0:+e}, d2uydxdy = {1:+e}, d2uydxdz = {2:+e}\n   '.format(result[p][ 6], result[p][ 7], result[p][ 8])
+            + 'd2uydydy = {0:+e}, d2uydydz = {1:+e}, d2uydzdz = {2:+e}\n   '.format(result[p][ 9], result[p][10], result[p][11])
+            + 'd2uzdxdx = {0:+e}, d2uzdxdy = {1:+e}, d2uzdxdz = {2:+e}\n   '.format(result[p][12], result[p][13], result[p][14])
+            + 'd2uzdydy = {0:+e}, d2uzdydz = {1:+e}, d2uzdzdz = {2:+e}'.format(result[p][15], result[p][16], result[p][17]))
     print('Requesting velocity laplacian at {0} points...'.format(N))
     result = lTDB.getData(time, points,
             sinterp = FD4Lag4, tinterp = temporalInterp,
             getFunction = 'getVelocityLaplacian')
     for p in range(N):
-        print('{0}: '.format(p)
-            + 'grad2ux = {0}, grad2uy = {1}, grad2uz = {2}, '.format(result[p][0], result[p][1], result[p][2]))
+        print('{0}: '.format(p) +
+              'grad2ux = {0:+e}, grad2uy = {1:+e}, grad2uz = {2:+e}, '.format(result[p][0], result[p][1], result[p][2]))
     print('Requesting pressure gradient at {0} points...'.format(N))
     result = lTDB.getData(time, points,
             sinterp = FD4Lag4, tinterp = temporalInterp,
             getFunction = 'getPressureGradient')
     for p in range(N):
         print('{0}: '.format(p)
-            + 'dpdx = {0}, dpdy = {1}, dpdz = {2}, '.format(result[p][0], result[p][1], result[p][2]))
+            + 'dpdx = {0:+e}, dpdy = {1:+e}, dpdz = {2:+e}, '.format(result[p][0], result[p][1], result[p][2]))
     print('Requesting pressure hessian at {0} points...'.format(N))
     result = lTDB.getData(time, points,
             sinterp = FD4Lag4, tinterp = temporalInterp,
             getFunction = 'getVelocityHessian')
     for p in range(N):
-        print('{0}: '.format(p)
-            + 'd2pdxdx = {0}, d2pdxdy = {1}, d2pdxdz = {2}, '.format(result[p][0], result[p][1], result[p][2])
-            + 'd2pdydy = {0}, d2pdydz = {1}, d2pdzdz = {2}, '.format(result[p][3], result[p][4], result[p][5]))
+        print('{0}: '.format(p) +
+              'd2pdxdx = {0:+e}, d2pdxdy = {1:+e}, d2pdxdz = {2:+e}\n   '.format(result[p][0], result[p][1], result[p][2])
+            + 'd2pdydy = {0:+e}, d2pdydz = {1:+e}, d2pdzdz = {2:+e}'.format(result[p][3], result[p][4], result[p][5]))
 
 #    print 'Requesting position at {0} points, starting at time {1} and ending at time {2}...'.format(N, startTime, endTime)
 #    result = pyJHTDB.getPosition(startTime, endTime, lag_dt, points, sinterp = spatialInterp)
@@ -371,9 +372,6 @@ def test_rawData(
             getFunction = 'Velocity')
     lJHTDB.finalize()
 
-    print res0.shape
-    print res4.shape
-
     fig = plt.figure(figsize=(12,6))
     ax = fig.add_subplot(121)
     c = ax.contour(res4[:, :, 0])
@@ -487,11 +485,10 @@ def test_interp_1D(
             figname = 'dtst')
     dist = (numpy.average(numpy.sqrt(numpy.sum((res0 - res1)**2, axis = 1))) /
             numpy.average(numpy.sqrt(numpy.sum((res0)**2, axis = 1))))
-    print dist
+    print (dist)
     ddist = (numpy.average(numpy.sqrt(numpy.sum((resd0 - resd1)**2, axis = 1))) /
              numpy.average(numpy.sqrt(numpy.sum((resd0)**2, axis = 1))))
-    print ddist
-
+    print (ddist)
     return res0, res1, resd0, resd1
 
 def test_interp_2D(
@@ -611,7 +608,7 @@ def test_interp_2D(
             figname = 'dtst')
     ddist = (numpy.average(numpy.sqrt(numpy.sum((resd0 - resd1)**2, axis = 1))) /
              numpy.average(numpy.sqrt(numpy.sum((resd0)**2, axis = 1))))
-    print ddist
+    print (ddist)
 
     return res0, res1, resd0, resd1
 
@@ -619,7 +616,8 @@ def test_divfree(
         info = pyJHTDB.dbinfo.channel,
         m = 1,
         q = 4,
-        npoints = 256):
+        npoints = 256,
+        dbinterp = 44):
 
     start = numpy.array([0, 0, 0], dtype = numpy.int)
     width = numpy.array([91, 67, 31], dtype = numpy.int)
@@ -654,7 +652,7 @@ def test_divfree(
     resd0 = lJHTDB.getData(
             0,
             x,
-            sinterp = 44,
+            sinterp = dbinterp,
             tinterp = 0,
             data_set = info['name'],
             getFunction = 'getVelocityGradient')
@@ -686,15 +684,124 @@ def test_divfree(
 
     dmagnitude = numpy.average(numpy.sqrt(numpy.sum((resd0)**2, axis = 1)))
     ddist = numpy.average(numpy.sqrt(numpy.sum((resd0 - resd1)**2, axis = 1))) / dmagnitude
-
-    print ('average relative distance between FD4Lag4 and M{0}Q{1} is {2}'.format(m, q, ddist))
+    print ('average relative distance between dbinterp and M{0}Q{1} is {2}'.format(m, q, ddist))
 
     div0 = resd0[:, 0] + resd0[:, 4] + resd0[:, 8]
     div1 = resd1[:, 0] + resd1[:, 4] + resd1[:, 8]
-    print('average divergence for FD4Lag4 is {0}'.format(numpy.average(div0**2) / dmagnitude))
+    print('average divergence for dbinterp is {0}'.format(numpy.average(div0**2) / dmagnitude))
     print('average divergence for M{0}Q{1} is {2}'.format(m, q, numpy.average(div1**2) / dmagnitude))
-
     return None
+
+def test_local_vs_db_interp(
+        info = pyJHTDB.dbinfo.channel,
+        m = 1,
+        q = 4,
+        npoints = 256,
+        dbinterp = [8, 44],
+        start = numpy.array([0, 0, 0], dtype = numpy.int),
+        width = numpy.array([91, 67, 31], dtype = numpy.int),
+        messages_on = False):
+
+    i = pyJHTDB.interpolator.spline_interpolator(
+            info = info,
+            n = (q - 2)/2,
+            m = m)
+    i.generate_clib()
+
+    # build point array
+    xg = [info['xnodes'][start[0] + i.n+1], info['xnodes'][start[0] + width[0] - i.n - 1]]
+    if info['yperiodic']:
+        yg = [info['ynodes'][start[1] + i.n+1], info['ynodes'][start[1] + width[1] - i.n - 1]]
+    else:
+        yg = [info['ynodes'][start[1]        ], info['ynodes'][start[1] + width[1] - i.n - 1]]
+    zg = [info['znodes'][start[2] + i.n+1], info['znodes'][start[2] + width[2] - i.n - 1]]
+    x = numpy.random.random(size = (npoints, 3)).astype(numpy.float32)
+    x[:, 0] = xg[0] + x[:, 0]*(xg[1] - xg[0])
+    x[:, 1] = yg[0] + x[:, 1]*(yg[1] - yg[0])
+    x[:, 2] = zg[0] + x[:, 2]*(zg[1] - zg[0])
+
+    lJHTDB = pyJHTDB.libJHTDB()
+    lJHTDB.initialize()
+    # get raw data to interpolate
+    test_field = lJHTDB.getRawData(
+            0,
+            start = start,
+            size  = width,
+            data_set = info['name'],
+            getFunction = 'Velocity')
+    # get DB field
+    res0 = lJHTDB.getData(
+            0,
+            x,
+            sinterp = dbinterp[0],
+            tinterp = 0,
+            data_set = info['name'],
+            getFunction = 'getVelocity')
+    # get DB gradient
+    resd0 = lJHTDB.getData(
+            0,
+            x,
+            sinterp = dbinterp[1],
+            tinterp = 0,
+            data_set = info['name'],
+            getFunction = 'getVelocityGradient')
+    # get locally interpolated field
+    res1 = i.cinterpolate(
+            x,
+            test_field,
+            diff = [0, 0, 0],
+            field_offset = start)
+    # get locally interpolated gradient
+    resdx1 = i.cinterpolate(
+            x,
+            test_field,
+            diff = [1, 0, 0],
+            field_offset = start)
+    resdy1 = i.cinterpolate(
+            x,
+            test_field,
+            diff = [0, 1, 0],
+            field_offset = start)
+    resdz1 = i.cinterpolate(
+            x,
+            test_field,
+            diff = [0, 0, 1],
+            field_offset = start)
+    resd1 = resd0.copy()
+    resd1[..., 0] = resdx1[..., 0]
+    resd1[..., 1] = resdy1[..., 0]
+    resd1[..., 2] = resdz1[..., 0]
+    resd1[..., 3] = resdx1[..., 1]
+    resd1[..., 4] = resdy1[..., 1]
+    resd1[..., 5] = resdz1[..., 1]
+    resd1[..., 6] = resdx1[..., 2]
+    resd1[..., 7] = resdy1[..., 2]
+    resd1[..., 8] = resdz1[..., 2]
+    del resdx1, resdy1, resdz1
+    lJHTDB.finalize()
+
+    if messages_on:
+        comp0 = ['ux', 'uy', 'uz']
+        comp1 = ['dxux', 'dyux', 'dzux',
+                 'dxuy', 'dyuy', 'dzuy',
+                 'dxuz', 'dyuz', 'dzuz']
+
+        print ('printing average relative distance between DB and local')
+        print ('example point is {0}'.format(x[0]))
+        print ('for direct interpolation using (DB) {0} and (local) M{1}Q{2}'.format(dbinterp[0], m, q))
+        print ('printing average((DB) - (local)) / average(DB), (DB) at example point, abs((DB) - (local)) at example point ')
+        for i in range(3):
+            magnitude = numpy.average(numpy.abs(res0[:, i]))
+            distance  = numpy.average(numpy.abs(res0[:, i] - res1[:, i])) / magnitude
+            print (comp0[i] + ' ' +
+                   '{0}, {1:+}, {2}'.format(distance, res0[0, i], numpy.abs(res0[0, i] - res1[0, i])))
+        print ('for gradient interpolation using (DB) {0} and (local) M{1}Q{2}'.format(dbinterp[1], m, q))
+        for i in range(9):
+            magnitude = numpy.average(numpy.abs(resd0[:, i]))
+            distance  = numpy.average(numpy.abs(resd0[:, i] - resd1[:, i])) / magnitude
+            print (comp1[i] + ' ' +
+                   '{0}, {1:+}, {2}'.format(distance, resd0[0, i], numpy.abs(resd0[0, i] - resd1[0, i])))
+    return res0, res1, resd0, resd1
 
 if __name__ == '__main__':
     test_plain()

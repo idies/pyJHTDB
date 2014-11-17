@@ -17,3 +17,5 @@ turblib/
 *.gz
 #temporary files
 .*.swp
+#ipython checkpoints
+.ipynb_checkpoints
