@@ -29,6 +29,7 @@ import distutils.command
 import distutils.command.build_ext
 import distutils.core
 import distutils.dist
+import tempfile
 
 import pyJHTDB
 import pyJHTDB.generic_splines as gs
@@ -46,8 +47,11 @@ class spline_interpolator:
         self.n = n
         self.m = m
         self.info = info
-        if os.path.exists(info['name'] + '_spline_interpolator_n{0}_m{1}.pickle.gz'.format(n, m)):
-            self.spline = pickle.load(gzip.open(info['name'] + '_spline_interpolator_n{0}_m{1}.pickle.gz'.format(n, m)))
+        pickle_file = os.path.join(
+                pyJHTDB.lib_folder,
+                info['name'] + '_spline_interpolator_n{0}_m{1}.pickle.gz'.format(n, m))
+        if os.path.exists(pickle_file):
+            self.spline = pickle.load(gzip.open(pickle_file))
         else:
             func = []
             for coord in ['x', 'y', 'z']:
@@ -68,7 +72,7 @@ class spline_interpolator:
                            'y': func[1],
                            'z': func[2]}
             pickle.dump(self.spline,
-                        gzip.open(info['name'] + '_spline_interpolator_n{0}_m{1}.pickle.gz'.format(n, m),
+                        gzip.open(pickle_file,
                              'wb'))
         # either channel or periodic cube, so it's cheap to compute fast betas for x and z
         self.spline['x'].compute_fast_beta()
@@ -196,18 +200,26 @@ class spline_interpolator:
     def generate_clib(
             self,
             cfile_name = None):
-        self.write_cfile(cfile_name = cfile_name)
-        builder = distutils.command.build_ext.build_ext(
-                distutils.dist.Distribution({'name' : self.cfile_name}))
-        builder.extensions = [
-                distutils.core.Extension(
-                    'lib' + self.cfile_name,
-                    sources = [self.cfile_name + '.c'])]
-        builder.build_lib = '.'
-        builder.swig_opts = []
-        builder.verbose = True
-        builder.run()
-        self.clib = np.ctypeslib.load_library('lib' + self.cfile_name, '.')
+        try:
+            self.clib = np.ctypeslib.load_library(
+                    'lib' + os.path.basename(self.cfile_name),
+                    pyJHTDB.lib_folder)
+        except:
+            self.write_cfile(cfile_name = cfile_name)
+            builder = distutils.command.build_ext.build_ext(
+                    distutils.dist.Distribution({'name' : os.path.basename(self.cfile_name)}))
+            builder.extensions = [
+                    distutils.core.Extension(
+                        'lib' + os.path.basename(self.cfile_name),
+                        sources = [self.cfile_name + '.c'])]
+            builder.build_lib = os.path.abspath(pyJHTDB.lib_folder)
+            builder.build_temp = tempfile.gettempdir()
+            builder.swig_opts = []
+            builder.verbose = True
+            builder.run()
+            self.clib = np.ctypeslib.load_library(
+                    'lib' + os.path.basename(self.cfile_name),
+                    pyJHTDB.lib_folder)
         return None
     def cinterpolate(
             self,
@@ -256,17 +268,23 @@ class spline_interpolator:
             cfile_name = None,  #'spline_m{0}q{1:0>2}'.format(self.m, self.n*2 + 2),
             base_cname = None): #'m{0}q{1:0>2}'.format(self.m, self.n*2 + 2)):
         if type(cfile_name) == type(None):
-            cfile_name = self.info['name'] + '_' + 'spline_m{0}q{1:0>2}'.format(self.m, self.n*2 + 2)
+            self.cfile_name = (pyJHTDB.lib_folder +
+                          self.info['name'] + '_' +
+                          'spline_m{0}q{1:0>2}'.format(self.m, self.n*2 + 2))
+        else:
+            self.cfile_name = cfile_name
         if type(base_cname) == type(None):
-            base_cname = 'm{0}q{1:0>2}'.format(self.m, self.n*2 + 2)
+            self.base_cname = 'm{0}q{1:0>2}'.format(self.m, self.n*2 + 2)
+        else:
+            self.base_name = base_name
+        if os.path.exists(self.cfile_name + '.c'):
+            return None
         def write_interp1D(bname, fname):
             tmp_txt  = '('
             for i in range(self.n*2+1):
                 tmp_txt += '\n' + bname[i] + '*' + fname[i] + ' + '
             tmp_txt += '\n' + bname[self.n*2+1] + '*' + fname[self.n*2+1] + ')'
             return tmp_txt
-        self.cfile_name = cfile_name
-        self.base_cname = base_cname
         cfile = open(self.cfile_name + '.c', 'w')
         ### headers
         cfile.write(
