@@ -371,9 +371,6 @@ def test_rawData(
             getFunction = 'Velocity')
     lJHTDB.finalize()
 
-    print res0.shape
-    print res4.shape
-
     fig = plt.figure(figsize=(12,6))
     ax = fig.add_subplot(121)
     c = ax.contour(res4[:, :, 0])
@@ -487,11 +484,10 @@ def test_interp_1D(
             figname = 'dtst')
     dist = (numpy.average(numpy.sqrt(numpy.sum((res0 - res1)**2, axis = 1))) /
             numpy.average(numpy.sqrt(numpy.sum((res0)**2, axis = 1))))
-    print dist
+    print (dist)
     ddist = (numpy.average(numpy.sqrt(numpy.sum((resd0 - resd1)**2, axis = 1))) /
              numpy.average(numpy.sqrt(numpy.sum((resd0)**2, axis = 1))))
-    print ddist
-
+    print (ddist)
     return res0, res1, resd0, resd1
 
 def test_interp_2D(
@@ -611,7 +607,7 @@ def test_interp_2D(
             figname = 'dtst')
     ddist = (numpy.average(numpy.sqrt(numpy.sum((resd0 - resd1)**2, axis = 1))) /
              numpy.average(numpy.sqrt(numpy.sum((resd0)**2, axis = 1))))
-    print ddist
+    print (ddist)
 
     return res0, res1, resd0, resd1
 
@@ -687,14 +683,12 @@ def test_divfree(
 
     dmagnitude = numpy.average(numpy.sqrt(numpy.sum((resd0)**2, axis = 1)))
     ddist = numpy.average(numpy.sqrt(numpy.sum((resd0 - resd1)**2, axis = 1))) / dmagnitude
-
     print ('average relative distance between dbinterp and M{0}Q{1} is {2}'.format(m, q, ddist))
 
     div0 = resd0[:, 0] + resd0[:, 4] + resd0[:, 8]
     div1 = resd1[:, 0] + resd1[:, 4] + resd1[:, 8]
     print('average divergence for dbinterp is {0}'.format(numpy.average(div0**2) / dmagnitude))
     print('average divergence for M{0}Q{1} is {2}'.format(m, q, numpy.average(div1**2) / dmagnitude))
-
     return None
 
 def test_local_vs_db_interp(
@@ -724,9 +718,6 @@ def test_local_vs_db_interp(
     x[:, 0] = xg[0] + x[:, 0]*(xg[1] - xg[0])
     x[:, 1] = yg[0] + x[:, 1]*(yg[1] - yg[0])
     x[:, 2] = zg[0] + x[:, 2]*(zg[1] - zg[0])
-    print xg
-    print yg
-    print zg
 
     lJHTDB = pyJHTDB.libJHTDB()
     lJHTDB.initialize()
