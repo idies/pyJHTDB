@@ -84,6 +84,7 @@ class spline_interpolator:
             self.by = self.spline['y'].fast_beta
         else:
             self.by = self.spline['y'].beta
+        self.clib_loaded = False
         return None
     def __call__(
             self,
@@ -220,6 +221,7 @@ class spline_interpolator:
             self.clib = np.ctypeslib.load_library(
                     'lib' + os.path.basename(self.cfile_name),
                     pyJHTDB.lib_folder)
+        self.clib_loaded = True
         return None
     def cinterpolate(
             self,
@@ -227,6 +229,8 @@ class spline_interpolator:
             f = None,
             diff = [0, 0, 0],
             field_offset = [0, 0, 0]):
+        if not self.clib_loaded:
+            self.generate_clib()
         diff = np.array(diff).astype(np.int32)
         field_offset = np.array(field_offset).astype(np.int32)
         field_size   = np.array(f.shape[:-1]).astype(np.int32)
