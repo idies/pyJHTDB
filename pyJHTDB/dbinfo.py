@@ -74,6 +74,7 @@ channel['dy'] = channel['ynodes'][1:] - channel['ynodes'][:channel['ynodes'].sha
 channel['dy'] = np.append(channel['dy'], [channel['dy'][0]])
 channel['yperiodic'] = False
 channel['yuniform'] = False
+channel['time'] = np.array(list(range(1024)), dtype = np.float32) * 0.0065
 
 def generate_temp_dbinfo(
         field):
