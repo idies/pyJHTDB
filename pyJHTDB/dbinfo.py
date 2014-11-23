@@ -22,6 +22,51 @@
 import numpy as np
 import os
 
+interpolation_code = {
+        # spatial interpolation
+        'NoSInt'                 :   0,
+        'NoSpatialInterpolation' :   0,
+        'Lag4'                   :   4,
+        'Lag6'                   :   6,
+        'Lag8'                   :   8,
+        'Lagrangian4thOrder'     :   4,
+        'Lagrangian6thOrder'     :   6,
+        'Lagrangian8thOrder'     :   8,
+        'FD4NoInt'               :  40,
+        'FD6NoInt'               :  60,
+        'FD8NoInt'               :  80,
+        'FD4Lag4'                :  44,
+        'M1Q4'                   : 104,
+        'M1Q6'                   : 106,
+        'M1Q8'                   : 108,
+        'M1Q10'                  : 110,
+        'M1Q12'                  : 112,
+        'M1Q14'                  : 114,
+        'M2Q4'                   : 204,
+        'M2Q6'                   : 206,
+        'M2Q8'                   : 208,
+        'M2Q10'                  : 210,
+        'M2Q12'                  : 212,
+        'M2Q14'                  : 214,
+        'M3Q4'                   : 304,
+        'M3Q6'                   : 306,
+        'M3Q8'                   : 308,
+        'M3Q10'                  : 310,
+        'M3Q12'                  : 312,
+        'M3Q14'                  : 314,
+        'M4Q4'                   : 404,
+        'M4Q6'                   : 406,
+        'M4Q8'                   : 408,
+        'M4Q10'                  : 410,
+        'M4Q12'                  : 412,
+        'M4Q14'                  : 414,
+        # temporal interpolation
+        'NoTInt'                 :   0,
+        'PCHIPInt'               :   1,
+        'NoTemporalInterpolation':   0,
+        'PCHIPInterpolation'     :   1,
+        }
+
 package_dir, package_filename = os.path.split(__file__)
 
 isotropic1024coarse = {'name'   : 'isotropic1024coarse'}
