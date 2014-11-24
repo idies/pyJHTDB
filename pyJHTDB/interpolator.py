@@ -49,7 +49,8 @@ class spline_interpolator:
             ny = None,
             my = None,
             nz = None,
-            mz = None):
+            mz = None,
+            initialize = True):
         self.nx = n if (type(nx) == type(None)) else nx
         self.ny = n if (type(ny) == type(None)) else ny
         self.nz = n if (type(nz) == type(None)) else nz
@@ -57,33 +58,39 @@ class spline_interpolator:
         self.my = m if (type(my) == type(None)) else my
         self.mz = m if (type(mz) == type(None)) else mz
         self.info = info
+        self.clib_loaded = False
+        self.initialized = False
+        if initialize:
+            self.initialize(compute_fast_beta = compute_fast_beta)
+        return None
+    def initialize(self, compute_fast_beta = False):
         pickle_file = {
                 'x' : os.path.join(
                         pyJHTDB.lib_folder,
-                        (info['name'] + '_spline_' +
+                        (self.info['name'] + '_spline_' +
                          'xn{0}m{1}.pickle.gz'.format(self.nx, self.mx))),
                 'y' : os.path.join(
                         pyJHTDB.lib_folder,
-                        (info['name'] + '_spline_' +
+                        (self.info['name'] + '_spline_' +
                          'yn{0}m{1}.pickle.gz'.format(self.ny, self.my))),
                 'z' : os.path.join(
                         pyJHTDB.lib_folder,
-                        (info['name'] + '_spline_' +
+                        (self.info['name'] + '_spline_' +
                          'zn{0}m{1}.pickle.gz'.format(self.nz, self.mz)))}
         self.spline = {}
         for coord in ['x', 'y', 'z']:
             if os.path.exists(pickle_file[coord]):
                 self.spline[coord] = pickle.load(gzip.open(pickle_file[coord]))
             else:
-                if info[coord + 'uniform'] and info[coord + 'periodic']:
+                if self.info[coord + 'uniform'] and self.info[coord + 'periodic']:
                     self.spline[coord] = gs.generic_spline_1D(
-                            info[coord + 'nodes'][:2],
+                            self.info[coord + 'nodes'][:2],
                             max_deriv = getattr(self, 'm' + coord),
                             neighbours = getattr(self, 'n' + coord),
-                            period = info['l' + coord])
+                            period = self.info['l' + coord])
                 else:
                     self.spline[coord] = gs.generic_spline_1D(
-                            info[coord + 'nodes'],
+                            self.info[coord + 'nodes'],
                             max_deriv = getattr(self, 'm' + coord),
                             neighbours = getattr(self, 'n' + coord))
                 self.spline[coord].compute_derivs()
@@ -101,7 +108,7 @@ class spline_interpolator:
             self.by = self.spline['y'].fast_beta
         else:
             self.by = self.spline['y'].beta
-        self.clib_loaded = False
+        self.initialized = True
         return None
     def __call__(
             self,
@@ -112,6 +119,8 @@ class spline_interpolator:
             getFunction = 'getVelocityAndPressure'):
         if (not len(points.shape) == 2):
             return None
+        if (not self.initialized):
+            self.initialize()
         field_points = np.zeros((points.shape[0], 2*self.nz+2, 2*self.ny+2, 2*self.nx+2, 3), dtype = np.float32)
         xgrid = np.floor(points[:, 0] / self.info['dx']).astype(np.int) % self.info['nx']
         xfrac = (points[:, 0] - self.info['xnodes'][xgrid])/self.info['dx']
@@ -184,6 +193,8 @@ class spline_interpolator:
                 result[:, p] = np.einsum('okjil,oi,oj,ok->ol', field_values[None, p], xb, yb, zb)
         return result
     def write_coefficients(self):
+        if (not self.initialized):
+            self.initialize()
         for coord in ['x', 'y', 'z']:
             for order in range(self.m+1):
                 text_file = open(
@@ -218,6 +229,8 @@ class spline_interpolator:
     def generate_clib(
             self,
             cfile_name = None):
+        if (not self.initialized):
+            self.initialize()
         try:
             self.clib = np.ctypeslib.load_library(
                     'lib' + os.path.basename(self.cfile_name),
@@ -288,6 +301,8 @@ class spline_interpolator:
             self,
             cfile_name = None,
             base_cname = None):
+        if (not self.initialized):
+            self.initialize()
         if type(cfile_name) == type(None):
             self.cfile_name = (pyJHTDB.lib_folder +
                           self.info['name'] + '_spline' +
@@ -428,6 +443,8 @@ class spline_interpolator:
             """
                 meant to be called for regularly spaced data, otherwise results make no sense.
             """
+            if (not self.initialized):
+                self.initialize()
             beta_vals = np.empty((len(dorder), 3, factor, len(self.bx[0][0])), dtype = data.dtype)
             for o in range(len(dorder)):
                 for i in range(factor):
