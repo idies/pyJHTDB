@@ -291,9 +291,9 @@ class spline_interpolator:
         if type(cfile_name) == type(None):
             self.cfile_name = (pyJHTDB.lib_folder +
                           self.info['name'] + '_spline' +
-                          '_xn{0}q{1}'.format(self.mx, self.nx*2 + 2) +
-                          '_yn{0}q{1}'.format(self.my, self.ny*2 + 2) +
-                          '_zn{0}q{1}'.format(self.mz, self.nz*2 + 2))
+                          '_xm{0}q{1}'.format(self.mx, self.nx*2 + 2) +
+                          '_ym{0}q{1}'.format(self.my, self.ny*2 + 2) +
+                          '_zm{0}q{1}'.format(self.mz, self.nz*2 + 2))
         else:
             self.cfile_name = cfile_name
         if type(base_cname) == type(None):
