@@ -323,6 +323,7 @@ class spline_interpolator:
                 'int point;\n' +
                 'int component;\n' +
                 'int i0, i1, i2;\n' +
+                'int xcounter, ycounter, zcounter;\n' +
                 'float bx[{0}], by[{0}], bz[{0}];\n'.format(self.n*2+2) +
                 'int ix[{0}], iy[{0}], iz[{0}];\n'.format(self.n*2+2))
         # loop over points
@@ -366,7 +367,17 @@ class spline_interpolator:
                                  ' + (i0+ix[{2}]))*field_components + component]').format(i, j, k))
                 fyname.append(write_interp1D(bx, fxname) + '\n')
             fzname.append(write_interp1D(by, fyname) + '\n')
-        src_txt += 'result[field_components*point + component] = ' + write_interp1D(bz, fzname) + ';\n'
+        #src_txt += 'result[field_components*point + component] = ' + write_interp1D(bz, fzname) + ';\n'
+        src_txt += (
+                'result[field_components*point + component] = 0;\n' +
+                'for (zcounter = 0; zcounter < {0}; zcounter++)\n'.format(self.n*2+2) +
+                'for (ycounter = 0; ycounter < {0}; ycounter++)\n'.format(self.n*2+2) +
+                'for (xcounter = 0; xcounter < {0}; xcounter++)\n'.format(self.n*2+2) +
+                'result[field_components*point + component] += ' +
+                'bz[zcounter]*by[ycounter]*bx[xcounter]*' +
+                'field[(((i2 + iz[zcounter]) *field_size[1] + ' +
+                        '(i1 + iy[ycounter]))*field_size[2] + ' +
+                        '(i0 + ix[xcounter]))*field_components + component];\n')
         src_txt += '}\n'                                            # close component loop
         src_txt += '}\n'                                            # close point loop
         src_txt += 'return EXIT_SUCCESS;\n}\n'                      # close function
