@@ -21,7 +21,7 @@
 
 import numpy as np
 import os
-import pickle
+import cPickle as pickle
 import gzip
 import ctypes as ct
 import distutils
