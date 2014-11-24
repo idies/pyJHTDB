@@ -57,37 +57,40 @@ class spline_interpolator:
         self.my = m if (type(my) == type(None)) else my
         self.mz = m if (type(mz) == type(None)) else mz
         self.info = info
-        pickle_file = os.path.join(
-                pyJHTDB.lib_folder,
-                info['name'] + '_spline_interpolator_' +
-                'xn{0}m{1}_'.format(self.nx, self.mx) +
-                'yn{0}m{1}_'.format(self.ny, self.my) +
-                'zn{0}m{1}.'.format(self.nz, self.mz) +
-                'pickle.gz')
-        if os.path.exists(pickle_file):
-            self.spline = pickle.load(gzip.open(pickle_file))
-        else:
-            func = []
-            for coord in ['x', 'y', 'z']:
+        pickle_file = {
+                'x' : os.path.join(
+                        pyJHTDB.lib_folder,
+                        (info['name'] + '_spline_' +
+                         'xn{0}m{1}.pickle.gz'.format(self.nx, self.mx))),
+                'y' : os.path.join(
+                        pyJHTDB.lib_folder,
+                        (info['name'] + '_spline_' +
+                         'yn{0}m{1}.pickle.gz'.format(self.ny, self.my))),
+                'z' : os.path.join(
+                        pyJHTDB.lib_folder,
+                        (info['name'] + '_spline_' +
+                         'zn{0}m{1}.pickle.gz'.format(self.nz, self.mz)))}
+        self.spline = {}
+        for coord in ['x', 'y', 'z']:
+            if os.path.exists(pickle_file[coord]):
+                self.spline[coord] = pickle.load(gzip.open(pickle_file[coord]))
+            else:
                 if info[coord + 'uniform'] and info[coord + 'periodic']:
-                    func.append(gs.generic_spline_1D(
+                    self.spline[coord] = gs.generic_spline_1D(
                             info[coord + 'nodes'][:2],
                             max_deriv = getattr(self, 'm' + coord),
                             neighbours = getattr(self, 'n' + coord),
-                            period = info['l' + coord]))
+                            period = info['l' + coord])
                 else:
-                    func.append(gs.generic_spline_1D(
+                    self.spline[coord] = gs.generic_spline_1D(
                             info[coord + 'nodes'],
                             max_deriv = getattr(self, 'm' + coord),
-                            neighbours = getattr(self, 'n' + coord)))
-                func[-1].compute_derivs()
-                func[-1].compute_beta()
-            self.spline = {'x': func[0],
-                           'y': func[1],
-                           'z': func[2]}
-            pickle.dump(self.spline,
-                        gzip.open(pickle_file,
-                             'wb'))
+                            neighbours = getattr(self, 'n' + coord))
+                self.spline[coord].compute_derivs()
+                self.spline[coord].compute_beta()
+                pickle.dump(self.spline[coord],
+                            gzip.open(pickle_file[coord],
+                                 'wb'))
         # either channel or periodic cube, so it's cheap to compute fast betas for x and z
         self.spline['x'].compute_fast_beta()
         self.spline['z'].compute_fast_beta()
