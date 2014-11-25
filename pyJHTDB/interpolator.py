@@ -356,6 +356,7 @@ class spline_interpolator:
         src_txt += (
                 'int point;\n' +
                 'int component;\n' +
+                'double sum;\n' +
                 'int i0, i1, i2;\n' +
                 'float bx[{0}], by[{1}], bz[{2}];\n'.format(
                     self.nx*2+2,
@@ -418,15 +419,16 @@ class spline_interpolator:
                         ';\n')
         else:
             src_txt += (
-                    'result[field_components*point + component] = 0;\n' +
+                    'sum = 0;\n'
                     'for (zcounter = 0; zcounter < {0}; zcounter++)\n'.format(self.nz*2+2) +
                     'for (ycounter = 0; ycounter < {0}; ycounter++)\n'.format(self.ny*2+2) +
                     'for (xcounter = 0; xcounter < {0}; xcounter++)\n'.format(self.nx*2+2) +
-                    'result[field_components*point + component] += ' +
+                    'sum += (double)(' +
                     'bz[zcounter]*by[ycounter]*bx[xcounter]*' +
                     'field[(((i2 + iz[zcounter]) *field_size[1] + ' +
                             '(i1 + iy[ycounter]))*field_size[2] + ' +
-                            '(i0 + ix[xcounter]))*field_components + component];\n')
+                            '(i0 + ix[xcounter]))*field_components + component]);\n' +
+                    'result[field_components*point + component] = (float)sum;\n')
         src_txt += '}\n'                                            # close component loop
         src_txt += '}\n'                                            # close point loop
         src_txt += 'return EXIT_SUCCESS;\n}\n'                      # close function
