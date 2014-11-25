@@ -229,14 +229,12 @@ class spline_interpolator:
     def generate_clib(
             self,
             cfile_name = None):
-        if (not self.initialized):
-            self.initialize()
+        self.write_cfile(cfile_name = cfile_name)
         try:
             self.clib = np.ctypeslib.load_library(
                     'lib' + os.path.basename(self.cfile_name),
                     pyJHTDB.lib_folder)
         except:
-            self.write_cfile(cfile_name = cfile_name)
             builder = distutils.command.build_ext.build_ext(
                     distutils.dist.Distribution({'name' : os.path.basename(self.cfile_name)}))
             builder.extensions = [
@@ -301,8 +299,6 @@ class spline_interpolator:
             self,
             cfile_name = None,
             base_cname = None):
-        if (not self.initialized):
-            self.initialize()
         if type(cfile_name) == type(None):
             self.cfile_name = (pyJHTDB.lib_folder +
                           self.info['name'] + '_spline' +
@@ -320,6 +316,8 @@ class spline_interpolator:
             self.base_name = base_name
         if os.path.exists(self.cfile_name + '.c'):
             return None
+        if (not self.initialized):
+            self.initialize()
         #def write_interp1D(bname, fname):
         #    tmp_txt  = '('
         #    for i in range(self.n*2+1):
