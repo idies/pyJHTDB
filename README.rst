@@ -88,7 +88,8 @@ On first contact with this library, we recommend that you first run
 The code that is executed can be found in "pyJHTDB/test.py", and it's
 the simplest example of how to access the turbulence database.
 
-**Configuration**
+Configuration
+=============
 
 While our service is open to anyone, we would like to keep track of who
 is using the service, and how. To this end, we would like each user or
