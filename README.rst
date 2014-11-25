@@ -9,7 +9,9 @@ More information can be found at http://turbulence.pha.jhu.edu/.
 Installing pypi version
 =======================
 
-If you have ``pip``, you can simply do this::
+If you have ``pip``, you can simply do this:
+
+.. code:: bash
 
     pip install pyJHTDB
 
@@ -19,13 +21,29 @@ If you don't have ``pip`` on your system, it is quite easy to get it
 following the instructions at
 http://pip.readthedocs.org/en/latest/installing.html.
 
+Cutout/local data functionality
+-------------------------------
+
+If you want to use the cutout functionality, you will need to install
+``h5py`` *before* you install ``pyJHTDB``, with:
+
+.. code:: bash
+
+    pip install h5py
+
+If you would like to use the local data functionality, you will need a
+full installation of the HDF5 libraries, see
+http://www.hdfgroup.org/HDF5/ for instructions.
+
 Installing from source
 ======================
 
 ubuntu 14.04
 ------------
 
-Bare-bone installation::
+Bare-bone installation:
+
+.. code:: bash
 
     sudo apt-get install build-essential gfortran
     sudo apt-get install python-setuptools
@@ -36,7 +54,9 @@ Bare-bone installation::
 Note that doing this should, in principle, also install ``sympy`` on
 your system, since it's used by ``pyJHTDB``.
 
-Happy fun installation::
+Happy fun installation:
+
+.. code:: bash
 
     sudo apt-get install build-essential gfortran
     sudo apt-get install python-setuptools
