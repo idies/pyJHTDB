@@ -50,7 +50,8 @@ class spline_interpolator:
             my = None,
             nz = None,
             mz = None,
-            initialize = True):
+            initialize = True,
+            cformula_unroll = False):
         self.nx = n if (type(nx) == type(None)) else nx
         self.ny = n if (type(ny) == type(None)) else ny
         self.nz = n if (type(nz) == type(None)) else nz
@@ -59,6 +60,7 @@ class spline_interpolator:
         self.mz = m if (type(mz) == type(None)) else mz
         self.info = info
         self.clib_loaded = False
+        self.cformula_unroll = cformula_unroll
         self.initialized = False
         if initialize:
             self.initialize(compute_fast_beta = compute_fast_beta)
@@ -318,12 +320,6 @@ class spline_interpolator:
             return None
         if (not self.initialized):
             self.initialize()
-        #def write_interp1D(bname, fname):
-        #    tmp_txt  = '('
-        #    for i in range(self.n*2+1):
-        #        tmp_txt += '\n' + bname[i] + '*' + fname[i] + ' + '
-        #    tmp_txt += '\n' + bname[self.n*2+1] + '*' + fname[self.n*2+1] + ')'
-        #    return tmp_txt
         cfile = open(self.cfile_name + '.c', 'w')
         ### headers
         cfile.write(
@@ -358,11 +354,9 @@ class spline_interpolator:
         src_txt += '{\n'
         # various variables
         src_txt += (
-#                'fprintf(stderr, "entering interpolate %d %d %d\\n", field_offset[0], field_offset[1], field_offset[2]);\n' +
                 'int point;\n' +
                 'int component;\n' +
                 'int i0, i1, i2;\n' +
-                'int xcounter, ycounter, zcounter;\n' +
                 'float bx[{0}], by[{1}], bz[{2}];\n'.format(
                     self.nx*2+2,
                     self.ny*2+2,
@@ -371,9 +365,10 @@ class spline_interpolator:
                     self.nx*2+2,
                     self.ny*2+2,
                     self.nz*2+2))
+        if not self.cformula_unroll:
+            src_txt += 'int xcounter, ycounter, zcounter;\n'
         # loop over points
         src_txt += 'for (point = 0; point < npoints; point++)\n{\n'
-#        src_txt += 'fprintf(stderr, "inside point loop, point is %d\\n", point);\n'
         # get polynomials
         src_txt += 'xbeta_' + base_xname + '(diff[0], fractions[point*3+0], bx);\n'
         if self.info['yperiodic']:
@@ -386,7 +381,6 @@ class spline_interpolator:
         src_txt += 'zindices_' + base_zname + '(nodes[3*point+2], iz);\n'
         # loop over components
         src_txt += 'for (component = 0; component < field_components; component++)\n{\n'
-#        src_txt += 'fprintf(stderr, "inside component loop, component is %d\\n", component);\n'
         bx = ['bx[{0}]'.format(i) for i in range(self.nx*2 + 2)]
         by = ['by[{0}]'.format(i) for i in range(self.ny*2 + 2)]
         bz = ['bz[{0}]'.format(i) for i in range(self.nz*2 + 2)]
@@ -400,29 +394,39 @@ class spline_interpolator:
                     'fprintf(stderr, "exiting interpolate now, results are most likely nonsensical\\n");\n' +
                     'return EXIT_FAILURE;\n' +
                 '}\n')
-        #fzname = []
-        #for i in range(self.nz*2 + 2):
-        #    fyname = []
-        #    for j in range(self.ny*2 + 2):
-        #        fxname = []
-        #        for k in range(self.nx*2 + 2):
-        #            fxname.append(
-        #                   ('field[(((i2+iz[{0}])*field_size[1]' +
-        #                         ' + (i1+iy[{1}]))*field_size[2]' +
-        #                         ' + (i0+ix[{2}]))*field_components + component]').format(i, j, k))
-        #        fyname.append(write_interp1D(bx, fxname) + '\n')
-        #    fzname.append(write_interp1D(by, fyname) + '\n')
-        #src_txt += 'result[field_components*point + component] = ' + write_interp1D(bz, fzname) + ';\n'
-        src_txt += (
-                'result[field_components*point + component] = 0;\n' +
-                'for (zcounter = 0; zcounter < {0}; zcounter++)\n'.format(self.nz*2+2) +
-                'for (ycounter = 0; ycounter < {0}; ycounter++)\n'.format(self.ny*2+2) +
-                'for (xcounter = 0; xcounter < {0}; xcounter++)\n'.format(self.nx*2+2) +
-                'result[field_components*point + component] += ' +
-                'bz[zcounter]*by[ycounter]*bx[xcounter]*' +
-                'field[(((i2 + iz[zcounter]) *field_size[1] + ' +
-                        '(i1 + iy[ycounter]))*field_size[2] + ' +
-                        '(i0 + ix[xcounter]))*field_components + component];\n')
+        if self.cformula_unroll:
+            def write_interp1D(bname, fname, q):
+                tmp_txt  = '('
+                for i in range(q-1):
+                    tmp_txt += '\n' + bname[i] + '*' + fname[i] + ' + '
+                tmp_txt += '\n' + bname[q-1] + '*' + fname[q-1] + ')'
+                return tmp_txt
+            fzname = []
+            for i in range(self.nz*2 + 2):
+                fyname = []
+                for j in range(self.ny*2 + 2):
+                    fxname = []
+                    for k in range(self.nx*2 + 2):
+                        fxname.append(
+                               ('field[(((i2+iz[{0}])*field_size[1]' +
+                                     ' + (i1+iy[{1}]))*field_size[2]' +
+                                     ' + (i0+ix[{2}]))*field_components + component]').format(i, j, k))
+                    fyname.append(write_interp1D(bx, fxname, self.nx*2 + 2) + '\n')
+                fzname.append(write_interp1D(by, fyname, self.ny*2 + 2) + '\n')
+            src_txt += ('result[field_components*point + component] = ' +
+                        write_interp1D(bz, fzname, self.nz*2+2) +
+                        ';\n')
+        else:
+            src_txt += (
+                    'result[field_components*point + component] = 0;\n' +
+                    'for (zcounter = 0; zcounter < {0}; zcounter++)\n'.format(self.nz*2+2) +
+                    'for (ycounter = 0; ycounter < {0}; ycounter++)\n'.format(self.ny*2+2) +
+                    'for (xcounter = 0; xcounter < {0}; xcounter++)\n'.format(self.nx*2+2) +
+                    'result[field_components*point + component] += ' +
+                    'bz[zcounter]*by[ycounter]*bx[xcounter]*' +
+                    'field[(((i2 + iz[zcounter]) *field_size[1] + ' +
+                            '(i1 + iy[ycounter]))*field_size[2] + ' +
+                            '(i0 + ix[xcounter]))*field_components + component];\n')
         src_txt += '}\n'                                            # close component loop
         src_txt += '}\n'                                            # close point loop
         src_txt += 'return EXIT_SUCCESS;\n}\n'                      # close function
