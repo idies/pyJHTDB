@@ -812,21 +812,22 @@ class LocalInterpTest:
         return None
     def set_up_field(
             self,
-            xnode_max = 64,
-            ynode_max = 128,
-            znode_max = 64,
+            xnodes = [0,  64],
+            ynodes = [0, 128],
+            znodes = [0,  64],
             buffer_size = 16):
+        self.buffer_size = 16
         full_frame = h5py.File(
             '/stuff/data/{0}/{0}_t0000.h5'.format(self.info['name']),
             'r')
-        self.xnode_max = xnode_max
-        self.ynode_max = ynode_max
-        self.znode_max = znode_max
-        self.buffer_size = buffer_size
+        self.xnodes = xnodes
+        self.ynodes = ynodes
+        self.znodes = znodes
         self.test_field = full_frame['u00000'][
-                            :self.znode_max + 2*self.buffer_size,
-                            :self.ynode_max + 2*self.buffer_size,
-                            :self.xnode_max + 2*self.buffer_size].copy()
+            self.znodes[0]:self.znodes[1],
+            self.ynodes[0]:self.ynodes[1],
+            self.xnodes[0]:self.xnodes[1]].copy()
+        self.y0buffer = min(self.buffer_size, self.ynodes[0])
         full_frame.close()
         return None
     def set_up_points(
@@ -835,14 +836,17 @@ class LocalInterpTest:
             yval = None):
         self.npoints = npoints
         if type(yval) == type(None):
-            self.p = numpy.random.random(
-                size = (npoints, self.ynode_max, 3)).astype(numpy.float32)
             if self.info['yperiodic']:
-                self.yindices = range(self.buffer_size,
-                                      self.ynode_max + self.buffer_size)
+                self.yindices = range(self.ynodes[0] + self.buffer_size,
+                                      self.ynodes[1] - self.buffer_size)
+            else:
+                self.yindices = range(self.ynodes[0] + self.y0buffer,
+                                      self.ynodes[1] - self.buffer_size)
+            self.p = numpy.random.random(
+                size = (npoints, self.yindices.shape[0], 3)).astype(numpy.float32)
+            if self.info['yperiodic']:
                 self.p[..., 1] *= self.info['dy']
             else:
-                self.yindices = range(0, self.ynode_max)
                 self.p[..., 1] *= self.info['dy'][None, self.yindices]
             self.p[..., 1] += self.info['ynodes'][None, self.yindices]
         else:
@@ -851,34 +855,28 @@ class LocalInterpTest:
             if yval == 'random':
                 if self.info['yperiodic']:
                     self.p[..., 1] = (
-                        self.info['ynodes'][self.buffer_size] +
+                        self.info['ynodes'][self.ynodes[0] + self.buffer_size] +
                         self.p[..., 1]*(
-                            self.info['ynodes'][self.ynode_max +
-                                                self.buffer_size] -
-                            self.info['ynodes'][self.buffer_size]))
+                            self.info['ynodes'][self.ynodes[1] - self.buffer_size] -
+                            self.info['ynodes'][self.ynodes[0] + self.buffer_size]))
                 else:
                     self.p[..., 1] = (
-                        self.info['ynodes'][0] +
+                        self.info['ynodes'][self.ynodes[0] + self.y0buffer] +
                         self.p[..., 1]*(
-                            self.info['ynodes'][self.ynode_max +
-                                                self.buffer_size] -
-                            self.info['ynodes'][0]))
-            elif type(yval) == float:
-                self.p[..., 1] = yval
+                            self.info['ynodes'][self.ynodes[1] - self.buffer_size] -
+                            self.info['ynodes'][self.ynodes[0] + self.y0buffer]))
             else:
-                self.p[..., 1] = 0.0
+                self.p[..., 1] = yval
         self.p[..., 0] = (
-            self.info['xnodes'][self.buffer_size] +
+            self.info['xnodes'][self.xnodes[0] + self.buffer_size] +
             self.p[..., 0]*(
-                self.info['xnodes'][self.xnode_max +
-                                    self.buffer_size] -
-                self.info['xnodes'][self.buffer_size]))
+                self.info['xnodes'][self.xnodes[1] - self.buffer_size] -
+                self.info['xnodes'][self.xnodes[0] + self.buffer_size]))
         self.p[..., 2] = (
-            self.info['znodes'][self.buffer_size] +
+            self.info['znodes'][self.znodes[0] + self.buffer_size] +
             self.p[..., 2]*(
-                self.info['znodes'][self.znode_max +
-                                    self.buffer_size] -
-                self.info['znodes'][self.buffer_size]))
+                self.info['znodes'][self.znodes[1] - self.buffer_size] -
+                self.info['znodes'][self.znodes[0] + self.buffer_size]))
         return None
     def set_up_interpolators(
             self,
@@ -912,17 +910,33 @@ class LocalInterpTest:
         self.gradu = []
         for k in range(len(self.keys)):
             self.uval.append(self.interp[k].cinterpolate(
-                self.p, self.test_field,
-                diff = [0, 0, 0]))
+                self.p,
+                self.test_field,
+                diff = [0, 0, 0],
+                field_offset = [self.xnodes[0],
+                                self.ynodes[0],
+                                self.znodes[0]]))
             dxvel = self.interp[k].cinterpolate(
-                self.p, self.test_field,
-                diff = [1, 0, 0])
+                self.p,
+                self.test_field,
+                diff = [1, 0, 0],
+                field_offset = [self.xnodes[0],
+                                self.ynodes[0],
+                                self.znodes[0]])
             dyvel = self.interp[k].cinterpolate(
-                self.p, self.test_field,
-                diff = [0, 1, 0])
+                self.p,
+                self.test_field,
+                diff = [0, 1, 0],
+                field_offset = [self.xnodes[0],
+                                self.ynodes[0],
+                                self.znodes[0]])
             dzvel = self.interp[k].cinterpolate(
-                self.p, self.test_field,
-                diff = [0, 0, 1])
+                self.p,
+                self.test_field,
+                diff = [0, 0, 1],
+                field_offset = [self.xnodes[0],
+                                self.ynodes[0],
+                                self.znodes[0]])
             self.gradu.append(numpy.zeros(
                 dxvel.shape[:-1] + (9,),
                 dtype = dxvel.dtype))
