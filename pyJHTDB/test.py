@@ -804,6 +804,160 @@ def test_local_vs_db_interp(
                    '{0}, {1:+}, {2}'.format(distance, resd0[0, i], numpy.abs(resd0[0, i] - resd1[0, i])))
     return res0, res1, resd0, resd1
 
+class LocalInterpTest:
+    def __init__(
+            self,
+            info):
+        self.info = info
+        return None
+    def set_up_field(
+            self,
+            xnode_max = 64,
+            ynode_max = 128,
+            znode_max = 64,
+            buffer_size = 16):
+        full_frame = h5py.File(
+            '/stuff/data/{0}/{0}_t0000.h5'.format(self.info['name']),
+            'r')
+        self.xnode_max = xnode_max
+        self.ynode_max = ynode_max
+        self.znode_max = znode_max
+        self.buffer_size = buffer_size
+        self.test_field = full_frame['u00000'][
+                            :self.znode_max + 2*self.buffer_size,
+                            :self.ynode_max + 2*self.buffer_size,
+                            :self.xnode_max + 2*self.buffer_size].copy()
+        full_frame.close()
+        return None
+    def set_up_points(
+            self,
+            npoints = 2**5,
+            yval = None):
+        self.npoints = npoints
+        if type(yval) == type(None):
+            self.p = numpy.random.random(
+                size = (npoints, self.ynode_max, 3)).astype(numpy.float32)
+            if self.info['yperiodic']:
+                self.yindices = range(self.buffer_size,
+                                      self.ynode_max + self.buffer_size)
+                self.p[..., 1] *= self.info['dy']
+            else:
+                self.yindices = range(0, self.ynode_max)
+                self.p[..., 1] *= self.info['dy'][None, self.yindices]
+            self.p[..., 1] += self.info['ynodes'][None, self.yindices]
+        else:
+            self.p = numpy.random.random(
+                size = (npoints, 3)).astype(numpy.float32)
+            if yval == 'random':
+                if self.info['yperiodic']:
+                    self.p[..., 1] = (
+                        self.info['ynodes'][self.buffer_size] +
+                        self.p[..., 1]*(
+                            self.info['ynodes'][self.ynode_max +
+                                                self.buffer_size] -
+                            self.info['ynodes'][self.buffer_size]))
+                else:
+                    self.p[..., 1] = (
+                        self.info['ynodes'][0] +
+                        self.p[..., 1]*(
+                            self.info['ynodes'][self.ynode_max +
+                                                self.buffer_size] -
+                            self.info['ynodes'][0]))
+            elif type(yval) == float:
+                self.p[..., 1] = yval
+            else:
+                self.p[..., 1] = 0.0
+        self.p[..., 0] = (
+            self.info['xnodes'][self.buffer_size] +
+            self.p[..., 0]*(
+                self.info['xnodes'][self.xnode_max +
+                                    self.buffer_size] -
+                self.info['xnodes'][self.buffer_size]))
+        self.p[..., 2] = (
+            self.info['znodes'][self.buffer_size] +
+            self.p[..., 2]*(
+                self.info['znodes'][self.znode_max +
+                                    self.buffer_size] -
+                self.info['znodes'][self.buffer_size]))
+        return None
+    def set_up_interpolators(
+            self,
+            pars = [[12, 3, 3, 2],
+                    [12, 4, 4, 2],
+                    [12, 5, 5, 2],
+                    [12, 6, 6, 2],
+                    [12, 7, 7, 2],
+                    [12, 8, 8, 2],
+                    [12, 9, 9, 2],
+                    [12,10,10, 2]]):
+        self.interp = {}
+        for par in pars:
+            self.interp[
+                'nx{0:0>2}_ny{1:0>2}_nz{2:0>2}_m{3}'.format(
+                    par[0], par[1], par[2], par[3])] = pyJHTDB.interpolator.spline_interpolator(
+                        info = self.info,
+                        nx = par[0],
+                        ny = par[1],
+                        nz = par[2],
+                        m = par[3],
+                        initialize = False,
+                        cformula_unroll = False)
+        return None
+    def interpolate(
+            self):
+        self.uval = {}
+        self.gradu = {}
+        for k in self.interp.keys():
+            self.uval[k] = self.interp[k].cinterpolate(
+                self.p, self.test_field,
+                diff = [0, 0, 0])
+            dxvel = self.interp[k].cinterpolate(
+                self.p, self.test_field,
+                diff = [1, 0, 0])
+            dyvel = self.interp[k].cinterpolate(
+                self.p, self.test_field,
+                diff = [0, 1, 0])
+            dzvel = self.interp[k].cinterpolate(
+                self.p, self.test_field,
+                diff = [0, 0, 1])
+            self.gradu[k] = numpy.zeros(
+                dxvel.shape[:-1] + (9,),
+                dtype = dxvel.dtype)
+            self.gradu[k][..., 0] = dxvel[..., 0]
+            self.gradu[k][..., 1] = dyvel[..., 0]
+            self.gradu[k][..., 2] = dzvel[..., 0]
+            self.gradu[k][..., 3] = dxvel[..., 1]
+            self.gradu[k][..., 4] = dyvel[..., 1]
+            self.gradu[k][..., 5] = dzvel[..., 1]
+            self.gradu[k][..., 6] = dxvel[..., 2]
+            self.gradu[k][..., 7] = dyvel[..., 2]
+            self.gradu[k][..., 8] = dzvel[..., 2]
+        return None
+    def get_divergence(
+            self):
+        self.divu = {}
+        self.divu_upper = {}
+        self.divu_lower = {}
+        for k in self.interp.keys():
+            factor = (numpy.sqrt(3) /
+                numpy.average(numpy.sqrt(
+                    self.gradu[k][..., 0]**2 +
+                    self.gradu[k][..., 4]**2 +
+                    self.gradu[k][..., 8]**2), axis = 0))
+            self.divu[k] = factor*numpy.average(numpy.abs(
+                    self.gradu[k][..., 0] +
+                    self.gradu[k][..., 4] +
+                    self.gradu[k][..., 8]), axis = 0)
+            self.divu_upper[k] = factor*numpy.percentile(numpy.abs(
+                    self.gradu[k][..., 0] +
+                    self.gradu[k][..., 4] +
+                    self.gradu[k][..., 8]), 90, axis = 0)
+            self.divu_lower[k] = factor*numpy.percentile(numpy.abs(
+                    self.gradu[k][..., 0] +
+                    self.gradu[k][..., 4] +
+                    self.gradu[k][..., 8]), 10, axis = 0)
+        return None
+
 if __name__ == '__main__':
     test_plain()
 
