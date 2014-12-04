@@ -890,27 +890,30 @@ class LocalInterpTest:
                     [12, 8, 8, 2],
                     [12, 9, 9, 2],
                     [12,10,10, 2]]):
-        self.interp = {}
+        self.interp = []
+        self.keys   = []
         for par in pars:
-            self.interp[
+            self.keys.append(
                 'nx{0:0>2}_ny{1:0>2}_nz{2:0>2}_m{3}'.format(
-                    par[0], par[1], par[2], par[3])] = pyJHTDB.interpolator.spline_interpolator(
-                        info = self.info,
-                        nx = par[0],
-                        ny = par[1],
-                        nz = par[2],
-                        m = par[3],
-                        initialize = False,
-                        cformula_unroll = False)
+                    par[0], par[1], par[2], par[3]))
+            self.interp.append(
+                pyJHTDB.interpolator.spline_interpolator(
+                    info = self.info,
+                    nx = par[0],
+                    ny = par[1],
+                    nz = par[2],
+                    m = par[3],
+                    initialize = False,
+                    cformula_unroll = False))
         return None
     def interpolate(
             self):
-        self.uval = {}
-        self.gradu = {}
-        for k in self.interp.keys():
-            self.uval[k] = self.interp[k].cinterpolate(
+        self.uval = []
+        self.gradu = []
+        for k in range(len(self.keys)):
+            self.uval.append(self.interp[k].cinterpolate(
                 self.p, self.test_field,
-                diff = [0, 0, 0])
+                diff = [0, 0, 0]))
             dxvel = self.interp[k].cinterpolate(
                 self.p, self.test_field,
                 diff = [1, 0, 0])
@@ -920,9 +923,9 @@ class LocalInterpTest:
             dzvel = self.interp[k].cinterpolate(
                 self.p, self.test_field,
                 diff = [0, 0, 1])
-            self.gradu[k] = numpy.zeros(
+            self.gradu.append(numpy.zeros(
                 dxvel.shape[:-1] + (9,),
-                dtype = dxvel.dtype)
+                dtype = dxvel.dtype))
             self.gradu[k][..., 0] = dxvel[..., 0]
             self.gradu[k][..., 1] = dyvel[..., 0]
             self.gradu[k][..., 2] = dzvel[..., 0]
@@ -932,30 +935,35 @@ class LocalInterpTest:
             self.gradu[k][..., 6] = dxvel[..., 2]
             self.gradu[k][..., 7] = dyvel[..., 2]
             self.gradu[k][..., 8] = dzvel[..., 2]
+        self.uval  = numpy.array(self.uval)
+        self.gradu = numpy.array(self.gradu)
         return None
     def get_divergence(
             self):
-        self.divu = {}
-        self.divu_upper = {}
-        self.divu_lower = {}
-        for k in self.interp.keys():
+        self.divu = []
+        self.divu_upper = []
+        self.divu_lower = []
+        for k in range(len(self.keys)):
             factor = (numpy.sqrt(3) /
                 numpy.average(numpy.sqrt(
                     self.gradu[k][..., 0]**2 +
                     self.gradu[k][..., 4]**2 +
                     self.gradu[k][..., 8]**2), axis = 0))
-            self.divu[k] = factor*numpy.average(numpy.abs(
+            self.divu.append(factor*numpy.average(numpy.abs(
                     self.gradu[k][..., 0] +
                     self.gradu[k][..., 4] +
-                    self.gradu[k][..., 8]), axis = 0)
-            self.divu_upper[k] = factor*numpy.percentile(numpy.abs(
+                    self.gradu[k][..., 8]), axis = 0))
+            self.divu_upper.append(factor*numpy.percentile(numpy.abs(
                     self.gradu[k][..., 0] +
                     self.gradu[k][..., 4] +
-                    self.gradu[k][..., 8]), 90, axis = 0)
-            self.divu_lower[k] = factor*numpy.percentile(numpy.abs(
+                    self.gradu[k][..., 8]), 90, axis = 0))
+            self.divu_lower.append(factor*numpy.percentile(numpy.abs(
                     self.gradu[k][..., 0] +
                     self.gradu[k][..., 4] +
-                    self.gradu[k][..., 8]), 10, axis = 0)
+                    self.gradu[k][..., 8]), 10, axis = 0))
+        self.divu = numpy.array(self.divu)
+        self.divu_upper = numpy.array(self.divu_upper)
+        self.divu_lower = numpy.array(self.divu_lower)
         return None
 
 if __name__ == '__main__':
