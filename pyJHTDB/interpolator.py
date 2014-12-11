@@ -21,7 +21,11 @@
 
 import numpy as np
 import os
-import cPickle as pickle
+import sys
+if sys.version_info < (3,):
+    import cPickle as pickle
+else:
+    import pickle
 import gzip
 import ctypes as ct
 import distutils
