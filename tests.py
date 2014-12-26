@@ -19,6 +19,9 @@
 #
 ########################################################################
 
+import sys
+sys.path[0] = ''
+
 import argparse
 
 parser = argparse.ArgumentParser(

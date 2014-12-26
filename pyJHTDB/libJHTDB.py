@@ -39,7 +39,10 @@ class libJHTDB(object):
             auth_token = pyJHTDB.auth_token):
         self.libname = 'libJHTDB'
         lib_location = os.path.dirname(inspect.getfile(pyJHTDB))
-        self.lib = np.ctypeslib.load_library(self.libname, os.path.abspath(os.path.join(lib_location, os.path.pardir)))
+        print(os.path.abspath(os.path.join(lib_location, os.path.pardir)))
+        self.lib = np.ctypeslib.load_library(
+            self.libname,
+            os.path.abspath(os.path.join(lib_location, os.path.pardir)))
         self.authToken = ctypes.c_char_p(auth_token.encode('ascii'))
         self.connection_on = False
         self.hdf5_file_list = []
