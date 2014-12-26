@@ -19,20 +19,22 @@
 #
 ########################################################################
 
-import numpy as np
 import os
 import sys
 if sys.version_info < (3,):
     import cPickle as pickle
 else:
     import pickle
+import numpy as np
 import gzip
 import ctypes as ct
+
 import distutils
 import distutils.command
 import distutils.command.build_ext
 import distutils.core
 import distutils.dist
+import distutils.log
 import tempfile
 
 import pyJHTDB
@@ -56,12 +58,12 @@ class spline_interpolator:
             mz = None,
             initialize = True,
             cformula_unroll = False):
-        self.nx = n if (type(nx) == type(None)) else nx
-        self.ny = n if (type(ny) == type(None)) else ny
-        self.nz = n if (type(nz) == type(None)) else nz
-        self.mx = m if (type(mx) == type(None)) else mx
-        self.my = m if (type(my) == type(None)) else my
-        self.mz = m if (type(mz) == type(None)) else mz
+        self.nx = int(np.floor(n)) if (type(nx) == type(None)) else int(np.floor(nx))
+        self.ny = int(np.floor(n)) if (type(ny) == type(None)) else int(np.floor(ny))
+        self.nz = int(np.floor(n)) if (type(nz) == type(None)) else int(np.floor(nz))
+        self.mx = int(np.floor(m)) if (type(mx) == type(None)) else int(np.floor(mx))
+        self.my = int(np.floor(m)) if (type(my) == type(None)) else int(np.floor(my))
+        self.mz = int(np.floor(m)) if (type(mz) == type(None)) else int(np.floor(mz))
         self.info = info
         self.clib_loaded = False
         self.cformula_unroll = cformula_unroll
@@ -74,15 +76,24 @@ class spline_interpolator:
                 'x' : os.path.join(
                         pyJHTDB.lib_folder,
                         (self.info['name'] + '_spline_' +
-                         'xn{0}m{1}.pickle.gz'.format(self.nx, self.mx))),
+                         'xn{0}m{1}'.format(self.nx, self.mx) +
+                         '.py{0}{1}'.format(sys.version_info[0],
+                                            sys.version_info[1]) +
+                         '.pickle.gz')),
                 'y' : os.path.join(
                         pyJHTDB.lib_folder,
                         (self.info['name'] + '_spline_' +
-                         'yn{0}m{1}.pickle.gz'.format(self.ny, self.my))),
+                         'yn{0}m{1}'.format(self.ny, self.my) +
+                         '.py{0}{1}'.format(sys.version_info[0],
+                                            sys.version_info[1]) +
+                         '.pickle.gz')),
                 'z' : os.path.join(
                         pyJHTDB.lib_folder,
                         (self.info['name'] + '_spline_' +
-                         'zn{0}m{1}.pickle.gz'.format(self.nz, self.mz)))}
+                         'zn{0}m{1}'.format(self.nz, self.mz) +
+                         '.py{0}{1}'.format(sys.version_info[0],
+                                            sys.version_info[1]) +
+                         '.pickle.gz'))}
         self.spline = {}
         for coord in ['x', 'y', 'z']:
             if os.path.exists(pickle_file[coord]):
@@ -238,22 +249,31 @@ class spline_interpolator:
         self.write_cfile(cfile_name = cfile_name)
         try:
             self.clib = np.ctypeslib.load_library(
-                    'lib' + os.path.basename(self.cfile_name),
+                    'lib' +
+                    'py{0}{1}'.format(sys.version_info[0],
+                                      sys.version_info[1]) +
+                    os.path.basename(self.cfile_name),
                     pyJHTDB.lib_folder)
         except:
             builder = distutils.command.build_ext.build_ext(
                     distutils.dist.Distribution({'name' : os.path.basename(self.cfile_name)}))
             builder.extensions = [
                     distutils.core.Extension(
-                        'lib' + os.path.basename(self.cfile_name),
+                        'lib' +
+                        'py{0}{1}'.format(sys.version_info[0],
+                                          sys.version_info[1]) +
+                        os.path.basename(self.cfile_name),
                         sources = [self.cfile_name + '.c'])]
             builder.build_lib = os.path.abspath(pyJHTDB.lib_folder)
             builder.build_temp = tempfile.gettempdir()
             builder.swig_opts = []
-            builder.verbose = True
+            distutils.log.set_verbosity(1)
             builder.run()
             self.clib = np.ctypeslib.load_library(
-                    'lib' + os.path.basename(self.cfile_name),
+                    'lib' +
+                    'py{0}{1}'.format(sys.version_info[0],
+                                      sys.version_info[1]) +
+                    os.path.basename(self.cfile_name),
                     pyJHTDB.lib_folder)
         self.clib_loaded = True
         return None
