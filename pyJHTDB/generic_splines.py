@@ -81,9 +81,9 @@ class generic_spline_1D:
             neighbours = 1):
         self.x = xvals.copy()
         self.dx = self.x[1:] - self.x[:self.x.shape[0] - 1]
-        self.m = max_deriv
-        self.n = neighbours
-        self.N = 2*neighbours + 2
+        self.m = int(np.floor(max_deriv))
+        self.n = int(np.floor(neighbours))
+        self.N = 2*self.n + 2
         self.periodic = not (period == None)
         self.uniform = (self.x.shape[0] == 2)
         self.deriv_coeff = []
@@ -171,7 +171,6 @@ class generic_spline_1D:
         self.neighbour_list = []
         if self.periodic:
             for i in range(len(self.deriv_coeff)-1):
-                print(type(self.n))
                 self.neighbour_list.append(range(i-self.n, i+self.n+2))
                 deltax = np.array([self.dx[i]**l for l in range(self.m + 1)])
                 a0 = self.alpha0_coeff*deltax[:, np.newaxis]
