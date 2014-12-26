@@ -19,11 +19,50 @@
 #
 ########################################################################
 
+import argparse
+
+parser = argparse.ArgumentParser(
+    description = 'Test pyJHTDB installation.')
+parser.add_argument(
+    '-p',
+    '--plain',
+    dest = 'plain',
+    action = 'store_true',
+    help = 'run plain test, i.e. turbc clone.')
+parser.add_argument(
+    '--grid-splines',
+    dest = 'grid_splines',
+    action = 'store_true',
+    help = 'run basic grid spline test.')
+parser.add_argument(
+    '--cutout',
+    dest = 'cutout',
+    action = 'store_true',
+    help = 'run cutout test.')
+parser.add_argument(
+    '--misc',
+    dest = 'misc',
+    action = 'store_true',
+    help = 'run misc test.')
+parser.add_argument(
+    '--interpolator',
+    dest = 'interpolator',
+    action = 'store_true',
+    help = 'run interpolator test.')
+
+opt = parser.parse_args()
+
 import pyJHTDB
 
-pyJHTDB.test_plain()
-pyJHTDB.test_gs()
+if opt.plain:
+    pyJHTDB.test_plain()
+if opt.grid_splines:
+    pyJHTDB.test_gs()
+if opt.interpolator:
+    pyJHTDB.test_interpolator()
 
-if pyJHTDB.found_h5py:
+if opt.misc and pyJHTDB.found_matplotlib:
+    pyJHTDB.test_misc()
+if opt.cutout and pyJHTDB.found_h5py:
     pyJHTDB.test_cutout()
 

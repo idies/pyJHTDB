@@ -171,6 +171,7 @@ class generic_spline_1D:
         self.neighbour_list = []
         if self.periodic:
             for i in range(len(self.deriv_coeff)-1):
+                print(type(self.n))
                 self.neighbour_list.append(range(i-self.n, i+self.n+2))
                 deltax = np.array([self.dx[i]**l for l in range(self.m + 1)])
                 a0 = self.alpha0_coeff*deltax[:, np.newaxis]
