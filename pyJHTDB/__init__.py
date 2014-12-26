@@ -46,7 +46,6 @@ import os.path
 import sys
 import numpy as np
 import ctypes
-import inspect
 import platform
 
 from pkg_resources import get_distribution, DistributionNotFound

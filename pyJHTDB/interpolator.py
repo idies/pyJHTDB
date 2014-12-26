@@ -19,20 +19,22 @@
 #
 ########################################################################
 
-import numpy as np
 import os
 import sys
 if sys.version_info < (3,):
     import cPickle as pickle
 else:
     import pickle
+import numpy as np
 import gzip
 import ctypes as ct
+
 import distutils
 import distutils.command
 import distutils.command.build_ext
 import distutils.core
 import distutils.dist
+import distutils.log
 import tempfile
 
 import pyJHTDB
@@ -265,7 +267,7 @@ class spline_interpolator:
             builder.build_lib = os.path.abspath(pyJHTDB.lib_folder)
             builder.build_temp = tempfile.gettempdir()
             builder.swig_opts = []
-            builder.verbose = True
+            distutils.log.set_verbosity(1)
             builder.run()
             self.clib = np.ctypeslib.load_library(
                     'lib' +
