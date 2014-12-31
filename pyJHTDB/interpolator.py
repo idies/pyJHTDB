@@ -61,6 +61,10 @@ class spline_interpolator:
         self.nx = int(np.floor(n)) if (type(nx) == type(None)) else int(np.floor(nx))
         self.ny = int(np.floor(n)) if (type(ny) == type(None)) else int(np.floor(ny))
         self.nz = int(np.floor(n)) if (type(nz) == type(None)) else int(np.floor(nz))
+        # for backwards compatibility, put in an n member as well
+        # I'm using the max, since the point is to use the value for buffers of 3D
+        # fields.
+        self.n = max(self.nx, self.ny, self.nz)
         self.mx = int(np.floor(m)) if (type(mx) == type(None)) else int(np.floor(mx))
         self.my = int(np.floor(m)) if (type(my) == type(None)) else int(np.floor(my))
         self.mz = int(np.floor(m)) if (type(mz) == type(None)) else int(np.floor(mz))
