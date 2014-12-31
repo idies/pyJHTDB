@@ -197,84 +197,84 @@ def ken_contours(
     fig.savefig(figname + '.eps', format = 'eps', bbox_inches = 'tight')
     return None
 
-def spectra_check(
-        info = pyJHTDB.dbinfo.isotropic1024coarse,
-        lJHTDB = None):
-    if not lJHTDB:
-        print ('no library given')
-        return None
-    nlines = 32
-    print(nlines, info['nx'], 3)
-    print(nlines, info['ny'], 3)
-    print(nlines, info['nz'], 3)
-    lines  = [numpy.zeros((nlines, info['nx'], 3), dtype = numpy.float32),
-              numpy.zeros((nlines, info['ny'], 3), dtype = numpy.float32),
-              numpy.zeros((nlines, info['nz'], 3), dtype = numpy.float32)]
-    lines[0][:, :, 0] = info['dx']*numpy.arange(.0, info['nx'], 1)
-    lines[0][:, :, 1] = info['dy']*numpy.random.randint(0, info['ny'], size = (nlines))[:, numpy.newaxis]
-    lines[0][:, :, 2] = info['dz']*numpy.random.randint(0, info['nz'], size = (nlines))[:, numpy.newaxis]
-    lines[1][:, :, 0] = info['dx']*numpy.random.randint(0, info['nx'], size = (nlines))[:, numpy.newaxis]
-    lines[1][:, :, 1] = info['dy']*numpy.arange(.0, info['ny'], 1)
-    lines[1][:, :, 2] = info['dz']*numpy.random.randint(0, info['nz'], size = (nlines))[:, numpy.newaxis]
-    lines[2][:, :, 0] = info['dx']*numpy.random.randint(0, info['nx'], size = (nlines))[:, numpy.newaxis]
-    lines[2][:, :, 1] = info['dy']*numpy.random.randint(0, info['ny'], size = (nlines))[:, numpy.newaxis]
-    lines[2][:, :, 2] = info['dz']*numpy.arange(.0, info['nz'], 1)
-    fig = plt.figure(figsize=(12.,6.))
-    axu = fig.add_axes([.05, .1, .4, .8])
-    axp = fig.add_axes([.55, .1, .4, .8])
-    coordname = ['x', 'y', 'z']
-    for i in range(3):
-        result = lJHTDB.getData(.0, lines[i],
-            sinterp = 0, tinterp = 0,
-            data_set = info['name'], getFunction = 'getVelocityAndPressure')
-        spec = numpy.fft.rfft(
-                numpy.sum(result[:, :, :3]**2, axis = 2), axis = 1)
-        axu.plot(numpy.average(numpy.abs(spec), axis = 0), label = '$i = ' + coordname[i] + '$')
-        spec = numpy.fft.rfft(
-                result[:, :, 3]**2, axis = 1)
-        axp.plot(numpy.average(numpy.abs(spec), axis = 0), label = '$i = ' + coordname[i] + '$')
-    axu.set_ylabel('$\\langle u_x^2 + u_y^2 + u_z^2 \\rangle$')
-    axp.set_ylabel('$\\langle p^2 \\rangle$')
-    for ax in [axu, axp]:
-        ax.set_xlabel('$k_i$')
-        ax.legend(loc = 'best')
-        ax.set_xscale('log')
-        ax.set_yscale('log')
-    fig.savefig('spec.pdf', format = 'pdf')
-    return None
-
-def contour_check(
-        info = pyJHTDB.dbinfo.isotropic1024coarse,
-        lJHTDB = None):
-    if not lJHTDB:
-        print ('no library given')
-        return None
-    nplanes = 1
-    planes  = [numpy.zeros((nplanes, info['ny'], info['nz'], 3), dtype = numpy.float32),
-               numpy.zeros((nplanes, info['nz'], info['nx'], 3), dtype = numpy.float32),
-               numpy.zeros((nplanes, info['nx'], info['ny'], 3), dtype = numpy.float32)]
-    planes[0][:, :, :, 0] = info['xnodes'][::(info['nx']/nplanes), numpy.newaxis, numpy.newaxis]
-    planes[0][:, :, :, 1] = info['ynodes'][         numpy.newaxis,             :, numpy.newaxis]
-    planes[0][:, :, :, 2] = info['znodes'][         numpy.newaxis, numpy.newaxis,             :]
-    #planes[1][:, :, :, 0] = info['dx']*numpy.arange(.0, info['nx'], 1)
-    #planes[1][:, :, :, 1] = info['dy']*numpy.random.randint(0, info['ny'], size = (nplanes))[:, numpy.newaxis, numpy.newaxis]
-    #planes[1][:, :, :, 2] = info['dz']*numpy.arange(.0, info['nz'], 1)
-    #planes[2][:, :, :, 0] = info['dx']*numpy.arange(.0, info['nx'], 1)
-    #planes[2][:, :, :, 1] = info['dy']*numpy.arange(.0, info['ny'], 1)
-    #planes[2][:, :, :, 2] = info['dz']*numpy.random.randint(0, info['nz'], size = (nplanes))[:, numpy.newaxis, numpy.newaxis]
-    coordname = ['yz', 'zx', 'xy']
-    for i in range(1):
-        result = lJHTDB.getData(.1, planes[i],
-            sinterp = 0, tinterp = 0,
-            data_set = info['name'], getFunction = 'getVelocityAndPressure')
-        fig = plt.figure(figsize = (10.24,10.24))
-        ax = fig.add_axes([0, 0, 1, 1], frameon = False)
-        ax.set_axis_off()
-        ax.imshow(result[0, :, :, 0])
-        fig.savefig('plane_' + coordname[i] + '_0.png', format = 'png', dpi = 100)
-    return None
-
 if pyJHTDB.found_matplotlib:
+
+    def spectra_check(
+            info = pyJHTDB.dbinfo.isotropic1024coarse,
+            lJHTDB = None):
+        if not lJHTDB:
+            print ('no library given')
+            return None
+        nlines = 32
+        print(nlines, info['nx'], 3)
+        print(nlines, info['ny'], 3)
+        print(nlines, info['nz'], 3)
+        lines  = [numpy.zeros((nlines, info['nx'], 3), dtype = numpy.float32),
+                  numpy.zeros((nlines, info['ny'], 3), dtype = numpy.float32),
+                  numpy.zeros((nlines, info['nz'], 3), dtype = numpy.float32)]
+        lines[0][:, :, 0] = info['dx']*numpy.arange(.0, info['nx'], 1)
+        lines[0][:, :, 1] = info['dy']*numpy.random.randint(0, info['ny'], size = (nlines))[:, numpy.newaxis]
+        lines[0][:, :, 2] = info['dz']*numpy.random.randint(0, info['nz'], size = (nlines))[:, numpy.newaxis]
+        lines[1][:, :, 0] = info['dx']*numpy.random.randint(0, info['nx'], size = (nlines))[:, numpy.newaxis]
+        lines[1][:, :, 1] = info['dy']*numpy.arange(.0, info['ny'], 1)
+        lines[1][:, :, 2] = info['dz']*numpy.random.randint(0, info['nz'], size = (nlines))[:, numpy.newaxis]
+        lines[2][:, :, 0] = info['dx']*numpy.random.randint(0, info['nx'], size = (nlines))[:, numpy.newaxis]
+        lines[2][:, :, 1] = info['dy']*numpy.random.randint(0, info['ny'], size = (nlines))[:, numpy.newaxis]
+        lines[2][:, :, 2] = info['dz']*numpy.arange(.0, info['nz'], 1)
+        fig = plt.figure(figsize=(12.,6.))
+        axu = fig.add_axes([.05, .1, .4, .8])
+        axp = fig.add_axes([.55, .1, .4, .8])
+        coordname = ['x', 'y', 'z']
+        for i in range(3):
+            result = lJHTDB.getData(.0, lines[i],
+                sinterp = 0, tinterp = 0,
+                data_set = info['name'], getFunction = 'getVelocityAndPressure')
+            spec = numpy.fft.rfft(
+                    numpy.sum(result[:, :, :3]**2, axis = 2), axis = 1)
+            axu.plot(numpy.average(numpy.abs(spec), axis = 0), label = '$i = ' + coordname[i] + '$')
+            spec = numpy.fft.rfft(
+                    result[:, :, 3]**2, axis = 1)
+            axp.plot(numpy.average(numpy.abs(spec), axis = 0), label = '$i = ' + coordname[i] + '$')
+        axu.set_ylabel('$\\langle u_x^2 + u_y^2 + u_z^2 \\rangle$')
+        axp.set_ylabel('$\\langle p^2 \\rangle$')
+        for ax in [axu, axp]:
+            ax.set_xlabel('$k_i$')
+            ax.legend(loc = 'best')
+            ax.set_xscale('log')
+            ax.set_yscale('log')
+        fig.savefig('spec.pdf', format = 'pdf')
+        return None
+
+    def contour_check(
+            info = pyJHTDB.dbinfo.isotropic1024coarse,
+            lJHTDB = None):
+        if not lJHTDB:
+            print ('no library given')
+            return None
+        nplanes = 1
+        planes  = [numpy.zeros((nplanes, info['ny'], info['nz'], 3), dtype = numpy.float32),
+                   numpy.zeros((nplanes, info['nz'], info['nx'], 3), dtype = numpy.float32),
+                   numpy.zeros((nplanes, info['nx'], info['ny'], 3), dtype = numpy.float32)]
+        planes[0][:, :, :, 0] = info['xnodes'][::(info['nx']/nplanes), numpy.newaxis, numpy.newaxis]
+        planes[0][:, :, :, 1] = info['ynodes'][         numpy.newaxis,             :, numpy.newaxis]
+        planes[0][:, :, :, 2] = info['znodes'][         numpy.newaxis, numpy.newaxis,             :]
+        #planes[1][:, :, :, 0] = info['dx']*numpy.arange(.0, info['nx'], 1)
+        #planes[1][:, :, :, 1] = info['dy']*numpy.random.randint(0, info['ny'], size = (nplanes))[:, numpy.newaxis, numpy.newaxis]
+        #planes[1][:, :, :, 2] = info['dz']*numpy.arange(.0, info['nz'], 1)
+        #planes[2][:, :, :, 0] = info['dx']*numpy.arange(.0, info['nx'], 1)
+        #planes[2][:, :, :, 1] = info['dy']*numpy.arange(.0, info['ny'], 1)
+        #planes[2][:, :, :, 2] = info['dz']*numpy.random.randint(0, info['nz'], size = (nplanes))[:, numpy.newaxis, numpy.newaxis]
+        coordname = ['yz', 'zx', 'xy']
+        for i in range(1):
+            result = lJHTDB.getData(.1, planes[i],
+                sinterp = 0, tinterp = 0,
+                data_set = info['name'], getFunction = 'getVelocityAndPressure')
+            fig = plt.figure(figsize = (10.24,10.24))
+            ax = fig.add_axes([0, 0, 1, 1], frameon = False)
+            ax.set_axis_off()
+            ax.imshow(result[0, :, :, 0])
+            fig.savefig('plane_' + coordname[i] + '_0.png', format = 'png', dpi = 100)
+        return None
 
     def clean_2D_field(
             field_2D,
@@ -294,6 +294,18 @@ if pyJHTDB.found_matplotlib:
                 figname + '.' + img_type,
                 dpi = dpi,
                 format = img_type)
+        return None
+
+    def test_misc():
+        # load shared library
+        lJHTDB = pyJHTDB.libJHTDB()
+        #initialize webservices
+        lJHTDB.initialize()
+        spectra_check(lJHTDB = lJHTDB)
+        contour_check(lJHTDB = lJHTDB,
+                      info = pyJHTDB.dbinfo.channel)
+        #finalize webservices
+        lJHTDB.finalize()
         return None
 
 if pyJHTDB.found_h5py:
@@ -325,20 +337,6 @@ if pyJHTDB.found_h5py:
                 + data['u00000'][:, :, 0, 2]**2)
         clean_2D_field(energy, figname = 'tst_zy0')
         return None
-
-def test_misc():
-    # load shared library
-    lJHTDB = pyJHTDB.libJHTDB()
-    #initialize webservices
-    lJHTDB.initialize()
-
-    spectra_check(lJHTDB = lJHTDB)
-    contour_check(lJHTDB = lJHTDB,
-                  info = pyJHTDB.dbinfo.channel)
-
-    #finalize webservices
-    lJHTDB.finalize()
-    return None
 
 def test_rawData(
         info = pyJHTDB.dbinfo.channel,
@@ -399,12 +397,20 @@ def test_interp_1D(
             m = m)
     i.generate_clib()
 
-    xg = numpy.linspace(info['xnodes'][i.n+1], info['xnodes'][width[0] - i.n - 1], npoints)
+    xg = numpy.linspace(info['xnodes'][i.nx+1],
+                        info['xnodes'][width[0] - i.nx - 1],
+                        npoints)
     if info['yperiodic']:
-        yg = numpy.linspace(info['ynodes'][i.n+1], info['ynodes'][width[1] - i.n - 1], npoints)
+        yg = numpy.linspace(info['ynodes'][i.ny+1],
+                            info['ynodes'][width[1] - i.ny - 1],
+                            npoints)
     else:
-        yg = numpy.linspace(info['ynodes'][0], info['ynodes'][width[1] - i.n - 1], npoints)
-    zg = numpy.linspace(info['znodes'][i.n+1], info['znodes'][width[2] - i.n - 1], npoints)
+        yg = numpy.linspace(info['ynodes'][0],
+                            info['ynodes'][width[1] - i.ny - 1],
+                            npoints)
+    zg = numpy.linspace(info['znodes'][i.nz+1],
+                        info['znodes'][width[2] - i.nz - 1],
+                        npoints)
     x = numpy.zeros((npoints, 3), numpy.float32)
     x[:, 0] = xg[0]
     x[:, 1] = yg[:]
@@ -464,31 +470,32 @@ def test_interp_1D(
     del resdx1, resdy1, resdz1
     lJHTDB.finalize()
 
-    def compare_results(
-            fld0,
-            fld1,
-            figname = 'tst'):
-        fig = plt.figure(figsize=(6,6))
-        ax = fig.add_subplot(111)
-        ax.plot(fld0, color = 'blue')
-        ax.plot(fld1, color = 'red')
-        fig.savefig(figname + '.pdf', format = 'pdf')
+    if pyJHTDB.found_matplotlib:
+        def compare_results(
+                fld0,
+                fld1,
+                figname = 'tst'):
+            fig = plt.figure(figsize=(6,6))
+            ax = fig.add_subplot(111)
+            ax.plot(fld0, color = 'blue')
+            ax.plot(fld1, color = 'red')
+            fig.savefig(figname + '.pdf', format = 'pdf')
 
-    compare_results(
-            res0,
-            res1,
-            figname = 'tst')
+        compare_results(
+                res0,
+                res1,
+                figname = 'tst')
 
-    compare_results(
-            resd0,
-            resd1,
-            figname = 'dtst')
+        compare_results(
+                resd0,
+                resd1,
+                figname = 'dtst')
     dist = (numpy.average(numpy.sqrt(numpy.sum((res0 - res1)**2, axis = 1))) /
             numpy.average(numpy.sqrt(numpy.sum((res0)**2, axis = 1))))
-    print (dist)
+    print ('average distance for result {0}'.format(dist))
     ddist = (numpy.average(numpy.sqrt(numpy.sum((resd0 - resd1)**2, axis = 1))) /
              numpy.average(numpy.sqrt(numpy.sum((resd0)**2, axis = 1))))
-    print (ddist)
+    print ('average distance for dresult {0}'.format(ddist))
     return res0, res1, resd0, resd1
 
 def test_interp_2D(
@@ -694,6 +701,7 @@ def test_divfree(
 
 def test_local_vs_db_interp(
         info = pyJHTDB.dbinfo.channel,
+        time = 0.0,
         m = 1,
         q = 4,
         npoints = 256,
@@ -724,14 +732,14 @@ def test_local_vs_db_interp(
     lJHTDB.initialize()
     # get raw data to interpolate
     test_field = lJHTDB.getRawData(
-            0,
+            time,
             start = start,
             size  = width,
             data_set = info['name'],
             getFunction = 'Velocity')
     # get DB field
     res0 = lJHTDB.getData(
-            0,
+            time,
             x,
             sinterp = dbinterp[0],
             tinterp = 0,
@@ -739,7 +747,7 @@ def test_local_vs_db_interp(
             getFunction = 'getVelocity')
     # get DB gradient
     resd0 = lJHTDB.getData(
-            0,
+            time,
             x,
             sinterp = dbinterp[1],
             tinterp = 0,
@@ -802,6 +810,182 @@ def test_local_vs_db_interp(
             print (comp1[i] + ' ' +
                    '{0}, {1:+}, {2}'.format(distance, resd0[0, i], numpy.abs(resd0[0, i] - resd1[0, i])))
     return res0, res1, resd0, resd1
+
+class LocalInterpTest:
+    def __init__(
+            self,
+            info):
+        self.info = info
+        return None
+    def set_up_field(
+            self,
+            xnodes = [0,  64],
+            ynodes = [0, 128],
+            znodes = [0,  64],
+            buffer_size = 16):
+        self.buffer_size = 16
+        full_frame = h5py.File(
+            '/stuff/data/{0}/{0}_t0000.h5'.format(self.info['name']),
+            'r')
+        self.xnodes = xnodes
+        self.ynodes = ynodes
+        self.znodes = znodes
+        self.test_field = full_frame['u00000'][
+            self.znodes[0]:self.znodes[1],
+            self.ynodes[0]:self.ynodes[1],
+            self.xnodes[0]:self.xnodes[1]].copy()
+        self.y0buffer = min(self.buffer_size, self.ynodes[0])
+        full_frame.close()
+        return None
+    def set_up_points(
+            self,
+            npoints = 2**5,
+            yval = None):
+        self.npoints = npoints
+        if type(yval) == type(None):
+            if self.info['yperiodic']:
+                self.yindices = range(self.ynodes[0] + self.buffer_size,
+                                      self.ynodes[1] - self.buffer_size)
+            else:
+                self.yindices = range(self.ynodes[0] + self.y0buffer,
+                                      self.ynodes[1] - self.buffer_size)
+            self.p = numpy.random.random(
+                size = (npoints, self.yindices.shape[0], 3)).astype(numpy.float32)
+            if self.info['yperiodic']:
+                self.p[..., 1] *= self.info['dy']
+            else:
+                self.p[..., 1] *= self.info['dy'][None, self.yindices]
+            self.p[..., 1] += self.info['ynodes'][None, self.yindices]
+        else:
+            self.p = numpy.random.random(
+                size = (npoints, 3)).astype(numpy.float32)
+            if yval == 'random':
+                if self.info['yperiodic']:
+                    self.p[..., 1] = (
+                        self.info['ynodes'][self.ynodes[0] + self.buffer_size] +
+                        self.p[..., 1]*(
+                            self.info['ynodes'][self.ynodes[1] - self.buffer_size] -
+                            self.info['ynodes'][self.ynodes[0] + self.buffer_size]))
+                else:
+                    self.p[..., 1] = (
+                        self.info['ynodes'][self.ynodes[0] + self.y0buffer] +
+                        self.p[..., 1]*(
+                            self.info['ynodes'][self.ynodes[1] - self.buffer_size] -
+                            self.info['ynodes'][self.ynodes[0] + self.y0buffer]))
+            else:
+                self.p[..., 1] = yval
+        self.p[..., 0] = (
+            self.info['xnodes'][self.xnodes[0] + self.buffer_size] +
+            self.p[..., 0]*(
+                self.info['xnodes'][self.xnodes[1] - self.buffer_size] -
+                self.info['xnodes'][self.xnodes[0] + self.buffer_size]))
+        self.p[..., 2] = (
+            self.info['znodes'][self.znodes[0] + self.buffer_size] +
+            self.p[..., 2]*(
+                self.info['znodes'][self.znodes[1] - self.buffer_size] -
+                self.info['znodes'][self.znodes[0] + self.buffer_size]))
+        return None
+    def set_up_interpolators(
+            self,
+            pars = [[12, 3, 3, 2],
+                    [12, 4, 4, 2],
+                    [12, 5, 5, 2],
+                    [12, 6, 6, 2],
+                    [12, 7, 7, 2],
+                    [12, 8, 8, 2],
+                    [12, 9, 9, 2],
+                    [12,10,10, 2]]):
+        self.interp = []
+        self.keys   = []
+        for par in pars:
+            self.keys.append(
+                'nx{0:0>2}_ny{1:0>2}_nz{2:0>2}_m{3}'.format(
+                    par[0], par[1], par[2], par[3]))
+            self.interp.append(
+                pyJHTDB.interpolator.spline_interpolator(
+                    info = self.info,
+                    nx = par[0],
+                    ny = par[1],
+                    nz = par[2],
+                    m = par[3],
+                    initialize = False,
+                    cformula_unroll = False))
+        return None
+    def interpolate(
+            self):
+        self.uval = []
+        self.gradu = []
+        for k in range(len(self.keys)):
+            self.uval.append(self.interp[k].cinterpolate(
+                self.p,
+                self.test_field,
+                diff = [0, 0, 0],
+                field_offset = [self.xnodes[0],
+                                self.ynodes[0],
+                                self.znodes[0]]))
+            dxvel = self.interp[k].cinterpolate(
+                self.p,
+                self.test_field,
+                diff = [1, 0, 0],
+                field_offset = [self.xnodes[0],
+                                self.ynodes[0],
+                                self.znodes[0]])
+            dyvel = self.interp[k].cinterpolate(
+                self.p,
+                self.test_field,
+                diff = [0, 1, 0],
+                field_offset = [self.xnodes[0],
+                                self.ynodes[0],
+                                self.znodes[0]])
+            dzvel = self.interp[k].cinterpolate(
+                self.p,
+                self.test_field,
+                diff = [0, 0, 1],
+                field_offset = [self.xnodes[0],
+                                self.ynodes[0],
+                                self.znodes[0]])
+            self.gradu.append(numpy.zeros(
+                dxvel.shape[:-1] + (9,),
+                dtype = dxvel.dtype))
+            self.gradu[k][..., 0] = dxvel[..., 0]
+            self.gradu[k][..., 1] = dyvel[..., 0]
+            self.gradu[k][..., 2] = dzvel[..., 0]
+            self.gradu[k][..., 3] = dxvel[..., 1]
+            self.gradu[k][..., 4] = dyvel[..., 1]
+            self.gradu[k][..., 5] = dzvel[..., 1]
+            self.gradu[k][..., 6] = dxvel[..., 2]
+            self.gradu[k][..., 7] = dyvel[..., 2]
+            self.gradu[k][..., 8] = dzvel[..., 2]
+        self.uval  = numpy.array(self.uval)
+        self.gradu = numpy.array(self.gradu)
+        return None
+    def get_divergence(
+            self):
+        self.divu = []
+        self.divu_upper = []
+        self.divu_lower = []
+        for k in range(len(self.keys)):
+            factor = (numpy.sqrt(3) /
+                numpy.average(numpy.sqrt(
+                    self.gradu[k][..., 0]**2 +
+                    self.gradu[k][..., 4]**2 +
+                    self.gradu[k][..., 8]**2), axis = 0))
+            self.divu.append(factor*numpy.average(numpy.abs(
+                    self.gradu[k][..., 0] +
+                    self.gradu[k][..., 4] +
+                    self.gradu[k][..., 8]), axis = 0))
+            self.divu_upper.append(factor*numpy.percentile(numpy.abs(
+                    self.gradu[k][..., 0] +
+                    self.gradu[k][..., 4] +
+                    self.gradu[k][..., 8]), 90, axis = 0))
+            self.divu_lower.append(factor*numpy.percentile(numpy.abs(
+                    self.gradu[k][..., 0] +
+                    self.gradu[k][..., 4] +
+                    self.gradu[k][..., 8]), 10, axis = 0))
+        self.divu = numpy.array(self.divu)
+        self.divu_upper = numpy.array(self.divu_upper)
+        self.divu_lower = numpy.array(self.divu_lower)
+        return None
 
 if __name__ == '__main__':
     test_plain()

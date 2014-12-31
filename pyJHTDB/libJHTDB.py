@@ -26,6 +26,7 @@ import ctypes
 import inspect
 
 import pyJHTDB
+from pyJHTDB.dbinfo import interpolation_code
 
 class ThresholdInfo(ctypes.Structure):
     _fields_ = [('x', ctypes.c_int),
@@ -38,7 +39,10 @@ class libJHTDB(object):
             auth_token = pyJHTDB.auth_token):
         self.libname = 'libJHTDB'
         lib_location = os.path.dirname(inspect.getfile(pyJHTDB))
-        self.lib = np.ctypeslib.load_library(self.libname, os.path.abspath(os.path.join(lib_location, os.path.pardir)))
+        print(os.path.abspath(os.path.join(lib_location, os.path.pardir)))
+        self.lib = np.ctypeslib.load_library(
+            self.libname,
+            os.path.abspath(os.path.join(lib_location, os.path.pardir)))
         self.authToken = ctypes.c_char_p(auth_token.encode('ascii'))
         self.connection_on = False
         self.hdf5_file_list = []
@@ -85,6 +89,10 @@ class libJHTDB(object):
             print('point coordinates in getData must be floats. stopping.')
             sys.exit()
             return None
+        if (type(sinterp) == str):
+            sinterp = interpolation_code[sinterp]
+        if (type(tinterp) == str):
+            tinterp = interpolation_code[tinterp]
         npoints = point_coords.shape[0]
         for i in range(1, len(point_coords.shape)-1):
             npoints *= point_coords.shape[i]

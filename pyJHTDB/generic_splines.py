@@ -81,9 +81,9 @@ class generic_spline_1D:
             neighbours = 1):
         self.x = xvals.copy()
         self.dx = self.x[1:] - self.x[:self.x.shape[0] - 1]
-        self.m = max_deriv
-        self.n = neighbours
-        self.N = 2*neighbours + 2
+        self.m = int(np.floor(max_deriv))
+        self.n = int(np.floor(neighbours))
+        self.N = 2*self.n + 2
         self.periodic = not (period == None)
         self.uniform = (self.x.shape[0] == 2)
         self.deriv_coeff = []
@@ -284,9 +284,9 @@ class generic_spline_1D:
         # end and return 0
         src_txt += 'return EXIT_SUCCESS;\n}\n'
         src_txt += 'int ' + cprefix + 'indices' + csuffix + '('
-        src_txt += 'int cell, '     # which cell are we in?
         src_txt += (
-                ' int *index)' +    # array where to place the values of the beta polynomials
+                'int cell, ' +      # which cell are we in?
+                'int *index)' +    # array where to place the values of the beta polynomials
                 '\n{\n')
         if self.periodic:
             for i in range(self.n*2 + 2):
@@ -294,13 +294,27 @@ class generic_spline_1D:
         else:
             src_txt += (
                     'switch (cell)\n{\n')
-            for cell in range(len(self.beta)):
+            for cell in range(self.n):
                 src_txt += 'case {0}:\n'.format(cell)
                 for i in range(len(self.neighbour_list[cell])):
                     src_txt += 'index[{0}] = {1};\n'.format(i, self.neighbour_list[cell][i] - cell)
                 if len(self.neighbour_list[cell]) < self.n*2+2:
                     src_txt += 'index[{0}] = {1};\n'.format(self.n*2+1, self.neighbour_list[cell][-1] - cell)
                 src_txt += 'break;\n'
+            for cell in range(len(self.beta)-self.n, len(self.beta)):
+                src_txt += 'case {0}:\n'.format(cell)
+                for i in range(len(self.neighbour_list[cell])):
+                    src_txt += 'index[{0}] = {1};\n'.format(i, self.neighbour_list[cell][i] - cell)
+                if len(self.neighbour_list[cell]) < self.n*2+2:
+                    src_txt += 'index[{0}] = {1};\n'.format(self.n*2+1, self.neighbour_list[cell][-1] - cell)
+                src_txt += 'break;\n'
+            cell = self.n+1
+            src_txt += 'default:\n'.format(cell)
+            for i in range(len(self.neighbour_list[cell])):
+                src_txt += 'index[{0}] = {1};\n'.format(i, self.neighbour_list[cell][i] - cell)
+            if len(self.neighbour_list[cell]) < self.n*2+2:
+                src_txt += 'index[{0}] = {1};\n'.format(self.n*2+1, self.neighbour_list[cell][-1] - cell)
+            src_txt += 'break;\n'
             src_txt += ('\n}\n')    # end cell switch
         # end and return 0
         src_txt += 'return EXIT_SUCCESS;\n}\n'

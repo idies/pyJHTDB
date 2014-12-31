@@ -74,8 +74,11 @@ h5cc_present = not (h5cc_executable == None)
 #
 open('MANIFEST.in',
      'w').write(
-             'include turblib/*.c\n'
-             'include turblib/*.h\n'
+             'include turblib/turblib.c\n' +
+             'include turblib/soapC.c\n' +
+             'include turblib/soapClient.c\n' +
+             'include turblib/stdsoap2.c\n' +
+             'include turblib/*.h\n' +
              'include turblib/*.nsmap')
 #
 ########################################################################
