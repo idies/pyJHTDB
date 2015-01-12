@@ -286,7 +286,8 @@ class spline_interpolator:
             x = None,
             f = None,
             diff = [0, 0, 0],
-            field_offset = [0, 0, 0]):
+            field_offset = [0, 0, 0],
+            debug = False):
         if not self.clib_loaded:
             self.generate_clib()
         diff = np.array(diff).astype(np.int32)
@@ -297,7 +298,8 @@ class spline_interpolator:
         assert(field_offset.shape[0] == 3 and
                len(field_offset.shape) == 1)
         assert(f.flags['C_CONTIGUOUS'] and
-               f.dtype == np.float32)
+               f.dtype == np.float32 and
+               len(f.shape) == 4)
         y = np.ascontiguousarray(x.reshape(-1, 3), np.float32)
         node_array = np.zeros(y.shape, np.int32)
         node_array[:, 0] = np.floor(y[:, 0] / self.info['dx'])
@@ -313,6 +315,9 @@ class spline_interpolator:
         else:
             frac_array[:, 1] = (y[:, 1] - self.info['ynodes'][node_array[:, 1]]) / self.info['dy'][node_array[:, 1]]
         frac_array[:, 2] = y[:, 2] / self.info['dz'] - node_array[:, 2]
+        if debug:
+            print(node_array)
+            print(field_offset)
         s = np.ascontiguousarray(np.zeros((y.shape[0], f.shape[-1]), np.float32))
         getattr(self.clib, 'interpolate_' + self.base_cname)(
                 frac_array.ctypes.data_as(ct.POINTER(ct.c_float)),
