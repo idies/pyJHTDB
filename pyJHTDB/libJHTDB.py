@@ -39,7 +39,6 @@ class libJHTDB(object):
             auth_token = pyJHTDB.auth_token):
         self.libname = 'libJHTDB'
         lib_location = os.path.dirname(inspect.getfile(pyJHTDB))
-        print(os.path.abspath(os.path.join(lib_location, os.path.pardir)))
         self.lib = np.ctypeslib.load_library(
             self.libname,
             os.path.abspath(os.path.join(lib_location, os.path.pardir)))
