@@ -68,6 +68,7 @@ class spline_interpolator:
         self.mx = int(np.floor(m)) if (type(mx) == type(None)) else int(np.floor(mx))
         self.my = int(np.floor(m)) if (type(my) == type(None)) else int(np.floor(my))
         self.mz = int(np.floor(m)) if (type(mz) == type(None)) else int(np.floor(mz))
+        self.m = min(self.nx, self.ny, self.nz)
         self.info = info
         self.clib_loaded = False
         self.cformula_unroll = cformula_unroll
