@@ -39,9 +39,8 @@ def get_cutout(
         data_type = 'u',
         auth_token = 'edu.jhu.pha.turbulence.testing-201302',
         base_website = 'turbulence.pha.jhu.edu'):
-    url = ('http://' + base_website + '/cutout/download.aspx/'
-         + auth_token + '/'
-         + data_set + '/' + data_type + '/'
+    url = ('http://{0}/cutout/download.aspx/{1}/{2}/{3}/'.format(
+                base_website, auth_token, data_set, data_type)
          + '{0},{1}/'.format(t0, tl)
          + '{0},{1}/'.format(x0, xl)
          + '{0},{1}/'.format(y0, yl)

@@ -70,7 +70,7 @@ lib_folder = os.path.join(homefolder, '.config/', 'JHTDB/')
 # check if .config/JHTDB folder exists, create it if not
 if os.path.isdir(lib_folder):
     if os.path.exists(os.path.join(lib_folder, 'auth_token.txt')):
-        auth_token = open(os.path.join(lib_folder, 'auth_token.txt'), 'r').readline().split()[0]
+        auth_token = str(open(os.path.join(lib_folder, 'auth_token.txt'), 'r').readline().split()[0])
     else:
         open(os.path.join(lib_folder, 'auth_token.txt'), 'w').write(auth_token)
 else:
