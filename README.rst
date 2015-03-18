@@ -47,6 +47,7 @@ Bare-bone installation:
     sudo apt-get install python-setuptools
     sudo apt-get install python-dev
     sudo easy_install numpy
+    python update_turblib.py
     sudo python setup.py install
 
 Note that doing this should, in principle, also install ``sympy`` on
@@ -64,6 +65,7 @@ Happy fun installation:
     sudo easy_install numpy
     sudo easy_install h5py
     sudo easy_install matplotlib
+    python update_turblib.py
     sudo python setup.py install
 
 I haven't tested the installation on any other system, but I think
@@ -94,7 +96,7 @@ Configuration
 While our service is open to anyone, we would like to keep track of who
 is using the service, and how. To this end, we would like each user or
 site to obtain an authorization token from us:
-http://turbulence.pha.jhu.edu/help/authtoken.html
+http://turbulence.pha.jhu.edu/help/authtoken.aspx
 For simple experimentation, the default token included in the package
 should be valid.
 

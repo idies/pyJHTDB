@@ -39,7 +39,6 @@ class libJHTDB(object):
             auth_token = pyJHTDB.auth_token):
         self.libname = 'libJHTDB'
         lib_location = os.path.dirname(inspect.getfile(pyJHTDB))
-        print(os.path.abspath(os.path.join(lib_location, os.path.pardir)))
         self.lib = np.ctypeslib.load_library(
             self.libname,
             os.path.abspath(os.path.join(lib_location, os.path.pardir)))
@@ -485,7 +484,7 @@ class libJHTDB(object):
             print('you didn\'t connect to the database')
             sys.exit()
         if not (x0.shape[1] == 3 and len(x0.shape) == 2):
-            print(('wrong shape of initial condition in getBlineAlt, ', x0.shape))
+            print(('wrong shape of initial condition in getBlineSphereBounded, ', x0.shape))
             sys.exit()
             return None
         nsteps = int(S / abs(ds))
@@ -541,7 +540,7 @@ class libJHTDB(object):
             print('you didn\'t connect to the database')
             sys.exit()
         if not (x0.shape[1] == 3 and len(x0.shape) == 2):
-            print(('wrong shape of initial condition in getBlineAlt, ', x0.shape))
+            print(('wrong shape of initial condition in getBlineSphereBoundedDebug, ', x0.shape))
             sys.exit()
             return None
         nsteps = int(S / abs(ds))
@@ -598,7 +597,7 @@ class libJHTDB(object):
             print('you didn\'t connect to the database')
             sys.exit()
         if not (x0.shape[1] == 3 and len(x0.shape) == 2):
-            print(('wrong shape of initial condition in getBlineAlt, ', x0.shape))
+            print(('wrong shape of initial condition in getBlineRectBounded, ', x0.shape))
             sys.exit()
             return None
         nsteps = int(S / abs(ds))
