@@ -94,7 +94,7 @@ Configuration
 While our service is open to anyone, we would like to keep track of who
 is using the service, and how. To this end, we would like each user or
 site to obtain an authorization token from us:
-http://turbulence.pha.jhu.edu/help/authtoken.html
+http://turbulence.pha.jhu.edu/help/authtoken.aspx
 For simple experimentation, the default token included in the package
 should be valid.
 
