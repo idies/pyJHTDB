@@ -80,12 +80,9 @@ class libJHTDB(object):
         if not self.connection_on:
             print('you didn\'t connect to the database')
             sys.exit()
+        point_coords = np.asarray(point_coords, dtype=np.float32)
         if not (point_coords.shape[-1] == 3):
             print ('wrong number of values for coordinates in getData')
-            sys.exit()
-            return None
-        if not (point_coords.dtype == np.float32):
-            print('point coordinates in getData must be floats. stopping.')
             sys.exit()
             return None
         if (type(sinterp) == str):
