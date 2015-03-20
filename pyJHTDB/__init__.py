@@ -63,7 +63,7 @@ except DistributionNotFound:
 else:
     __version__ = _dist.version
 
-auth_token = 'edu.jhu.pha.turbulence.testing-201302'
+auth_token = 'edu.jhu.pha.turbulence.testing-201406'
 homefolder = os.path.expanduser('~')
 lib_folder = os.path.join(homefolder, '.config/', 'JHTDB/')
 
