@@ -343,13 +343,13 @@ class spline_interpolator:
                           '_zm{0}q{1}'.format(self.mz, self.nz*2 + 2))
         else:
             self.cfile_name = cfile_name
+        base_xname = 'xm{0}q{1}'.format(self.mx, self.nx*2 + 2)
+        base_yname = 'ym{0}q{1}'.format(self.my, self.ny*2 + 2)
+        base_zname = 'zm{0}q{1}'.format(self.mz, self.nz*2 + 2)
         if type(base_cname) == type(None):
-            base_xname = 'xm{0}q{1}'.format(self.mx, self.nx*2 + 2)
-            base_yname = 'ym{0}q{1}'.format(self.my, self.ny*2 + 2)
-            base_zname = 'zm{0}q{1}'.format(self.mz, self.nz*2 + 2)
             self.base_cname = base_xname + '_' + base_yname + '_' + base_zname
         else:
-            self.base_name = base_name
+            self.base_cname = base_cname
         if os.path.exists(self.cfile_name + '.c'):
             return None
         if (not self.initialized):
