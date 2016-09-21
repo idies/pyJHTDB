@@ -187,7 +187,7 @@ int getSphericalBoundedBline(
     // traj will contain all the trajectories, and traj_length will contain the lengths of all trajectories
     // the shape of traj is assumed to be (number of particles, allocated_traj_length, 3)
     int p, s;
-    float bsize, rad0, rad1, stmp, xtmp, ytmp, ztmp, valtmp;
+    float bsize, rad0, rad_one, stmp, xtmp, ytmp, ztmp, valtmp;
     float (*x)[3];
 	float y[1][3];
 	float bfield0[1][3];
@@ -224,7 +224,7 @@ int getSphericalBoundedBline(
             x[1][0] = x[0][0] + .5*ds*(bfield0[0][0] + bfield1[0][0]);
             x[1][1] = x[0][1] + .5*ds*(bfield0[0][1] + bfield1[0][1]);
             x[1][2] = x[0][2] + .5*ds*(bfield0[0][2] + bfield1[0][2]);
-            if ((rad1 = sqrt((x[1][0] - ox)*(x[1][0] - ox)
+            if ((rad_one = sqrt((x[1][0] - ox)*(x[1][0] - ox)
                            + (x[1][1] - oy)*(x[1][1] - oy)
                            + (x[1][2] - oz)*(x[1][2] - oz))) > radius)
             {
@@ -234,12 +234,12 @@ int getSphericalBoundedBline(
                 //valtmp = (x[0][0] - ox)*(x[1][0] - ox)
                 //       + (x[0][1] - oy)*(x[1][1] - oy)
                 //       + (x[0][2] - oz)*(x[1][2] - oz);
-                //stmp = (2*(1 - valtmp) + sqrt(4*(1 - 2*valtmp + valtmp*valtmp) + 4*radius*radius*(rad1*rad1 + rad0*rad0 - 2*valtmp))) / (2 * (rad1*rad1 + rad0*rad0 - 2*valtmp));
+                //stmp = (2*(1 - valtmp) + sqrt(4*(1 - 2*valtmp + valtmp*valtmp) + 4*radius*radius*(rad_one*rad_one + rad0*rad0 - 2*valtmp))) / (2 * (rad_one*rad_one + rad0*rad0 - 2*valtmp));
                 //xtmp = x[0][0]*(1 - stmp) + stmp * x[1][0];
                 //ytmp = x[0][1]*(1 - stmp) + stmp * x[1][1];
                 //ztmp = x[0][2]*(1 - stmp) + stmp * x[1][2];
                 //fprintf(stderr, "%g %g %g\n", stmp, xtmp, x[1][0]);
-                //stmp = (2*(1 - valtmp) - sqrt(4*(1 - 2*valtmp + valtmp*valtmp) + 4*radius*radius*(rad1*rad1 + rad0*rad0 - 2*valtmp))) / (2 * (rad1*rad1 + rad0*rad0 - 2*valtmp));
+                //stmp = (2*(1 - valtmp) - sqrt(4*(1 - 2*valtmp + valtmp*valtmp) + 4*radius*radius*(rad_one*rad_one + rad0*rad0 - 2*valtmp))) / (2 * (rad_one*rad_one + rad0*rad0 - 2*valtmp));
                 //fprintf(stderr, "%g %g %g\n", stmp, xtmp, x[1][0]);
                 //x[1][0] = xtmp;
                 //x[1][1] = ytmp;
@@ -292,7 +292,7 @@ int getSphericalBoundedBlineDebug(
     // traj will contain all the trajectories, and traj_length will contain the lengths of all trajectories
     // the shape of traj is assumed to be (number of particles, allocated_traj_length, 3)
     int p, s;
-    float bsize, rad0, rad1, stmp, xtmp, ytmp, ztmp, valtmp;
+    float bsize, rad0, rad_one, stmp, xtmp, ytmp, ztmp, valtmp;
     float (*x)[3];
 	float bfield0[1][3];
 
@@ -314,10 +314,10 @@ int getSphericalBoundedBlineDebug(
             x[1][0] = x[0][0] + ds*bfield0[0][0];
             x[1][1] = x[0][1] + ds*bfield0[0][1];
             x[1][2] = x[0][2] + ds*bfield0[0][2];
-            rad1 = sqrt((x[1][0] - ox)*(x[1][0] - ox)
+            rad_one = sqrt((x[1][0] - ox)*(x[1][0] - ox)
                       + (x[1][1] - oy)*(x[1][1] - oy)
                       + (x[1][2] - oz)*(x[1][2] - oz));
-            if (rad1 > radius)
+            if (rad_one > radius)
             {
                 //rad0 = sqrt((x[0][0] - ox)*(x[0][0] - ox)
                 //          + (x[0][1] - oy)*(x[0][1] - oy)
@@ -325,12 +325,12 @@ int getSphericalBoundedBlineDebug(
                 //valtmp = (x[0][0] - ox)*(x[1][0] - ox)
                 //       + (x[0][1] - oy)*(x[1][1] - oy)
                 //       + (x[0][2] - oz)*(x[1][2] - oz);
-                //stmp = (2*(1 - valtmp) + sqrt(4*(1 - 2*valtmp + valtmp*valtmp) + 4*radius*radius*(rad1*rad1 + rad0*rad0 - 2*valtmp))) / (2 * (rad1*rad1 + rad0*rad0 - 2*valtmp));
+                //stmp = (2*(1 - valtmp) + sqrt(4*(1 - 2*valtmp + valtmp*valtmp) + 4*radius*radius*(rad_one*rad_one + rad0*rad0 - 2*valtmp))) / (2 * (rad_one*rad_one + rad0*rad0 - 2*valtmp));
                 //xtmp = x[0][0]*(1 - stmp) + stmp * x[1][0];
                 //ytmp = x[0][1]*(1 - stmp) + stmp * x[1][1];
                 //ztmp = x[0][2]*(1 - stmp) + stmp * x[1][2];
                 //fprintf(stderr, "%g %g %g\n", stmp, xtmp, x[1][0]);
-                //stmp = (2*(1 - valtmp) - sqrt(4*(1 - 2*valtmp + valtmp*valtmp) + 4*radius*radius*(rad1*rad1 + rad0*rad0 - 2*valtmp))) / (2 * (rad1*rad1 + rad0*rad0 - 2*valtmp));
+                //stmp = (2*(1 - valtmp) - sqrt(4*(1 - 2*valtmp + valtmp*valtmp) + 4*radius*radius*(rad_one*rad_one + rad0*rad0 - 2*valtmp))) / (2 * (rad_one*rad_one + rad0*rad0 - 2*valtmp));
                 //fprintf(stderr, "%g %g %g\n", stmp, xtmp, x[1][0]);
                 //x[1][0] = xtmp;
                 //x[1][1] = ytmp;
