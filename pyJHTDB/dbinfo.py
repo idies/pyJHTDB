@@ -78,7 +78,7 @@ for coord in ['x', 'y', 'z']:
     isotropic1024coarse['d' + coord] = np.pi/512
     isotropic1024coarse[coord + 'periodic'] = True
     isotropic1024coarse[coord + 'uniform'] = True
-isotropic1024coarse['time'] = np.array(list(range(1024)), dtype = np.float32) * 2.048 / 1024
+isotropic1024coarse['time'] = np.array(list(range(5028)), dtype = np.float32) * 10.056 / 5028
 isotropic1024coarse['diss'] = 0.0928
 isotropic1024coarse['nu']   = 0.000185
 
@@ -121,7 +121,7 @@ channel['dy'] = channel['ynodes'][1:] - channel['ynodes'][:channel['ynodes'].sha
 channel['dy'] = np.append(channel['dy'], [channel['dy'][0]])
 channel['yperiodic'] = False
 channel['yuniform'] = False
-channel['time'] = np.array(list(range(1024)), dtype = np.float32) * 0.0065
+channel['time'] = np.array(list(range(4000)), dtype = np.float32) * 0.0065
 channel['nu'] = 5e-5
 
 def generate_temp_dbinfo(
