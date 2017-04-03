@@ -157,6 +157,8 @@ class libJHTDB(object):
             result_dim = 3
         elif getFunction in ['Pressure']:
             result_dim = 1
+        elif (getFunction in ['Density'])&(data_set in ['mixing']):
+            result_dim = 1
         else:
             print(('wrong result type requested in getRawData\n'
                  + 'maybe it\'s just missing from the list?'))
