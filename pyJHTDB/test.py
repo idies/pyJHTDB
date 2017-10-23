@@ -321,8 +321,7 @@ if pyJHTDB.found_h5py:
                 chunk_zdim = 13,
                 data_set = 'mhd1024',
                 data_type = 'ub',
-                filename = 'tmp',
-                base_website = 'turbulence.pha.jhu.edu')
+                filename = 'tmp')
         data = h5py.File('tmp.h5', mode = 'r')
         energy = (data['u00000'][0, :, :, 0]**2
                 + data['u00000'][0, :, :, 1]**2
