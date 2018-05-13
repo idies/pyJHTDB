@@ -82,9 +82,54 @@ isotropic1024coarse['time'] = np.array(list(range(5028)), dtype = np.float32) * 
 isotropic1024coarse['diss'] = 0.0928
 isotropic1024coarse['nu']   = 0.000185
 
+
+isotropic1024fine = {'name'   : 'isotropic1024fine'}
+isotropic1024fine['name'] = 'isotropic1024fine'
+
+for coord in ['x', 'y', 'z']:
+    isotropic1024fine[coord + 'nodes'] = (np.pi/512)*np.array(list(range(1024)), dtype = np.float32)
+    isotropic1024fine['n' + coord] = 1024
+    isotropic1024fine['l' + coord] = 2*np.pi
+    isotropic1024fine['d' + coord] = np.pi/512
+    isotropic1024fine[coord + 'periodic'] = True
+    isotropic1024fine[coord + 'uniform'] = True
+isotropic1024fine['time'] = np.array(list(range(100)), dtype = np.float32) * 0.0198/99
+isotropic1024fine['diss'] = 0.0928
+isotropic1024fine['nu']   = 0.000185
+
+isotropic4096 = {'name'   : 'isotropic4096'}
+isotropic4096['name'] = 'isotropic4096'
+
+for coord in ['x', 'y', 'z']:
+    isotropic4096[coord + 'nodes'] = (np.pi/512)*np.array(list(range(4096)), dtype = np.float32)
+    isotropic4096['n' + coord] = 4096
+    isotropic4096['l' + coord] = 2*np.pi
+    isotropic4096['d' + coord] = np.pi/512
+    isotropic4096[coord + 'periodic'] = True
+    isotropic4096[coord + 'uniform'] = True
+isotropic4096['diss'] = 1.4144
+isotropic4096['nu']   = 1.732e-4
+isotropic4096['time']   = [0]
+
+
+rotstrat4096 = {'name'   : 'rotstrat4096'}
+rotstrat4096['name'] = 'rotstrat4096'
+
+for coord in ['x', 'y', 'z']:
+    rotstrat4096[coord + 'nodes'] = (np.pi/512)*np.array(list(range(4096)), dtype = np.float32)
+    rotstrat4096['n' + coord] = 4096
+    rotstrat4096['l' + coord] = 2*np.pi
+    rotstrat4096['d' + coord] = np.pi/512
+    rotstrat4096[coord + 'periodic'] = True
+    rotstrat4096[coord + 'uniform'] = True
+rotstrat4096['diss'] = 0.0123
+rotstrat4096['nu']   = 4e-5
+rotstrat4096['time']   = range(0,5)
+
 mhd1024 = {}
 for key in list(isotropic1024coarse.keys()):
     mhd1024[key] = isotropic1024coarse[key]
+
 mhd1024['name'] = 'mhd1024'
 
 for coord in ['x', 'y', 'z']:

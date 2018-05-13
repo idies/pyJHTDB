@@ -60,6 +60,10 @@ class libJHTDB(object):
         self.lib.soapdestroy()
         self.connection_on = False
         return None
+
+    def add_token(self,token):
+        self.authToken = token
+
     def add_hdf5_file(self, filename):
         if pyJHTDB.found_h5py and (not filename in self.hdf5_file_list):
             self.hdf5_file_list.append(filename)
@@ -71,12 +75,13 @@ class libJHTDB(object):
             return self.lib.turblibAddLocalSource(ctypes.c_char_p((filename + '.h5').encode('ascii')))
         else:
             return 0
+
     def getData(self,
-            time, point_coords,
-            sinterp = 0, tinterp = 0,
-            data_set = 'isotropic1024coarse',
-            getFunction = 'getVelocity',
-            make_modulo = False):
+                time, point_coords,
+                sinterp=0, tinterp=0,
+                data_set='isotropic1024coarse',
+                getFunction='getVelocity',
+                make_modulo=False):
         if not self.connection_on:
             print('you didn\'t connect to the database')
             sys.exit()
@@ -93,12 +98,12 @@ class libJHTDB(object):
         if (type(tinterp) == str):
             tinterp = interpolation_code[tinterp]
         npoints = point_coords.shape[0]
-        for i in range(1, len(point_coords.shape)-1):
+        for i in range(1, len(point_coords.shape) - 1):
             npoints *= point_coords.shape[i]
         if make_modulo:
             pcoords = np.zeros(point_coords.shape, np.float64)
             pcoords[:] = point_coords
-            np.mod(pcoords, 2*np.pi, point_coords)
+            np.mod(pcoords, 2 * np.pi, point_coords)
         if not getFunction[0:3] == 'get':
             getFunction = 'get' + getFunction
         get_data = getattr(self.lib, getFunction)
@@ -112,11 +117,12 @@ class libJHTDB(object):
                            'getVelocityLaplacian',
                            'getMagneticFieldLaplacian',
                            'getVectorPotentialLaplacian',
-                           'getPressureGradient']:
+                           'getPressureGradient',
+                           'getTemperatureGradient']:
             result_dim = 3
-        elif getFunction in ['getVelocityAndPressure']:
+        elif getFunction in ['getVelocityAndPressure', 'getVelocityAndTemperature']:
             result_dim = 4
-        elif getFunction in ['getPressureHessian']:
+        elif getFunction in ['getPressureHessian', 'getTemperatureHessian']:
             result_dim = 6
         elif getFunction in ['getVelocityGradient',
                              'getMagneticFieldGradient',
@@ -126,12 +132,14 @@ class libJHTDB(object):
                              'getMagneticFieldHessian',
                              'getVectorPotentialHessian']:
             result_dim = 18
+        elif getFunction in ['getPressure', 'getTemperature']:
+            result_dim = 1
         else:
             print(('wrong result type requested in getData\n'
-                 + 'maybe it\'s just missing from the list?'))
+                   + 'maybe it\'s just missing from the list?'))
             sys.exit()
             return None
-        newshape = list(point_coords.shape[0:len(point_coords.shape)-1])
+        newshape = list(point_coords.shape[0:len(point_coords.shape) - 1])
         newshape.append(result_dim)
         result_array = np.empty(newshape, dtype=np.float32)
         get_data(self.authToken,
@@ -141,13 +149,14 @@ class libJHTDB(object):
                  point_coords.ctypes.data_as(ctypes.POINTER(ctypes.POINTER(ctypes.c_float))),
                  result_array.ctypes.data_as(ctypes.POINTER(ctypes.POINTER(ctypes.c_float))))
         return result_array
+
     def getRawData(
             self,
             time,
-            start = np.array([0, 0, 0], dtype = np.int),
-            size  = np.array([8, 8, 8], dtype = np.int),
-            data_set = 'channel',
-            getFunction = 'Velocity'):
+            start=np.array([0, 0, 0], dtype=np.int),
+            size=np.array([8, 8, 8], dtype=np.int),
+            data_set='channel',
+            getFunction='Velocity'):
         if not self.connection_on:
             print('you didn\'t connect to the database')
             sys.exit()
@@ -155,13 +164,11 @@ class libJHTDB(object):
                            'MagneticField',
                            'VectorPotential']:
             result_dim = 3
-        elif getFunction in ['Pressure']:
-            result_dim = 1
-        elif (getFunction in ['Density'])&(data_set in ['mixing']):
+        elif getFunction in ['Pressure', 'Temperature']:
             result_dim = 1
         else:
             print(('wrong result type requested in getRawData\n'
-                 + 'maybe it\'s just missing from the list?'))
+                   + 'maybe it\'s just missing from the list?'))
             sys.exit()
             return None
         getFunction = 'getRaw' + getFunction
@@ -178,6 +185,7 @@ class libJHTDB(object):
                  ctypes.c_int(size[2]),
                  result_array.ctypes.data_as(ctypes.POINTER(ctypes.c_char)))
         return result_array
+
     def getBoxFilter(self,
             time, point_coords,
             data_set = 'isotropic1024coarse',
@@ -212,6 +220,7 @@ class libJHTDB(object):
                  point_coords.ctypes.data_as(ctypes.POINTER(ctypes.POINTER(ctypes.c_float))),
                  result_array.ctypes.data_as(ctypes.POINTER(ctypes.POINTER(ctypes.c_float))))
         return result_array
+
     def getThreshold(
             self,
             data_set = 'isotropic1024coarse',
@@ -250,6 +259,7 @@ class libJHTDB(object):
             data[i]['z'] = result[i].z
             data[i]['value'] = result[i].value
         return data
+
     def getPosition(self,
             starttime = 0.0,
             endtime = 0.1,
@@ -290,6 +300,7 @@ class libJHTDB(object):
             print('got next position for time step {0}'.format(tstep))
             traj_array[tstep] = result_array
         return traj_array, time_array
+
     def getFilteredPosition(self,
             starttime = 0.0,
             endtime = 0.1,
@@ -330,6 +341,7 @@ class libJHTDB(object):
             traj_array[tstep] = result_array
             time_array[tstep] = starttime + tstep * integration_time
         return traj_array, time_array
+
     def getBlines(self,
             time = 0.0,
             ds = 0.0004,
@@ -371,6 +383,7 @@ class libJHTDB(object):
             y = history[s-1] + ds * bhat0
             history[s] = history[s-1] + .5*ds * (bhat0 + getBunit(y))
         return history
+
     def getBline(self,
             time = 0.0,
             ds = 0.0004,
@@ -397,6 +410,7 @@ class libJHTDB(object):
         history[0] = point
         result_array = point.copy()
         get_data = getattr(self.lib, 'getMagneticField')
+
         def getBunit(point_coords):
             #print point_coords
             get_data(
@@ -418,6 +432,7 @@ class libJHTDB(object):
             y = history[s-1] + ds * bhat0
             history[s] = history[s-1] + .5*ds * (bhat0 + getBunit(y))
         return history
+
     def get2wayBline(self,
             time = 0.0,
             ds = 0.0004,
@@ -446,6 +461,7 @@ class libJHTDB(object):
                 data_set = data_set,
                 out_of_domain = out_of_domain)
         return np.concatenate((l1[::-1], l0[1:]), axis = 0)
+
     def getBlineAlt(self,
             time, nsteps, ds,
             x0,
@@ -471,6 +487,7 @@ class libJHTDB(object):
                 ctypes.c_int(sinterp), ctypes.c_int(tinterp), ctypes.c_int(npoints),
                 result_array.ctypes.data_as(ctypes.POINTER(ctypes.POINTER(ctypes.c_float))))
         return result_array
+
     def getBlineSphereBounded(self,
             time = 0,
             S = 0.05,
@@ -527,6 +544,7 @@ class libJHTDB(object):
             for l in range(len(bline_list)):
                 bline_list[l] = np.concatenate((result_array[l, 1:length_array[l]][::-1].copy(), bline_list[l]), axis = 0)
         return bline_list
+
     def getBlineSphereBoundedDebug(self,
             time = 0,
             S = 0.05,
@@ -583,6 +601,7 @@ class libJHTDB(object):
             for l in range(len(bline_list)):
                 bline_list[l] = np.concatenate((result_array[l, 1:length_array[l]][::-1].copy(), bline_list[l]), axis = 0)
         return bline_list
+
     def getBlineRectBounded(self,
             time = 0,
             S = 0.05,
