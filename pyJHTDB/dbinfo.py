@@ -169,6 +169,29 @@ channel['yuniform'] = False
 channel['time'] = np.array(list(range(4000)), dtype = np.float32) * 0.0065
 channel['nu'] = 5e-5
 
+channel5200 = {
+        'name'   : 'channel5200',
+        'xnodes' : np.array(range(10240))*(8*np.pi/10240),
+        'ynodes' : np.loadtxt(os.path.join(package_dir, 'data/big_channel_Y_COOR.txt')),
+        'znodes' : np.array(range(7680))*(3*np.pi/7680),
+        'lx'     : 8*np.pi,
+        'ly'     : 2.,
+        'lz'     : 3*np.pi,}
+
+for coord in ['x', 'z']:
+    channel5200['n' + coord] = channel5200[coord + 'nodes'].shape[0]
+    channel5200[coord + 'periodic'] = True
+    channel5200[coord + 'uniform'] = True
+    channel5200['d' + coord] = channel5200['l' + coord] / channel5200['n' + coord]
+
+channel5200['ny'] = channel5200['ynodes'].shape[0]
+channel5200['dy'] = channel5200['ynodes'][1:] - channel5200['ynodes'][:channel5200['ynodes'].shape[0]-1]
+channel5200['dy'] = np.append(channel5200['dy'], [channel5200['dy'][0]])
+channel5200['yperiodic'] = False
+channel5200['yuniform'] = False
+channel5200['time'] = np.array(list(range(10)), dtype = np.float32) * 0.7 # FIXME
+channel5200['nu'] = 8e-6
+
 def generate_temp_dbinfo(
         field):
     info = {'name': 'temp',
