@@ -65,17 +65,17 @@ else:
 
 auth_token = 'edu.jhu.pha.turbulence.testing-201406'
 homefolder = os.path.expanduser('~')
-lib_folder = os.path.join(homefolder, '.config/', 'JHTDB/')
+#lib_folder = os.path.join(homefolder, '.config/', 'JHTDB/')
 
 # check if .config/JHTDB folder exists, create it if not
-if os.path.isdir(lib_folder):
-    if os.path.exists(os.path.join(lib_folder, 'auth_token.txt')):
-        auth_token = str(open(os.path.join(lib_folder, 'auth_token.txt'), 'r').readline().split()[0])
-    else:
-        open(os.path.join(lib_folder, 'auth_token.txt'), 'w').write(auth_token)
-else:
-    os.mkdir(lib_folder)
-    open(os.path.join(lib_folder, 'auth_token.txt'), 'w').write(auth_token)
+#if os.path.isdir(lib_folder):
+#    if os.path.exists(os.path.join(lib_folder, 'auth_token.txt')):
+#        auth_token = str(open(os.path.join(lib_folder, 'auth_token.txt'), 'r').readline().split()[0])
+#    else:
+#        open(os.path.join(lib_folder, 'auth_token.txt'), 'w').write(auth_token)
+#else:
+#    os.mkdir(lib_folder)
+#    open(os.path.join(lib_folder, 'auth_token.txt'), 'w').write(auth_token)
 
 try:
     import h5py
