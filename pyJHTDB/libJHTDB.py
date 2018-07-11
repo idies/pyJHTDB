@@ -62,7 +62,7 @@ class libJHTDB(object):
         return None
 
     def add_token(self,token):
-        self.authToken = token
+        self.authToken = ctypes.c_char_p(token.encode('ascii'))
 
     def add_hdf5_file(self, filename):
         if pyJHTDB.found_h5py and (not filename in self.hdf5_file_list):

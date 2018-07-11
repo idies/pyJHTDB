@@ -106,4 +106,3 @@ from .test import test_interp_1D as test_interpolator
 from .generic_splines import main0 as test_gs
 if found_h5py:
     from .test import test_cutout
-

@@ -107,7 +107,7 @@ setup(
         name = 'pyJHTDB',
         version = VERSION,
         packages = ['pyJHTDB'],
-        scripts=['scripts/pyJHTDB-auth'],
+      ###scripts=['scripts/pyJHTDB-auth'],
         package_data = {'pyJHTDB': ['data/channel_xgrid.npy',
                                     'data/channel_ygrid.npy',
                                     'data/channel_zgrid.npy',
