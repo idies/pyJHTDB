@@ -22,6 +22,10 @@
 
 
 ########################################################################
+
+import os
+import sys
+
 #
 # some global settings
 #
@@ -99,7 +103,8 @@ libJHTDB = Extension(
                    'turblib/soapC.c',
                    'turblib/soapClient.c',
                    'turblib/stdsoap2.c'],
-        include_dirs = ['turblib'],
+        include_dirs = ['turblib',
+                        os.path.join(sys.exec_prefix, 'include')],
         define_macros = macros,
         libraries = libraries)
 
