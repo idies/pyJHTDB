@@ -29,12 +29,6 @@
 #include <stdlib.h>
 #include <math.h>
 
-#ifdef CUTOUT_SUPPORT
-
-#include <hdf5.h>
-
-#endif//CUTOUT_SUPPORT
-
 #include <turblib.h>
 
 // relative error of single precision numbers
@@ -344,7 +338,6 @@ int getSphericalBoundedBlineDebug(
     return 0;
 }
 
-#ifdef CUTOUT_SUPPORT
 int set_custom_dataset_description(float dx, float dt, int size)
 {
     extern set_info DataSets[8];
@@ -354,249 +347,247 @@ int set_custom_dataset_description(float dx, float dt, int size)
     return 0;
 }
 
-int read_from_file(
-        char *dataset,
-        int tindex,
-        int xindex, int xsize,
-        int yindex, int ysize,
-        int zindex, int zsize,
-        float *ufield,
-        float *bfield)
-{
-    TurbDataset dataset_ = getDataSet(dataset);
-    hsize_t dim_mem[] = {zsize, ysize, xsize, 3};
-    hid_t mspace = H5Screate_simple(4, dim_mem, NULL);
-    loadSubBlock(
-            dataset_,
-            turb_velocity,
-            tindex,
-            mspace,
-            ufield,
-            xindex, yindex, zindex,
-            xsize,
-            ysize,
-            zsize,
-            0, 0, 0);
-    loadSubBlock(
-            dataset_,
-            turb_magnetic,
-            tindex,
-            mspace,
-            bfield,
-            xindex, yindex, zindex,
-            xsize,
-            ysize,
-            zsize,
-            0, 0, 0);
-    return 0;
-}
+//int read_from_file(
+//        char *dataset,
+//        int tindex,
+//        int xindex, int xsize,
+//        int yindex, int ysize,
+//        int zindex, int zsize,
+//        float *ufield,
+//        float *bfield)
+//{
+//    TurbDataset dataset_ = getDataSet(dataset);
+//    hsize_t dim_mem[] = {zsize, ysize, xsize, 3};
+//    hid_t mspace = H5Screate_simple(4, dim_mem, NULL);
+//    loadSubBlock(
+//            dataset_,
+//            turb_velocity,
+//            tindex,
+//            mspace,
+//            ufield,
+//            xindex, yindex, zindex,
+//            xsize,
+//            ysize,
+//            zsize,
+//            0, 0, 0);
+//    loadSubBlock(
+//            dataset_,
+//            turb_magnetic,
+//            tindex,
+//            mspace,
+//            bfield,
+//            xindex, yindex, zindex,
+//            xsize,
+//            ysize,
+//            zsize,
+//            0, 0, 0);
+//    return 0;
+//}
 
-int getCustomPosition(
-        char *authToken,
-        char *dataset,
-        float startTime,
-        float endTime,
-        float dt,
-        enum SpatialInterpolation spatial,
-        int count,
-        float datain[][3],
-        float dataout[][3])
-{
-    TurbDataset dataset_ = getDataSet(dataset);
-    extern set_info DataSets[8];
-    float vel0[count][3], time0;
-    float vel1[count][3];
-    float vel[count][3];
-    float time, deltat;
-    int p, tcounter, nsteps;
-    deltat = DataSets[dataset_].dt;
-    nsteps = ceil((endTime - startTime) / dt);
-    dt = (endTime - startTime) / nsteps;
-    for (p = 0; p < count; p++)
-    {
-        dataout[p][0] = datain[p][0];
-        dataout[p][1] = datain[p][1];
-        dataout[p][2] = datain[p][2];
-    }
-    time = startTime;
-    for (tcounter = 0; tcounter < nsteps; tcounter++)
-    {
-        time0 = deltat * floor(time / deltat);
-        getVelocity(authToken, dataset, time         , spatial, 0, count, datain, vel0);
-        getVelocity(authToken, dataset, time + deltat, spatial, 0, count, datain, vel1);
-        for (p = 0; p < count; p++)
-        {
-            vel[p][0] = ((time - time0) / deltat) * (vel1[p][0] - vel0[p][0]) + vel0[p][0];
-            vel[p][1] = ((time - time0) / deltat) * (vel1[p][1] - vel0[p][1]) + vel0[p][1];
-            vel[p][2] = ((time - time0) / deltat) * (vel1[p][2] - vel0[p][2]) + vel0[p][2];
-            dataout[p][0] = dataout[p][0] + dt * vel[p][0];
-            dataout[p][1] = dataout[p][1] + dt * vel[p][1];
-            dataout[p][2] = dataout[p][2] + dt * vel[p][2];
-        }
-        time += dt;
-    }
-    return 0;
-}
+//int getCustomPosition(
+//        char *authToken,
+//        char *dataset,
+//        float startTime,
+//        float endTime,
+//        float dt,
+//        enum SpatialInterpolation spatial,
+//        int count,
+//        float datain[][3],
+//        float dataout[][3])
+//{
+//    TurbDataset dataset_ = getDataSet(dataset);
+//    extern set_info DataSets[8];
+//    float vel0[count][3], time0;
+//    float vel1[count][3];
+//    float vel[count][3];
+//    float time, deltat;
+//    int p, tcounter, nsteps;
+//    deltat = DataSets[dataset_].dt;
+//    nsteps = ceil((endTime - startTime) / dt);
+//    dt = (endTime - startTime) / nsteps;
+//    for (p = 0; p < count; p++)
+//    {
+//        dataout[p][0] = datain[p][0];
+//        dataout[p][1] = datain[p][1];
+//        dataout[p][2] = datain[p][2];
+//    }
+//    time = startTime;
+//    for (tcounter = 0; tcounter < nsteps; tcounter++)
+//    {
+//        time0 = deltat * floor(time / deltat);
+//        getVelocity(authToken, dataset, time         , spatial, 0, count, datain, vel0);
+//        getVelocity(authToken, dataset, time + deltat, spatial, 0, count, datain, vel1);
+//        for (p = 0; p < count; p++)
+//        {
+//            vel[p][0] = ((time - time0) / deltat) * (vel1[p][0] - vel0[p][0]) + vel0[p][0];
+//            vel[p][1] = ((time - time0) / deltat) * (vel1[p][1] - vel0[p][1]) + vel0[p][1];
+//            vel[p][2] = ((time - time0) / deltat) * (vel1[p][2] - vel0[p][2]) + vel0[p][2];
+//            dataout[p][0] = dataout[p][0] + dt * vel[p][0];
+//            dataout[p][1] = dataout[p][1] + dt * vel[p][1];
+//            dataout[p][2] = dataout[p][2] + dt * vel[p][2];
+//        }
+//        time += dt;
+//    }
+//    return 0;
+//}
+//
+//int isBLocal(
+//        const char *data_set,
+//        int x,
+//        int y,
+//        int z,
+//        int time)
+//{
+//    TurbDataset d = getDataSet(data_set);
+//    return isDataComplete(
+//            d,
+//            2,
+//            x - 16,
+//            y - 16,
+//            z - 16,
+//            32,
+//            32,
+//            32,
+//            time);
+//}
 
-int isBLocal(
-        const char *data_set,
-        int x,
-        int y,
-        int z,
-        int time)
-{
-    TurbDataset d = getDataSet(data_set);
-    return isDataComplete(
-            d,
-            2,
-            x - 16,
-            y - 16,
-            z - 16,
-            32,
-            32,
-            32,
-            time);
-}
+//int interpolateBoxFilter(
+//        char *authToken,
+//        char *dataset, char *field, float time, float filterwidth,
+//        int count, float datain[][3], float dataout[][3])
+//{
+//    extern set_info DataSets[8];
+//    float cell_nodes[8*count][3];
+//    float cellvalues[8*count][3];
+//    int p;
+//    float xx, yy, zz;
+//    TurbDataset dataset_ = getDataSet(dataset);
+//    float dx = DataSets[dataset_].dx;
+//    for (p = 0; p < count; p++)
+//    {
+//        // corner 000
+//        cell_nodes[8*p][0] = dx*floor(datain[p][0]/dx);
+//        cell_nodes[8*p][1] = dx*floor(datain[p][1]/dx);
+//        cell_nodes[8*p][2] = dx*floor(datain[p][2]/dx);
+//        // corner 001
+//        cell_nodes[8*p + 1][0] = cell_nodes[8*p][0] + dx;
+//        cell_nodes[8*p + 1][1] = cell_nodes[8*p][1]     ;
+//        cell_nodes[8*p + 1][2] = cell_nodes[8*p][2]     ;
+//        // corner 010
+//        cell_nodes[8*p + 2][0] = cell_nodes[8*p][0]     ;
+//        cell_nodes[8*p + 2][1] = cell_nodes[8*p][1] + dx;
+//        cell_nodes[8*p + 2][2] = cell_nodes[8*p][2]     ;
+//        // corner 011
+//        cell_nodes[8*p + 3][0] = cell_nodes[8*p][0] + dx;
+//        cell_nodes[8*p + 3][1] = cell_nodes[8*p][1] + dx;
+//        cell_nodes[8*p + 3][2] = cell_nodes[8*p][2]     ;
+//        // corner 100
+//        cell_nodes[8*p + 4][0] = cell_nodes[8*p][0]     ;
+//        cell_nodes[8*p + 4][1] = cell_nodes[8*p][1]     ;
+//        cell_nodes[8*p + 4][2] = cell_nodes[8*p][2] + dx;
+//        // corner 101
+//        cell_nodes[8*p + 5][0] = cell_nodes[8*p][0] + dx;
+//        cell_nodes[8*p + 5][1] = cell_nodes[8*p][1]     ;
+//        cell_nodes[8*p + 5][2] = cell_nodes[8*p][2] + dx;
+//        // corner 110
+//        cell_nodes[8*p + 6][0] = cell_nodes[8*p][0]     ;
+//        cell_nodes[8*p + 6][1] = cell_nodes[8*p][1] + dx;
+//        cell_nodes[8*p + 6][2] = cell_nodes[8*p][2] + dx;
+//        // corner 111
+//        cell_nodes[8*p + 7][0] = cell_nodes[8*p][0] + dx;
+//        cell_nodes[8*p + 7][1] = cell_nodes[8*p][1] + dx;
+//        cell_nodes[8*p + 7][2] = cell_nodes[8*p][2] + dx;
+//    }
+//    getBoxFilter(
+//            authToken,
+//            dataset,
+//            field,
+//            time,
+//            filterwidth,
+//            8*count,
+//            cell_nodes,
+//            cellvalues);
+//    for (p = 0; p < count; p++)
+//    {
+//        // get fractions
+//        xx = (datain[p][0] - cell_nodes[8*p][0]) / dx;
+//        yy = (datain[p][1] - cell_nodes[8*p][1]) / dx;
+//        zz = (datain[p][2] - cell_nodes[8*p][2]) / dx;
+//        // not most efficient way of writing the formula, but the most clear
+//        dataout[p][0] = (((cellvalues[8*p  ][0]*(1-xx) + cellvalues[8*p+1][0]*xx)*(1-yy)
+//                        + (cellvalues[8*p+2][0]*(1-xx) + cellvalues[8*p+3][0]*xx)* yy   )*(1-zz)
+//                        +((cellvalues[8*p+4][0]*(1-xx) + cellvalues[8*p+5][0]*xx)*(1-yy)
+//                        + (cellvalues[8*p+6][0]*(1-xx) + cellvalues[8*p+7][0]*xx)* yy   )* zz);
+//        dataout[p][1] = (((cellvalues[8*p  ][1]*(1-xx) + cellvalues[8*p+1][1]*xx)*(1-yy)
+//                        + (cellvalues[8*p+2][1]*(1-xx) + cellvalues[8*p+3][1]*xx)* yy   )*(1-zz)
+//                        +((cellvalues[8*p+4][1]*(1-xx) + cellvalues[8*p+5][1]*xx)*(1-yy)
+//                        + (cellvalues[8*p+6][1]*(1-xx) + cellvalues[8*p+7][1]*xx)* yy   )* zz);
+//        dataout[p][2] = (((cellvalues[8*p  ][2]*(1-xx) + cellvalues[8*p+1][2]*xx)*(1-yy)
+//                        + (cellvalues[8*p+2][2]*(1-xx) + cellvalues[8*p+3][2]*xx)* yy   )*(1-zz)
+//                        +((cellvalues[8*p+4][2]*(1-xx) + cellvalues[8*p+5][2]*xx)*(1-yy)
+//                        + (cellvalues[8*p+6][2]*(1-xx) + cellvalues[8*p+7][2]*xx)* yy   )* zz);
+//    }
+//    return 0;
+//}
 
-int interpolateBoxFilter(
-        char *authToken,
-        char *dataset, char *field, float time, float filterwidth,
-        int count, float datain[][3], float dataout[][3])
-{
-    extern set_info DataSets[8];
-    float cell_nodes[8*count][3];
-    float cellvalues[8*count][3];
-    int p;
-    float xx, yy, zz;
-    TurbDataset dataset_ = getDataSet(dataset);
-    float dx = DataSets[dataset_].dx;
-    for (p = 0; p < count; p++)
-    {
-        // corner 000
-        cell_nodes[8*p][0] = dx*floor(datain[p][0]/dx);
-        cell_nodes[8*p][1] = dx*floor(datain[p][1]/dx);
-        cell_nodes[8*p][2] = dx*floor(datain[p][2]/dx);
-        // corner 001
-        cell_nodes[8*p + 1][0] = cell_nodes[8*p][0] + dx;
-        cell_nodes[8*p + 1][1] = cell_nodes[8*p][1]     ;
-        cell_nodes[8*p + 1][2] = cell_nodes[8*p][2]     ;
-        // corner 010
-        cell_nodes[8*p + 2][0] = cell_nodes[8*p][0]     ;
-        cell_nodes[8*p + 2][1] = cell_nodes[8*p][1] + dx;
-        cell_nodes[8*p + 2][2] = cell_nodes[8*p][2]     ;
-        // corner 011
-        cell_nodes[8*p + 3][0] = cell_nodes[8*p][0] + dx;
-        cell_nodes[8*p + 3][1] = cell_nodes[8*p][1] + dx;
-        cell_nodes[8*p + 3][2] = cell_nodes[8*p][2]     ;
-        // corner 100
-        cell_nodes[8*p + 4][0] = cell_nodes[8*p][0]     ;
-        cell_nodes[8*p + 4][1] = cell_nodes[8*p][1]     ;
-        cell_nodes[8*p + 4][2] = cell_nodes[8*p][2] + dx;
-        // corner 101
-        cell_nodes[8*p + 5][0] = cell_nodes[8*p][0] + dx;
-        cell_nodes[8*p + 5][1] = cell_nodes[8*p][1]     ;
-        cell_nodes[8*p + 5][2] = cell_nodes[8*p][2] + dx;
-        // corner 110
-        cell_nodes[8*p + 6][0] = cell_nodes[8*p][0]     ;
-        cell_nodes[8*p + 6][1] = cell_nodes[8*p][1] + dx;
-        cell_nodes[8*p + 6][2] = cell_nodes[8*p][2] + dx;
-        // corner 111
-        cell_nodes[8*p + 7][0] = cell_nodes[8*p][0] + dx;
-        cell_nodes[8*p + 7][1] = cell_nodes[8*p][1] + dx;
-        cell_nodes[8*p + 7][2] = cell_nodes[8*p][2] + dx;
-    }
-    getBoxFilter(
-            authToken,
-            dataset,
-            field,
-            time,
-            filterwidth,
-            8*count,
-            cell_nodes,
-            cellvalues);
-    for (p = 0; p < count; p++)
-    {
-        // get fractions
-        xx = (datain[p][0] - cell_nodes[8*p][0]) / dx;
-        yy = (datain[p][1] - cell_nodes[8*p][1]) / dx;
-        zz = (datain[p][2] - cell_nodes[8*p][2]) / dx;
-        // not most efficient way of writing the formula, but the most clear
-        dataout[p][0] = (((cellvalues[8*p  ][0]*(1-xx) + cellvalues[8*p+1][0]*xx)*(1-yy)
-                        + (cellvalues[8*p+2][0]*(1-xx) + cellvalues[8*p+3][0]*xx)* yy   )*(1-zz)
-                        +((cellvalues[8*p+4][0]*(1-xx) + cellvalues[8*p+5][0]*xx)*(1-yy)
-                        + (cellvalues[8*p+6][0]*(1-xx) + cellvalues[8*p+7][0]*xx)* yy   )* zz);
-        dataout[p][1] = (((cellvalues[8*p  ][1]*(1-xx) + cellvalues[8*p+1][1]*xx)*(1-yy)
-                        + (cellvalues[8*p+2][1]*(1-xx) + cellvalues[8*p+3][1]*xx)* yy   )*(1-zz)
-                        +((cellvalues[8*p+4][1]*(1-xx) + cellvalues[8*p+5][1]*xx)*(1-yy)
-                        + (cellvalues[8*p+6][1]*(1-xx) + cellvalues[8*p+7][1]*xx)* yy   )* zz);
-        dataout[p][2] = (((cellvalues[8*p  ][2]*(1-xx) + cellvalues[8*p+1][2]*xx)*(1-yy)
-                        + (cellvalues[8*p+2][2]*(1-xx) + cellvalues[8*p+3][2]*xx)* yy   )*(1-zz)
-                        +((cellvalues[8*p+4][2]*(1-xx) + cellvalues[8*p+5][2]*xx)*(1-yy)
-                        + (cellvalues[8*p+6][2]*(1-xx) + cellvalues[8*p+7][2]*xx)* yy   )* zz);
-    }
-    return 0;
-}
-
-int getFilteredPosition(
-        char *authToken,
-        char *dataset,
-        float startTime,
-        float endTime,
-        float dt,
-        float filterwidth,
-        int count,
-        float datain[][3],
-        float dataout[][3])
-{
-    float vel0[count][3], vel1[count][3];
-    float y[count][3];
-    float time, deltat;
-    int p, tcounter, nsteps;
-    nsteps = ceil((endTime - startTime) / dt);
-    dt = (endTime - startTime) / nsteps;
-    for (p = 0; p < count; p++)
-    {
-        dataout[p][0] = datain[p][0];
-        dataout[p][1] = datain[p][1];
-        dataout[p][2] = datain[p][2];
-    }
-    time = startTime;
-    for (tcounter = 0; tcounter < nsteps; tcounter++)
-    {
-        interpolateBoxFilter(
-                authToken,
-                dataset,
-                "velocity",
-                time,
-                filterwidth,
-                count,
-                dataout,
-                vel0);
-        for (p = 0; p < count; p++)
-        {
-            y[p][0] = dataout[p][0] + dt * vel0[p][0];
-            y[p][1] = dataout[p][1] + dt * vel0[p][1];
-            y[p][2] = dataout[p][2] + dt * vel0[p][2];
-        }
-        time += dt;
-        interpolateBoxFilter(
-                authToken,
-                dataset,
-                "velocity",
-                time,
-                filterwidth,
-                count,
-                y,
-                vel1);
-        for (p = 0; p < count; p++)
-        {
-            dataout[p][0] = dataout[p][0] + dt * .5 * (vel0[p][0] + vel1[p][0]);
-            dataout[p][1] = dataout[p][1] + dt * .5 * (vel0[p][1] + vel1[p][1]);
-            dataout[p][2] = dataout[p][2] + dt * .5 * (vel0[p][2] + vel1[p][2]);
-        }
-    }
-    return 0;
-}
-
-#endif//CUTOUT_SUPPORT
+//int getFilteredPosition(
+//        char *authToken,
+//        char *dataset,
+//        float startTime,
+//        float endTime,
+//        float dt,
+//        float filterwidth,
+//        int count,
+//        float datain[][3],
+//        float dataout[][3])
+//{
+//    float vel0[count][3], vel1[count][3];
+//    float y[count][3];
+//    float time, deltat;
+//    int p, tcounter, nsteps;
+//    nsteps = ceil((endTime - startTime) / dt);
+//    dt = (endTime - startTime) / nsteps;
+//    for (p = 0; p < count; p++)
+//    {
+//        dataout[p][0] = datain[p][0];
+//        dataout[p][1] = datain[p][1];
+//        dataout[p][2] = datain[p][2];
+//    }
+//    time = startTime;
+//    for (tcounter = 0; tcounter < nsteps; tcounter++)
+//    {
+//        interpolateBoxFilter(
+//                authToken,
+//                dataset,
+//                "velocity",
+//                time,
+//                filterwidth,
+//                count,
+//                dataout,
+//                vel0);
+//        for (p = 0; p < count; p++)
+//        {
+//            y[p][0] = dataout[p][0] + dt * vel0[p][0];
+//            y[p][1] = dataout[p][1] + dt * vel0[p][1];
+//            y[p][2] = dataout[p][2] + dt * vel0[p][2];
+//        }
+//        time += dt;
+//        interpolateBoxFilter(
+//                authToken,
+//                dataset,
+//                "velocity",
+//                time,
+//                filterwidth,
+//                count,
+//                y,
+//                vel1);
+//        for (p = 0; p < count; p++)
+//        {
+//            dataout[p][0] = dataout[p][0] + dt * .5 * (vel0[p][0] + vel1[p][0]);
+//            dataout[p][1] = dataout[p][1] + dt * .5 * (vel0[p][1] + vel1[p][1]);
+//            dataout[p][2] = dataout[p][2] + dt * .5 * (vel0[p][2] + vel1[p][2]);
+//        }
+//    }
+//    return 0;
+//}
 

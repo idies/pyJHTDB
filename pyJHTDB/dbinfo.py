@@ -172,7 +172,7 @@ channel['nu'] = 5e-5
 channel5200 = {
         'name'   : 'channel5200',
         'xnodes' : np.array(range(10240))*(8*np.pi/10240),
-        'ynodes' : np.loadtxt(os.path.join(package_dir, 'data/big_channel_Y_COOR.txt')),
+        'ynodes' : np.load(os.path.join(package_dir, 'data/channel5200_ygrid.npy')),
         'znodes' : np.array(range(7680))*(3*np.pi/7680),
         'lx'     : 8*np.pi,
         'ly'     : 2.,
@@ -189,8 +189,35 @@ channel5200['dy'] = channel5200['ynodes'][1:] - channel5200['ynodes'][:channel52
 channel5200['dy'] = np.append(channel5200['dy'], [channel5200['dy'][0]])
 channel5200['yperiodic'] = False
 channel5200['yuniform'] = False
-channel5200['time'] = np.array(list(range(10)), dtype = np.float32) * 0.7 # FIXME
+channel5200['time'] = np.array(list(range(10)), dtype = np.float32) # FIXME
 channel5200['nu'] = 8e-6
+
+transition_bl = {
+        'name'   : 'transition_bl',
+        'xnodes' : np.array(range(3320))*0.292210466,
+        'ynodes' : np.load(os.path.join(package_dir, 'data/transition_bl_ygrid.npy')),
+        'znodes' : np.array(range(2048))*0.117244748,
+        'lx'     : 969.8465,
+        'ly'     : 2.,
+        'lz'     : 240.,}
+
+for coord in ['z']:
+    transition_bl['n' + coord] = transition_bl[coord + 'nodes'].shape[0]
+    transition_bl[coord + 'periodic'] = True
+    transition_bl[coord + 'uniform'] = True
+    transition_bl['d' + coord] = channel5200['l' + coord] / channel5200['n' + coord]
+
+transition_bl['nx'] = channel5200['xnodes'].shape[0]
+transition_bl['yperiodic'] = False
+transition_bl['yuniform'] = True
+
+transition_bl['ny'] = channel5200['ynodes'].shape[0]
+transition_bl['dy'] = channel5200['ynodes'][1:] - channel5200['ynodes'][:channel5200['ynodes'].shape[0]-1]
+transition_bl['dy'] = np.append(channel5200['dy'], [channel5200['dy'][0]])
+transition_bl['yperiodic'] = False
+transition_bl['yuniform'] = False
+transition_bl['time'] = np.array(list(range(4701)), dtype = np.float32) * 0.25
+transition_bl['nu'] = 0.00125
 
 def generate_temp_dbinfo(
         field):

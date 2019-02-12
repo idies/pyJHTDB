@@ -6,7 +6,7 @@ pyJHTDB
 Python wrapper for the JHU Turbulence Database Cluster library.
 More information can be found at http://turbulence.pha.jhu.edu/.
 
-Installing pypi version
+Installing pypi version (RECOMMENDED)
 =======================
 
 If you have ``pip``, you can simply do this:
@@ -68,13 +68,7 @@ Happy fun installation:
     python update_turblib.py
     sudo python setup.py install
 
-I haven't tested the installation on any other system, but I think
-reasonable variations on the above should work for the minimal
-installation on all unix systems (i.e. for MacOS as well).
-If you manage to get it working (i.e. you import test_plain like the
-README says and you can run it), please let me know what steps you
-needed to take for your system, so I can append the instructions to
-this file.
+The procedures are similar in MacOS.
 
 Basic usage
 ===========
@@ -100,13 +94,8 @@ http://turbulence.pha.jhu.edu/help/authtoken.aspx
 For simple experimentation, the default token included in the package
 should be valid.
 
-If you do obtain an authorization token, please write it in the file
-``auth_token.txt``, in the folder ``.config/JHTDB`` from your home
-folder. This folder should be generated automatically upon first
-importing the package.
 
 The ``.config/JHTDB`` folder is also used to store data used by the
 ``pyJHTDB.interpolator.spline_interpolator`` class, including shared
 libraries. If you do not plan on using the local interpolation
 functionality, no data files will be generated.
-

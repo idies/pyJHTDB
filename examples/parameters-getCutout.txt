@@ -1,0 +1,11 @@
+{
+"token":"edu.jhu.pha.turbulence.testing-201311",
+"dataset":"channel",
+"field":"u",
+"time_step":0,
+"xstart":0,"ystart":0,"zstart":0,
+"nx":256,"ny":256,"nz":256,
+"xstep":4,"ystep":4,"zstep":4,
+"Filter_Width":1,
+"format":"vtk"
+}

@@ -708,7 +708,7 @@ def test_local_vs_db_interp(
         start = numpy.array([0, 0, 0], dtype = numpy.int),
         width = numpy.array([91, 67, 31], dtype = numpy.int),
         messages_on = False,
-	token = "edu.jhu.pha.turbulence.testing-201311"):
+        token = "edu.jhu.pha.turbulence.testing-201311"):
 
     i = pyJHTDB.interpolator.spline_interpolator(
             info = info,
@@ -734,7 +734,7 @@ def test_local_vs_db_interp(
 
     # get raw data to interpolate
     test_field = lJHTDB.getRawData(
-            time,
+            int(time),
             start = start,
             size  = width,
             data_set = info['name'],

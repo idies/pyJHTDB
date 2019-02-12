@@ -39,6 +39,7 @@ class libJHTDB(object):
             auth_token = pyJHTDB.auth_token):
         self.libname = 'libJHTDB'
         lib_location = os.path.dirname(inspect.getfile(pyJHTDB))
+        print(lib_location)
         self.lib = np.ctypeslib.load_library(
             self.libname,
             os.path.abspath(os.path.join(lib_location, os.path.pardir)))
@@ -64,17 +65,17 @@ class libJHTDB(object):
     def add_token(self,token):
         self.authToken = ctypes.c_char_p(token.encode('ascii'))
 
-    def add_hdf5_file(self, filename):
-        if pyJHTDB.found_h5py and (not filename in self.hdf5_file_list):
-            self.hdf5_file_list.append(filename)
-            data = pyJHTDB.h5py.File(filename + '.h5', mode = 'r')
-            self.hdf5_file_desc[filename] = {}
-            for key in ['_contents', '_dataset', '_size', '_start']:
-                self.hdf5_file_desc[filename][key] = data[key][:]
-            data.close()
-            return self.lib.turblibAddLocalSource(ctypes.c_char_p((filename + '.h5').encode('ascii')))
-        else:
-            return 0
+#    def add_hdf5_file(self, filename):
+#        if pyJHTDB.found_h5py and (not filename in self.hdf5_file_list):
+#            self.hdf5_file_list.append(filename)
+#            data = pyJHTDB.h5py.File(filename + '.h5', mode = 'r')
+#            self.hdf5_file_desc[filename] = {}
+#            for key in ['_contents', '_dataset', '_size', '_start']:
+#                self.hdf5_file_desc[filename][key] = data[key][:]
+#            data.close()
+#            return self.lib.turblibAddLocalSource(ctypes.c_char_p((filename + '.h5').encode('ascii')))
+#        else:
+#            return 0
 
     def getData(self,
                 time, point_coords,
@@ -152,7 +153,7 @@ class libJHTDB(object):
 
     def getRawData(
             self,
-            time,
+            time=0,
             start=np.array([0, 0, 0], dtype=np.int),
             size=np.array([8, 8, 8], dtype=np.int),
             data_set='channel',
@@ -176,13 +177,60 @@ class libJHTDB(object):
         result_array = np.empty(tuple(list(size[::-1]) + [result_dim]), dtype=np.float32)
         get_data(self.authToken,
                  ctypes.c_char_p(data_set.encode('ascii')),
-                 ctypes.c_float(time),
+                 ctypes.c_int(time),
                  ctypes.c_int(start[0]),
                  ctypes.c_int(start[1]),
                  ctypes.c_int(start[2]),
                  ctypes.c_int(size[0]),
                  ctypes.c_int(size[1]),
                  ctypes.c_int(size[2]),
+                 result_array.ctypes.data_as(ctypes.POINTER(ctypes.c_char)))
+        return result_array
+    
+    def getCutout(
+            self,
+            data_set='isotropic1024coarse',
+            field='u',
+            time=0,
+            start=np.array([0, 0, 0], dtype=np.int),
+            size=np.array([8, 8, 8], dtype=np.int),
+            step=np.array([1, 1, 1], dtype=np.int),
+            filter_width=1):
+        if not self.connection_on:
+            print('you didn\'t connect to the database')
+            sys.exit()
+        if field in ['u', 'a', 'b']:
+            result_dim = 3
+        elif field in ['p', 'd', 't']:
+            result_dim = 1
+        else:
+            print(('wrong result type requested in getCutout\n'
+                   + 'maybe it\'s just missing from the list?'))
+            sys.exit()
+            return None
+        
+        tempa=np.arange(start[0], start[0]+size[0], step[0])
+        tempb=np.arange(start[1], start[1]+size[1], step[1])
+        tempc=np.arange(start[2], start[2]+size[2], step[2])
+        real_size=np.array([np.size(tempa), np.size(tempb), np.size(tempc)], dtype=np.int)
+        
+        getFunction = 'getCutout'
+        get_data = getattr(self.lib, getFunction)
+        result_array = np.empty(tuple(list(real_size[::-1]) + [result_dim]), dtype=np.float32)
+        get_data(self.authToken,
+                 ctypes.c_char_p(data_set.encode('ascii')),
+                 ctypes.c_char_p(field.encode('ascii')),
+                 ctypes.c_int(time),
+                 ctypes.c_int(start[0]),
+                 ctypes.c_int(start[1]),
+                 ctypes.c_int(start[2]),
+                 ctypes.c_int(size[0]),
+                 ctypes.c_int(size[1]),
+                 ctypes.c_int(size[2]),
+                 ctypes.c_int(step[0]),
+                 ctypes.c_int(step[1]),
+                 ctypes.c_int(step[2]),
+                 ctypes.c_int(filter_width),
                  result_array.ctypes.data_as(ctypes.POINTER(ctypes.c_char)))
         return result_array
 
