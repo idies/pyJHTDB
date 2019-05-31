@@ -321,8 +321,7 @@ if pyJHTDB.found_h5py:
                 chunk_zdim = 13,
                 data_set = 'mhd1024',
                 data_type = 'ub',
-                filename = 'tmp',
-                base_website = 'turbulence.pha.jhu.edu')
+                filename = 'tmp')
         data = h5py.File('tmp.h5', mode = 'r')
         energy = (data['u00000'][0, :, :, 0]**2
                 + data['u00000'][0, :, :, 1]**2
@@ -708,7 +707,8 @@ def test_local_vs_db_interp(
         dbinterp = [8, 44],
         start = numpy.array([0, 0, 0], dtype = numpy.int),
         width = numpy.array([91, 67, 31], dtype = numpy.int),
-        messages_on = False):
+        messages_on = False,
+        token = "edu.jhu.pha.turbulence.testing-201311"):
 
     i = pyJHTDB.interpolator.spline_interpolator(
             info = info,
@@ -730,9 +730,11 @@ def test_local_vs_db_interp(
 
     lJHTDB = pyJHTDB.libJHTDB()
     lJHTDB.initialize()
+    lJHTDB.add_token(token)
+
     # get raw data to interpolate
     test_field = lJHTDB.getRawData(
-            time,
+            int(time),
             start = start,
             size  = width,
             data_set = info['name'],

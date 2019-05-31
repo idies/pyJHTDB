@@ -1,0 +1,10 @@
+{
+"token":"edu.jhu.pha.turbulence.testing-201311",
+"dataset":"isotropic1024coarse",
+"fields":"up",
+"tstart":1,"tend":8,"tstep":3,
+"xstart":1,"ystart":1,"zstart":1,
+"xend":16,"yend":16,"zend":16,
+"xstep":2,"ystep":2,"zstep":2,
+"Filter_Width":1
+}

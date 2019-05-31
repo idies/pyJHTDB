@@ -38,13 +38,15 @@ def get_cutout(
         data_set = 'isotropic1024coarse',
         data_type = 'u',
         auth_token = 'edu.jhu.pha.turbulence.testing-201302',
-        base_website = 'turbulence.pha.jhu.edu'):
-    url = ('http://{0}/cutout/download.aspx/{1}/{2}/{3}/'.format(
+        base_website = 'dsp033.pha.jhu.edu',
+        file_format = 'hdf5'):
+    url = ('http://{0}/jhtdb/getcutout/{1}/{2}/{3}/'.format(
                 base_website, auth_token, data_set, data_type)
          + '{0},{1}/'.format(t0, tl)
          + '{0},{1}/'.format(x0, xl)
          + '{0},{1}/'.format(y0, yl)
-         + '{0},{1}/'.format(z0, zl))
+         + '{0},{1}/'.format(z0, zl)
+         + '{0}/'.format(file_format))
     print(url)
     if data_type in ['u', 'b', 'a']:
         ncomponents = 3
@@ -77,7 +79,8 @@ def get_big_cutout(
         data_set = 'isotropic1024coarse',
         data_type = 'u',
         auth_token = 'edu.jhu.pha.turbulence.testing-201302',
-        base_website = 'turbulence.pha.jhu.edu'):
+        base_website = 'dsp033.pha.jhu.edu',
+        file_format = 'hdf5'):
     big_data_file = h5py.File(filename + '.h5', mode='w')
     xchunk_list = [chunk_xdim for n in range(int(xl / chunk_xdim))]
     if not (xl % chunk_xdim == 0):
@@ -115,7 +118,8 @@ def get_big_cutout(
                                     data_set = data_set,
                                     data_type = current_data_type,
                                     auth_token = auth_token,
-                                    base_website = base_website)
+                                    base_website = base_website,
+                                    file_format = file_format)
                         new_file = h5py.File(tmp_filename + '.h5', mode='r')
                         new_data = new_file[current_data_type + '{0:0>5}'.format(time*10)]
                         big_data[time - t0][cz*chunk_zdim:cz*chunk_zdim+zchunk_list[cz],

@@ -78,13 +78,58 @@ for coord in ['x', 'y', 'z']:
     isotropic1024coarse['d' + coord] = np.pi/512
     isotropic1024coarse[coord + 'periodic'] = True
     isotropic1024coarse[coord + 'uniform'] = True
-isotropic1024coarse['time'] = np.array(list(range(1024)), dtype = np.float32) * 2.048 / 1024
+isotropic1024coarse['time'] = np.array(list(range(5028)), dtype = np.float32) * 10.056 / 5028
 isotropic1024coarse['diss'] = 0.0928
 isotropic1024coarse['nu']   = 0.000185
+
+
+isotropic1024fine = {'name'   : 'isotropic1024fine'}
+isotropic1024fine['name'] = 'isotropic1024fine'
+
+for coord in ['x', 'y', 'z']:
+    isotropic1024fine[coord + 'nodes'] = (np.pi/512)*np.array(list(range(1024)), dtype = np.float32)
+    isotropic1024fine['n' + coord] = 1024
+    isotropic1024fine['l' + coord] = 2*np.pi
+    isotropic1024fine['d' + coord] = np.pi/512
+    isotropic1024fine[coord + 'periodic'] = True
+    isotropic1024fine[coord + 'uniform'] = True
+isotropic1024fine['time'] = np.array(list(range(100)), dtype = np.float32) * 0.0198/99
+isotropic1024fine['diss'] = 0.0928
+isotropic1024fine['nu']   = 0.000185
+
+isotropic4096 = {'name'   : 'isotropic4096'}
+isotropic4096['name'] = 'isotropic4096'
+
+for coord in ['x', 'y', 'z']:
+    isotropic4096[coord + 'nodes'] = (np.pi/512)*np.array(list(range(4096)), dtype = np.float32)
+    isotropic4096['n' + coord] = 4096
+    isotropic4096['l' + coord] = 2*np.pi
+    isotropic4096['d' + coord] = np.pi/512
+    isotropic4096[coord + 'periodic'] = True
+    isotropic4096[coord + 'uniform'] = True
+isotropic4096['diss'] = 1.4144
+isotropic4096['nu']   = 1.732e-4
+isotropic4096['time']   = [0]
+
+
+rotstrat4096 = {'name'   : 'rotstrat4096'}
+rotstrat4096['name'] = 'rotstrat4096'
+
+for coord in ['x', 'y', 'z']:
+    rotstrat4096[coord + 'nodes'] = (np.pi/512)*np.array(list(range(4096)), dtype = np.float32)
+    rotstrat4096['n' + coord] = 4096
+    rotstrat4096['l' + coord] = 2*np.pi
+    rotstrat4096['d' + coord] = np.pi/512
+    rotstrat4096[coord + 'periodic'] = True
+    rotstrat4096[coord + 'uniform'] = True
+rotstrat4096['diss'] = 0.0123
+rotstrat4096['nu']   = 4e-5
+rotstrat4096['time']   = range(0,5)
 
 mhd1024 = {}
 for key in list(isotropic1024coarse.keys()):
     mhd1024[key] = isotropic1024coarse[key]
+
 mhd1024['name'] = 'mhd1024'
 
 for coord in ['x', 'y', 'z']:
@@ -121,8 +166,58 @@ channel['dy'] = channel['ynodes'][1:] - channel['ynodes'][:channel['ynodes'].sha
 channel['dy'] = np.append(channel['dy'], [channel['dy'][0]])
 channel['yperiodic'] = False
 channel['yuniform'] = False
-channel['time'] = np.array(list(range(1024)), dtype = np.float32) * 0.0065
+channel['time'] = np.array(list(range(4000)), dtype = np.float32) * 0.0065
 channel['nu'] = 5e-5
+
+channel5200 = {
+        'name'   : 'channel5200',
+        'xnodes' : np.array(range(10240))*(8*np.pi/10240),
+        'ynodes' : np.load(os.path.join(package_dir, 'data/channel5200_ygrid.npy')),
+        'znodes' : np.array(range(7680))*(3*np.pi/7680),
+        'lx'     : 8*np.pi,
+        'ly'     : 2.,
+        'lz'     : 3*np.pi,}
+
+for coord in ['x', 'z']:
+    channel5200['n' + coord] = channel5200[coord + 'nodes'].shape[0]
+    channel5200[coord + 'periodic'] = True
+    channel5200[coord + 'uniform'] = True
+    channel5200['d' + coord] = channel5200['l' + coord] / channel5200['n' + coord]
+
+channel5200['ny'] = channel5200['ynodes'].shape[0]
+channel5200['dy'] = channel5200['ynodes'][1:] - channel5200['ynodes'][:channel5200['ynodes'].shape[0]-1]
+channel5200['dy'] = np.append(channel5200['dy'], [channel5200['dy'][0]])
+channel5200['yperiodic'] = False
+channel5200['yuniform'] = False
+channel5200['time'] = np.array(list(range(10)), dtype = np.float32) # FIXME
+channel5200['nu'] = 8e-6
+
+transition_bl = {
+        'name'   : 'transition_bl',
+        'xnodes' : np.array(range(3320))*0.292210466,
+        'ynodes' : np.load(os.path.join(package_dir, 'data/transition_bl_ygrid.npy')),
+        'znodes' : np.array(range(2048))*0.117244748,
+        'lx'     : 969.8465,
+        'ly'     : 2.,
+        'lz'     : 240.,}
+
+for coord in ['z']:
+    transition_bl['n' + coord] = transition_bl[coord + 'nodes'].shape[0]
+    transition_bl[coord + 'periodic'] = True
+    transition_bl[coord + 'uniform'] = True
+    transition_bl['d' + coord] = channel5200['l' + coord] / channel5200['n' + coord]
+
+transition_bl['nx'] = channel5200['xnodes'].shape[0]
+transition_bl['yperiodic'] = False
+transition_bl['yuniform'] = True
+
+transition_bl['ny'] = channel5200['ynodes'].shape[0]
+transition_bl['dy'] = channel5200['ynodes'][1:] - channel5200['ynodes'][:channel5200['ynodes'].shape[0]-1]
+transition_bl['dy'] = np.append(channel5200['dy'], [channel5200['dy'][0]])
+transition_bl['yperiodic'] = False
+transition_bl['yuniform'] = False
+transition_bl['time'] = np.array(list(range(4701)), dtype = np.float32) * 0.25
+transition_bl['nu'] = 0.00125
 
 def generate_temp_dbinfo(
         field):

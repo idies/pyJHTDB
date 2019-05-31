@@ -45,10 +45,8 @@ AUTHOR_EMAIL = GROUP_EMAIL
 #   2. VERSION should contain information on whether or not it depends
 #      on the hdf5 library, since that can't be installed through pip.
 #
-import datetime
-now = datetime.datetime.now()
-date_name = '{0:0>4}{1:0>2}{2:0>2}'.format(now.year, now.month, now.day)
-VERSION = date_name
+import pyJHTDB
+VERSION = pyJHTDB.version
 #if HDF5_ON:
 #    VERSION += '-hdf5'
 #
@@ -87,9 +85,9 @@ open('MANIFEST.in',
 
 libraries = []
 macros = []
-if h5cc_present and HDF5_ON:
-    libraries.append('hdf5')
-    macros.append(('CUTOUT_SUPPORT', '1'))
+#if h5cc_present and HDF5_ON:
+#    libraries.append('hdf5')
+#    macros.append(('CUTOUT_SUPPORT', '1'))
 
 from setuptools import setup, Extension
 libJHTDB = Extension(
@@ -107,11 +105,14 @@ setup(
         name = 'pyJHTDB',
         version = VERSION,
         packages = ['pyJHTDB'],
-        scripts=['scripts/pyJHTDB-auth'],
+      ###scripts=['scripts/pyJHTDB-auth'],
         package_data = {'pyJHTDB': ['data/channel_xgrid.npy',
                                     'data/channel_ygrid.npy',
-                                    'data/channel_zgrid.npy']},
-        install_requires = ['numpy>=1.8', 'sympy>=0.7.4.1'],
+                                    'data/channel_zgrid.npy',
+                                    'data/channel5200_ygrid.npy',
+                                    'data/transition_bl_ygrid.npy']},
+        python_requires='>3.6',
+        install_requires = ['numpy>=1.15.0', 'scipy>=1.1.0', 'sympy>=1.2', 'h5py>=2.8.0', 'matplotlib>=3.0.0'],
         ext_modules = [libJHTDB],
         test_suite = 'tests',
 
