@@ -23,7 +23,7 @@
 import os
 
 if not os.path.isdir('turblib'):
-    os.system('git clone https://github.com/idies/turblib')
+    os.system('git clone https://github.com/idies/turblib --branch develop')
 else:
     os.chdir('turblib')
     os.system('git pull')

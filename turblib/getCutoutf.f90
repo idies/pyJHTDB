@@ -22,7 +22,7 @@
     character(*), parameter :: authtoken = 'edu.jhu.pha.turbulence.testing-201406' // CHAR(0)
     character(1) :: field
 
-    integer, parameter :: time_step=0, x_start=1, y_start=10, z_start=1, x_end=2, y_end=11, z_end=2
+    integer, parameter :: time_step=1, x_start=1, y_start=10, z_start=1, x_end=2, y_end=11, z_end=2
     integer, parameter :: x_step=1, y_step=1, z_step=1, filter_width=1
     integer :: size, i
     real(RP), allocatable :: result(:)

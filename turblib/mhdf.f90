@@ -85,11 +85,7 @@
     real(RP) :: dataout9(9, 10)  ! results from Gradient function
     real(RP) :: dataout18(18, 10) ! results from Hessian function
 
-    integer,parameter :: time_step=10, x=0, y=0, z=0, xwidth=4, ywidth=4, zwidth=4
     integer,parameter :: x_start=1, y_start=1, z_start=1, x_end=4, y_end=4, z_end=4
-    !real(RP) :: rawdata(xwidth*ywidth*zwidth*3)
-    real(RP) :: rawdata(3,xwidth*ywidth*zwidth)
-    real(RP) :: rawpressure(xwidth*ywidth*zwidth)
 
     real(RP) :: threshold = 10.0_RP; ! threshold level
     character(*), parameter :: threshold_field = 'vorticity' // CHAR(0) ! field used for threshold query
@@ -109,8 +105,6 @@
     integer :: getvectorpotential, getvectorpotentialgradient
     integer :: getvectorpotentiallaplacian, getvectorpotentialhessian
     integer :: getpressuregradient, getpressurehessian
-    integer :: getrawvelocity, getrawpressure
-    integer :: getrawmagneticfield, getrawvectorpotential
     integer :: getposition
     integer :: getpressure
     integer :: getthreshold
@@ -127,9 +121,7 @@
 
     ! Formatting rules
     character(*), parameter :: format1='(i3,1(a,e13.6))'
-    character(*), parameter :: rawformat1='(i4,1(a,e13.6))'
     character(*), parameter :: format3='(i3,3(a,e13.6))'
-    character(*), parameter :: rawformat3='(i4,3(a,e13.6))'
     character(*), parameter :: format4='(i3,4(a,e13.6))'
     character(*), parameter :: format6='(i3,6(a,e13.6))'
     character(*), parameter :: format9='(i3,9(a,e13.6))'
@@ -396,37 +388,6 @@
         write(*,format6) i, ': d2pdxdx=', dataout6(1,i), ', d2pdxdy=', dataout6(2,i), &
             ', d2pdxdz=', dataout6(3,i), ', d2pdydy=', dataout6(4,i),  &
             ', d2pdydz=', dataout6(5,i), ', d2pdzdz', dataout6(6,i)
-    end do
-
-    write(*,*)
-    write(*,'(a)') 'Requesting raw velocity ...'
-    rc = getrawvelocity(authkey, dataset, time_step, x, y, z, xwidth, ywidth, zwidth, rawdata)
-    do i = 1, xwidth*ywidth*zwidth
-        !write(*,rawformat3) i, ': Vx=', rawdata(3*(i-1)+1), ', Vy=', rawdata(3*(i-1)+2), ', Vz=', rawdata(3*(i-1)+3)
-        !write(*,rawformat3) i, ': Vx=', rawdata(1,i), ', Vy=', rawdata(2,i), ', Vz=', rawdata(3,i)
-    end do
-
-    write(*,*)
-    write(*,'(a)') 'Requesting raw pressure ...'
-    rc = getrawpressure(authkey, dataset, time_step, x, y, z, xwidth, ywidth, zwidth, rawpressure)
-    do i = 1, xwidth*ywidth*zwidth
-        !write(*,rawformat1) i, ': ', rawpressure(i)
-    end do
-
-    write(*,*)
-    write(*,'(a)') 'Requesting raw magnetic field ...'
-    rc = getrawmagneticfield(authkey, dataset, time_step, x, y, z, xwidth, ywidth, zwidth, rawdata)
-    do i = 1, xwidth*ywidth*zwidth
-        !write(*,rawformat3) i, ': bx=', rawdata(3*(i-1)+1), ', by=', rawdata(3*(i-1)+2), ', bz=', rawdata(3*(i-1)+3)
-        !write(*,rawformat3) i, ': bx=', rawdata(1,i), ', by=', rawdata(2,i), ', bz=', rawdata(3,i)
-    end do
-
-    write(*,*)
-    write(*,'(a)') 'Requesting raw vector potential ...'
-    rc = getrawvectorpotential(authkey, dataset, time_step, x, y, z, xwidth, ywidth, zwidth, rawdata)
-    do i = 1, xwidth*ywidth*zwidth
-        !write(*,rawformat3) i, ': ax=', rawdata(3*(i-1)+1), ', ay=', rawdata(3*(i-1)+2), ', az=', rawdata(3*(i-1)+3)
-        !write(*,rawformat3) i, ': ax=', rawdata(1,i), ', ay=', rawdata(2,i), ', az=', rawdata(3,i)
     end do
 
     write(*,*)

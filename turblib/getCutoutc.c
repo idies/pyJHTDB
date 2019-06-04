@@ -32,7 +32,7 @@ int main(int argc, char *argv[])
 
 	float *result;
 
-	int time_step = 0, x_start, y_start, z_start, x_end, y_end, z_end;
+	int time_step = 1, x_start, y_start, z_start, x_end, y_end, z_end;
 	int x_step = 1, y_step = 1, z_step = 1, filter_width = 1;
 	int size, i;
 

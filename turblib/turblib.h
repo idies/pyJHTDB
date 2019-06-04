@@ -702,9 +702,9 @@ extern "C" {
 
 	/* Cutout functions */
 
-	int lagrangianInterp(int comps, float *kernel, float position[3], int nOrder, float dx, float result[comps]);
-	int lagrangianInterp2(int comps, dataKernel *kernel, float position[3], int nOrder, float dx, float result[comps]);
-	int pchipInterp(int comps, float data[4][comps], float time, int timestep, float dt, float result[comps]);
+	int lagrangianInterp(int comps, float *kernel, float position[3], int nOrder, float dx, float *result);
+	int lagrangianInterp2(int comps, dataKernel *kernel, float position[3], int nOrder, float dx, float *result);
+	int pchipInterp(int comps, float *data[4], float time, int timestep, float dt, float *result);
 
 	int computeGradient(dataKernel* kernel, int comps, float dx, int size, int nOrder, float *output);
 	int computeHessian(dataKernel* kernel, int comps, float dx, int size, int nOrder, float *output);

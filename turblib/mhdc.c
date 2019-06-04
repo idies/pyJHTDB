@@ -45,11 +45,7 @@ int main(int argc, char *argv[]) {
 	float endTime = 0.376F;
 	float lag_dt = 0.0004F;
 
-	int time_step = 10, X = 0, Y = 0, Z = 0, Xwidth = 16, Ywidth = 16, Zwidth = 16;
-	int components = 3;
-	float * rawdata = (float*)malloc(Xwidth*Ywidth*Zwidth * sizeof(float)*components);
-	int pressure_components = 1;
-	float * rawpressure = (float*)malloc(Xwidth*Ywidth*Zwidth * sizeof(float)*pressure_components);
+	int x_start=1, y_start=1, z_start=1, x_end=4, y_end=4, z_end=4;
 
 	char * field = "velocity"; /* field used for the calls to getBoxFilter, getBoxFilterSGSsymtensor
 								and getBoxFilterGradient */
@@ -278,30 +274,6 @@ int main(int argc, char *argv[]) {
 			p, result3[p][0], result3[p][1], result3[p][2]);
 	}
 
-	printf("Requesting raw velocity data...\n");
-	getRawVelocity(authtoken, dataset, time_step, X, Y, Z, Xwidth, Ywidth, Zwidth, (char*)rawdata);
-	for (p = 0; p < Xwidth*Ywidth*Zwidth; p++) {
-		//printf("%d: Vx=%f, Vy=%f, Vz=%f\n", p, rawdata[3*p],  rawdata[3*p+1], rawdata[3*p+2]);
-	}
-
-	printf("Requesting raw pressure data...\n");
-	getRawPressure(authtoken, dataset, time_step, X, Y, Z, Xwidth, Ywidth, Zwidth, (char*)rawpressure);
-	for (p = 0; p < Xwidth*Ywidth*Zwidth; p++) {
-		//printf("%d: P=%f\n", p, rawpressure[p]);
-	}
-
-	printf("Requesting raw magnetic data...\n");
-	getRawMagneticField(authtoken, dataset, time_step, X, Y, Z, Xwidth, Ywidth, Zwidth, (char*)rawdata);
-	for (p = 0; p < Xwidth*Ywidth*Zwidth; p++) {
-		//printf("%d: Bx=%f, By=%f, Bz=%f\n", p, rawdata[3*p],  rawdata[3*p+1], rawdata[3*p+2]);
-	}
-
-	printf("Requesting raw vector potential data...\n");
-	getRawVectorPotential(authtoken, dataset, time_step, X, Y, Z, Xwidth, Ywidth, Zwidth, (char*)rawdata);
-	for (p = 0; p < Xwidth*Ywidth*Zwidth; p++) {
-		//printf("%d: Ax=%f, Ay=%f, Az=%f\n", p, rawdata[3*p],  rawdata[3*p+1], rawdata[3*p+2]);
-	}
-
 	printf("\nRequesting position at %d points, starting at time %f and ending at time %f...\n", N, startTime, endTime);
 	getPosition(authtoken, dataset, startTime, endTime, lag_dt, spatialInterp, N, points, result3);
 
@@ -362,7 +334,7 @@ int main(int argc, char *argv[]) {
 	printf("\nRequesting threshold...\n");
 	//NOTE: The array storing the results is dynamically allocated inside the getThreshold function,
 	//because it's size is not known. It needs to be freed after it has been used to avoid leaking the memory.
-	getThreshold(authtoken, dataset, threshold_field, time, threshold, FD4NoInt, 1, 1, 1, 4, 4, 4,
+	getThreshold(authtoken, dataset, threshold_field, time, threshold, FD4NoInt, x_start, y_start, z_start, x_end, y_end, z_end,
 		&threshold_array, &threshold_array_size);
 	for (p = 0; p < threshold_array_size; p++) {
 		printf("(%d, %d, %d): %13.6e\n", threshold_array[p].x, threshold_array[p].y, threshold_array[p].z,

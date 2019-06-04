@@ -21,19 +21,6 @@ If you don't have ``pip`` on your system, it is quite easy to get it
 following the instructions at
 http://pip.readthedocs.org/en/latest/installing.html.
 
-**Cutout/local data functionality**
-
-If you want to use the cutout functionality, you will need to install
-``h5py`` *before* you install ``pyJHTDB``, with:
-
-.. code:: bash
-
-    pip install h5py
-
-If you would like to use the local data functionality, you will need a
-full installation of the HDF5 libraries, see
-http://www.hdfgroup.org/HDF5/ for instructions.
-
 Installing from source
 ======================
 
@@ -46,25 +33,7 @@ Bare-bone installation:
     sudo apt-get install build-essential gfortran
     sudo apt-get install python-setuptools
     sudo apt-get install python-dev
-    sudo easy_install numpy
-    python update_turblib.py
-    sudo python setup.py install
-
-Note that doing this should, in principle, also install ``sympy`` on
-your system, since it's used by ``pyJHTDB``.
-
-Happy fun installation:
-
-.. code:: bash
-
-    sudo apt-get install build-essential gfortran
-    sudo apt-get install python-setuptools
-    sudo apt-get install python-dev
-    sudo apt-get install libpng-dev libfreetype6-dev
-    sudo apt-get install libhdf5-dev
-    sudo easy_install numpy
-    sudo easy_install h5py
-    sudo easy_install matplotlib
+    sudo easy_install numpy scipy sympy h5py matplotlib
     python update_turblib.py
     sudo python setup.py install
 

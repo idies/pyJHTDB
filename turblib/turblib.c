@@ -440,8 +440,8 @@ int getThreshold(char *authToken,
 	input.y_USCOREstart = y_start;
 	input.z_USCOREstart = z_start;
 	input.x_USCOREend = x_end;
-	input.x_USCOREend = y_end;
-	input.x_USCOREend = z_end;
+	input.y_USCOREend = y_end;
+	input.z_USCOREend = z_end;
 	input.addr = NULL;
 
 	rc = soap_call___turb1__GetThreshold(&__jhuturbsoap, NULL, NULL, &input, &output);
@@ -1482,8 +1482,8 @@ int getRawVelocity(char *authToken,
 
 	rc = soap_call___turb1__GetRawVelocity(&__jhuturbsoap, NULL, NULL, &input, &output);
 	if (rc == SOAP_OK) {
-		memcpy(dataout, output.GetRawVelocityResult->__ptr,
-			output.GetRawVelocityResult->__size);
+		memcpy(dataout, (&output.GetRawVelocityResult)->__ptr,
+			(&output.GetRawVelocityResult)->__size);
 		bzero(__turblib_err, TURB_ERROR_LENGTH);
 	}
 	else {
@@ -1573,8 +1573,8 @@ int getRawMagneticField(char *authToken,
 
 	rc = soap_call___turb1__GetRawMagneticField(&__jhuturbsoap, NULL, NULL, &input, &output);
 	if (rc == SOAP_OK) {
-		memcpy(dataout, output.GetRawMagneticFieldResult->__ptr,
-			output.GetRawMagneticFieldResult->__size);
+		memcpy(dataout, (&output.GetRawMagneticFieldResult)->__ptr,
+			(&output.GetRawMagneticFieldResult)->__size);
 		bzero(__turblib_err, TURB_ERROR_LENGTH);
 	}
 	else {
@@ -1664,8 +1664,8 @@ int getRawVectorPotential(char *authToken,
 
 	rc = soap_call___turb1__GetRawVectorPotential(&__jhuturbsoap, NULL, NULL, &input, &output);
 	if (rc == SOAP_OK) {
-		memcpy(dataout, output.GetRawVectorPotentialResult->__ptr,
-			output.GetRawVectorPotentialResult->__size);
+		memcpy(dataout, (&output.GetRawVectorPotentialResult)->__ptr,
+			(&output.GetRawVectorPotentialResult)->__size);
 		bzero(__turblib_err, TURB_ERROR_LENGTH);
 	}
 	else {
@@ -1755,8 +1755,8 @@ int getRawPressure(char *authToken,
 
 	rc = soap_call___turb1__GetRawPressure(&__jhuturbsoap, NULL, NULL, &input, &output);
 	if (rc == SOAP_OK) {
-		memcpy(dataout, output.GetRawPressureResult->__ptr,
-			output.GetRawPressureResult->__size);
+		memcpy(dataout, (&output.GetRawPressureResult)->__ptr,
+			(&output.GetRawPressureResult)->__size);
 		bzero(__turblib_err, TURB_ERROR_LENGTH);
 	}
 	else {
@@ -1925,8 +1925,8 @@ int getRawDensity(char *authToken,
 
 	rc = soap_call___turb1__GetRawDensity(&__jhuturbsoap, NULL, NULL, &input, &output);
 	if (rc == SOAP_OK) {
-		memcpy(dataout, output.GetRawDensityResult->__ptr,
-			output.GetRawDensityResult->__size);
+		memcpy(dataout, (&output.GetRawDensityResult)->__ptr,
+			(&output.GetRawDensityResult)->__size);
 		bzero(__turblib_err, TURB_ERROR_LENGTH);
 	}
 	else {
@@ -1980,8 +1980,8 @@ int getCutout(char *authToken,
 
 	rc = soap_call___turb1__GetAnyCutoutWeb(&__jhuturbsoap, NULL, NULL, &input, &output);
 	if (rc == SOAP_OK) {
-		memcpy(dataout, output.GetAnyCutoutWebResult->__ptr,
-			output.GetAnyCutoutWebResult->__size);
+		memcpy(dataout, (&output.GetAnyCutoutWebResult)->__ptr,
+			(&output.GetAnyCutoutWebResult)->__size);
 		//memcpy(dataout, output.GetAnyCutoutWebResult->float_,
 		//	output.GetAnyCutoutWebResult->__sizefloat_ * sizeof(float));
 		bzero(__turblib_err, TURB_ERROR_LENGTH);
@@ -2003,7 +2003,7 @@ int getCutout(char *authToken,
 
 /* Interpolation Functions */
 
-int lagrangianInterp(int comps, float *kernel, float position[3], int nOrder, float dx, float result[comps])
+int lagrangianInterp(int comps, float *kernel, float position[3], int nOrder, float dx, float *result)
 {
 	int node[3];
 	node[0] = (int)(floor(position[0] / dx));
@@ -2078,7 +2078,7 @@ int lagrangianInterp(int comps, float *kernel, float position[3], int nOrder, fl
 	return 0;
 }
 
-int lagrangianInterp2(int comps, dataKernel* kernel, float position[3], int nOrder, float dx, float result[comps])
+int lagrangianInterp2(int comps, dataKernel* kernel, float position[3], int nOrder, float dx, float *result)
 {
 	int node[3];
 	node[0] = (int)(floor(position[0] / dx));
@@ -2154,7 +2154,7 @@ int lagrangianInterp2(int comps, dataKernel* kernel, float position[3], int nOrd
 	return 0;
 }
 
-int pchipInterp(int comps, float data[4][comps], float time, int timestep, float dt, float result[comps])
+int pchipInterp(int comps, float *data[4], float time, int timestep, float dt, float *result)
 {
 	float times[4] = { (timestep - 1) * dt, (timestep)* dt, (timestep + 1) * dt, (timestep + 2) * dt };
 	int j;

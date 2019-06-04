@@ -219,7 +219,8 @@ class libJHTDB(object):
         getFunction = 'getCutout'
         get_data = getattr(self.lib, getFunction)
         result_array = np.empty(tuple(list(real_size[::-1]) + [result_dim]), dtype=np.float32)
-        get_data(self.authToken,
+        try:
+            get_data(self.authToken,
                  ctypes.c_char_p(data_set.encode('ascii')),
                  ctypes.c_char_p(field.encode('ascii')),
                  ctypes.c_int(time_step),
@@ -234,6 +235,11 @@ class libJHTDB(object):
                  ctypes.c_int(step[2]),
                  ctypes.c_int(filter_width),
                  result_array.ctypes.data_as(ctypes.POINTER(ctypes.c_char)))
+            
+        except Exception as es:
+            print(es)
+            raise
+
         return result_array
 
     def getbigCutout(
