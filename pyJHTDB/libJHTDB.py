@@ -253,10 +253,16 @@ class libJHTDB(object):
             end=np.array([8, 8, 8], dtype=np.int),
             step=np.array([1, 1, 1], dtype=np.int),
             filter_width=1,
-            hdf5_output=True):
+            filename='N/A'):
+            #hdf5_output=True):
         if not self.connection_on:
             print('you didn\'t connect to the database')
             sys.exit()
+
+        if (filename.lower()=='n/a' or filename.lower()=='na'):
+            hdf5_output=False
+        else:
+            hdf5_output=True
 
         idx_t=np.arange(t_start, t_end+1, t_step)
         idx_x=np.arange(start[0], end[0]+1, step[0])
@@ -295,7 +301,7 @@ class libJHTDB(object):
             return None
 
         if (hdf5_output):
-            hdf5_file, xdmf_file, shape=self.hdf5_init(data_set,t_start,t_end,t_step,start,end,step,filter_width,idx_x,idx_y,idx_z)
+            hdf5_file, xdmf_file, shape=self.hdf5_init(filename, data_set,t_start,t_end,t_step,start,end,step,filter_width,idx_x,idx_y,idx_z)
 
         for field in fields:
             if field == 'u':
@@ -345,7 +351,7 @@ class libJHTDB(object):
                     result[xyzs0[2]:xyze0[2]+1, xyzs0[1]:xyze0[1]+1, xyzs0[0]:xyze0[0]+1,:] = temp
 
                 if (hdf5_output):
-                    self.hdf5_writing(result,data_set,VarName,dim,time_step,hdf5_file,xdmf_file,shape)
+                    self.hdf5_writing(filename,result,data_set,VarName,dim,time_step,hdf5_file,xdmf_file,shape)
 
         if (hdf5_output):
             self.hdf5_end(hdf5_file,xdmf_file)
@@ -354,6 +360,7 @@ class libJHTDB(object):
 
     def hdf5_init(
             self,
+            filename,
             data_set,
             t_start,
             t_end,
@@ -401,7 +408,7 @@ class libJHTDB(object):
             ycoor=idx_y*dx
             zcoor=idx_z*dx
 
-        filename=data_set
+        #filename=data_set
         fh = h5py.File(filename+'.h5', driver='core', block_size=16, backing_store=True)
         fh.attrs["dataset"] = np.string_(data_set)
         #fh.attrs["timeStep"] = time_step
@@ -443,6 +450,7 @@ class libJHTDB(object):
 
     def hdf5_writing(
             self,
+            filename,
             result,
             data_set,
             VarName,
@@ -462,7 +470,7 @@ class libJHTDB(object):
         elif (dim==1):
             Attribute_Type="Scalar"
                 
-        filename=data_set
+        #filename=data_set
         nl = '\r\n'
         
         print(f"    <Grid Name=\"Structured Grid\" GridType=\"Uniform\">{nl}", file=tf)

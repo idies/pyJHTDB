@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[1]:
+# In[ ]:
 
 
 import numpy as np
@@ -9,7 +9,7 @@ import pyJHTDB
 from pyJHTDB import libJHTDB
 
 
-# In[5]:
+# In[ ]:
 
 
 import json
@@ -33,6 +33,7 @@ Filter_Width=int(params.get("Filter_Width",1))
 time_step=int(params.get("time_step",0))
 fields=params.get("fields","u")
 data_set=params.get("dataset","isotropic1024coarse")
+output_filename=params.get("output_filename",data_set)
 
 #if fields == 'u':
 #    VarName="Velocity"
@@ -54,13 +55,15 @@ data_set=params.get("dataset","isotropic1024coarse")
 #    dim = 1
 
 
-# In[3]:
+# In[ ]:
 
 
 lJHTDB = libJHTDB()
 lJHTDB.initialize()
 lJHTDB.add_token(auth_token)
 
+## "filename" parameter is the file names of output files, if filename='N/A', no files will be written. 
+##             For example, if filename='results', the function will write "results.h5" and "results.xmf".
 ## The function only returns the data at the last time step within [t_start:t_step:t_end]
 ## The function only returns the data in the last field. For example, result=p if field=[up].
 result = lJHTDB.getbigCutout(
@@ -69,7 +72,7 @@ result = lJHTDB.getbigCutout(
         end=np.array([xend, yend, zend], dtype = np.int),
         step=np.array([xstep, ystep, zstep], dtype = np.int),
         filter_width=Filter_Width,
-        hdf5_output=True)
+        filename=output_filename)
 
 lJHTDB.finalize()
 print(result.shape)
