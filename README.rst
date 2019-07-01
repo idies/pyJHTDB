@@ -30,12 +30,10 @@ Bare-bone installation:
 
 .. code:: bash
 
-    sudo apt-get install build-essential gfortran
-    sudo apt-get install python-setuptools
-    sudo apt-get install python-dev
-    sudo easy_install numpy scipy sympy h5py matplotlib
+    git clone https://github.com/idies/pyJHTDB.git
+    cd pyJHTDB
     python update_turblib.py
-    sudo python setup.py install
+    pip install --upgrade --force-reinstall ./
 
 The procedures are similar in MacOS.
 
@@ -63,8 +61,3 @@ http://turbulence.pha.jhu.edu/help/authtoken.aspx
 For simple experimentation, the default token included in the package
 should be valid.
 
-
-The ``.config/JHTDB`` folder is also used to store data used by the
-``pyJHTDB.interpolator.spline_interpolator`` class, including shared
-libraries. If you do not plan on using the local interpolation
-functionality, no data files will be generated.

@@ -33,7 +33,7 @@ import matplotlib.pyplot as plt
 import pyJHTDB
 import pyJHTDB.dbinfo
 import pyJHTDB.interpolator
-import matplotlib_extra as me
+#import matplotlib_extra as me
 
 def generate_interpolation_points(
         info,
