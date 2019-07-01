@@ -301,6 +301,7 @@ class libJHTDB(object):
             return None
 
         if (hdf5_output):
+            nl = '\r\n'
             hdf5_file, xdmf_file, shape=self.hdf5_init(filename, data_set,t_start,t_end,t_step,start,end,step,filter_width,idx_x,idx_y,idx_z)
 
         for field in fields:
@@ -330,6 +331,9 @@ class libJHTDB(object):
 
             split_no=int(np.ceil(npoints/(192000000/dim)))
             tmp=np.array_split(np.arange(npoints).reshape(nnx,nny,nnz), split_no)
+            
+            if (hdf5_output):
+                    print(f"    <Grid Name=\"{VarName}\" GridType=\"Collection\" CollectionType=\"Temporal\">{nl}", file=xdmf_file)
 
             for time_step in np.arange(t_start, t_end+1, t_step):
 
@@ -352,6 +356,9 @@ class libJHTDB(object):
 
                 if (hdf5_output):
                     self.hdf5_writing(filename,result,data_set,VarName,dim,time_step,hdf5_file,xdmf_file,shape)
+                    
+            if (hdf5_output):
+                    print(f"    </Grid>{nl}", file=xdmf_file)
 
         if (hdf5_output):
             self.hdf5_end(hdf5_file,xdmf_file)
@@ -473,30 +480,30 @@ class libJHTDB(object):
         #filename=data_set
         nl = '\r\n'
         
-        print(f"    <Grid Name=\"Structured Grid\" GridType=\"Uniform\">{nl}", file=tf)
-        print(f"      <Time Value=\"{time_step}\" />{nl}", file=tf)
-        print(f"      <Topology TopologyType=\"3DRectMesh\" NumberOfElements=\"{shape[0]} {shape[1]} {shape[2]}\"/>{nl}", file=tf)
-        print(f"      <Geometry GeometryType=\"VXVYVZ\">{nl}", file=tf)
-        print(f"        <DataItem Name=\"Xcoor\" Dimensions=\"{shape[2]}\" NumberType=\"Float\" Precision=\"4\" Format=\"HDF\">{nl}", file=tf)
-        print(f"          {filename}.h5:/xcoor", file=tf)
-        print(f"        </DataItem>{nl}", file=tf)
-        print(f"        <DataItem Name=\"Ycoor\" Dimensions=\"{shape[1]}\" NumberType=\"Float\" Precision=\"4\" Format=\"HDF\">{nl}", file=tf)
-        print(f"          {filename}.h5:/ycoor", file=tf)
-        print(f"        </DataItem>{nl}", file=tf)
-        print(f"        <DataItem Name=\"Zcoor\" Dimensions=\"{shape[0]}\" NumberType=\"Float\" Precision=\"4\" Format=\"HDF\">{nl}", file=tf)
-        print(f"          {filename}.h5:/zcoor", file=tf)
-        print(f"        </DataItem>{nl}", file=tf)
-        print(f"      </Geometry>{nl}", file=tf)
+        print(f"      <Grid Name=\"Structured Grid\" GridType=\"Uniform\">{nl}", file=tf)
+        print(f"        <Time Value=\"{time_step}\" />{nl}", file=tf)
+        print(f"        <Topology TopologyType=\"3DRectMesh\" NumberOfElements=\"{shape[0]} {shape[1]} {shape[2]}\"/>{nl}", file=tf)
+        print(f"        <Geometry GeometryType=\"VXVYVZ\">{nl}", file=tf)
+        print(f"          <DataItem Name=\"Xcoor\" Dimensions=\"{shape[2]}\" NumberType=\"Float\" Precision=\"4\" Format=\"HDF\">{nl}", file=tf)
+        print(f"            {filename}.h5:/xcoor{nl}", file=tf)
+        print(f"          </DataItem>{nl}", file=tf)
+        print(f"          <DataItem Name=\"Ycoor\" Dimensions=\"{shape[1]}\" NumberType=\"Float\" Precision=\"4\" Format=\"HDF\">{nl}", file=tf)
+        print(f"            {filename}.h5:/ycoor{nl}", file=tf)
+        print(f"          </DataItem>{nl}", file=tf)
+        print(f"          <DataItem Name=\"Zcoor\" Dimensions=\"{shape[0]}\" NumberType=\"Float\" Precision=\"4\" Format=\"HDF\">{nl}", file=tf)
+        print(f"            {filename}.h5:/zcoor{nl}", file=tf)
+        print(f"          </DataItem>{nl}", file=tf)
+        print(f"        </Geometry>{nl}", file=tf)
 
         print(f"{nl}", file=tf)
 
-        print(f"      <Attribute Name=\"{VarName}\" AttributeType=\"{Attribute_Type}\" Center=\"Node\">{nl}", file=tf)
-        print(f"        <DataItem Dimensions=\"{shape[0]} {shape[1]} {shape[2]} {dim}\" NumberType=\"Float\" Precision=\"4\" Format=\"HDF\">{nl}", file=tf)
-        print(f"          {filename}.h5:/{H5_ds_name}{nl}", file=tf)
-        print(f"        </DataItem>{nl}", file=tf)
-        print(f"      </Attribute>{nl}", file=tf)
+        print(f"        <Attribute Name=\"{VarName}\" AttributeType=\"{Attribute_Type}\" Center=\"Node\">{nl}", file=tf)
+        print(f"          <DataItem Dimensions=\"{shape[0]} {shape[1]} {shape[2]} {dim}\" NumberType=\"Float\" Precision=\"4\" Format=\"HDF\">{nl}", file=tf)
+        print(f"            {filename}.h5:/{H5_ds_name}{nl}", file=tf)
+        print(f"          </DataItem>{nl}", file=tf)
+        print(f"        </Attribute>{nl}", file=tf)
 
-        print(f"    </Grid>{nl}", file=tf)
+        print(f"      </Grid>{nl}", file=tf)
 
         print(f"{nl}", file=tf)
 
