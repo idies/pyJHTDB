@@ -135,6 +135,8 @@ class libJHTDB(object):
             result_dim = 18
         elif getFunction in ['getPressure', 'getTemperature']:
             result_dim = 1
+        elif getFunction in ['getInvariant']:
+            result_dim = 2
         else:
             print(('wrong result type requested in getData\n'
                    + 'maybe it\'s just missing from the list?'))
@@ -158,34 +160,39 @@ class libJHTDB(object):
             size=np.array([8, 8, 8], dtype=np.int),
             data_set='channel',
             getFunction='Velocity'):
-        if not self.connection_on:
-            print('you didn\'t connect to the database')
-            sys.exit()
-        if getFunction in ['Velocity',
-                           'MagneticField',
-                           'VectorPotential']:
-            result_dim = 3
-        elif getFunction in ['Pressure', 'Temperature']:
-            result_dim = 1
-        else:
-            print(('wrong result type requested in getRawData\n'
-                   + 'maybe it\'s just missing from the list?'))
-            sys.exit()
-            return None
-        getFunction = 'getRaw' + getFunction
-        get_data = getattr(self.lib, getFunction)
-        result_array = np.empty(tuple(list(size[::-1]) + [result_dim]), dtype=np.float32)
-        get_data(self.authToken,
-                 ctypes.c_char_p(data_set.encode('ascii')),
-                 ctypes.c_int(time),
-                 ctypes.c_int(start[0]),
-                 ctypes.c_int(start[1]),
-                 ctypes.c_int(start[2]),
-                 ctypes.c_int(size[0]),
-                 ctypes.c_int(size[1]),
-                 ctypes.c_int(size[2]),
-                 result_array.ctypes.data_as(ctypes.POINTER(ctypes.c_char)))
-        return result_array
+
+        print(('This function is no longer supported. Please use getbigCutout instead.'))
+        sys.exit()
+        return None
+
+        # if not self.connection_on:
+        #     print('you didn\'t connect to the database')
+        #     sys.exit()
+        # if getFunction in ['Velocity',
+        #                    'MagneticField',
+        #                    'VectorPotential']:
+        #     result_dim = 3
+        # elif getFunction in ['Pressure', 'Temperature']:
+        #     result_dim = 1
+        # else:
+        #     print(('wrong result type requested in getRawData\n'
+        #            + 'maybe it\'s just missing from the list?'))
+        #     sys.exit()
+        #     return None
+        # getFunction = 'getRaw' + getFunction
+        # get_data = getattr(self.lib, getFunction)
+        # result_array = np.empty(tuple(list(size[::-1]) + [result_dim]), dtype=np.float32)
+        # get_data(self.authToken,
+        #          ctypes.c_char_p(data_set.encode('ascii')),
+        #          ctypes.c_int(time),
+        #          ctypes.c_int(start[0]),
+        #          ctypes.c_int(start[1]),
+        #          ctypes.c_int(start[2]),
+        #          ctypes.c_int(size[0]),
+        #          ctypes.c_int(size[1]),
+        #          ctypes.c_int(size[2]),
+        #          result_array.ctypes.data_as(ctypes.POINTER(ctypes.c_char)))
+        # return result_array
     
     def getCutout(
             self,

@@ -363,6 +363,14 @@ int getDensityHessian(char *authToken,
 		return getDensityHessianSoap(authToken, dataset, time, spatial, temporal, count, datain, dataout);
 }
 
+int getInvariant(char *authToken,
+	char *dataset, float time,
+	enum SpatialInterpolation spatial, enum TemporalInterpolation temporal,
+	int count, float datain[][3], float dataout[])
+{
+		return getInvariantSoap(authToken, dataset, time, spatial, temporal, count, datain, dataout);
+}
+
 int getVelocitySoap(char *authToken,
 	char *dataset, float time,
 	enum SpatialInterpolation spatial, enum TemporalInterpolation temporal,
@@ -1890,6 +1898,47 @@ int getDensityHessianSoap(char *authToken,
 	soap_done(&__jhuturbsoap); /*  detach the gSOAP environment  */
 
 	__turblib_errno = rc;
+	return rc;
+}
+
+int getInvariantSoap(char *authToken,
+	char *dataset, float time,
+	enum SpatialInterpolation spatial, enum TemporalInterpolation temporal,
+	int count, float datain[][3], float dataout[][2])
+{
+	int rc;
+
+	struct _turb1__GetInvariant input;
+	struct _turb1__GetInvariantResponse output;
+
+	input.authToken = authToken;
+	input.dataset = dataset;
+	input.time = time;
+	input.spatialInterpolation = SpatialIntToEnum(spatial);
+	input.temporalInterpolation = TemporalIntToEnum(temporal);
+
+	struct turb1__ArrayOfPoint3 pointArray;
+	pointArray.__sizePoint3 = count;
+	pointArray.Point3 = (void *)datain;
+	input.points = &pointArray;
+	input.addr = NULL;
+
+	rc = soap_call___turb1__GetInvariant(&__jhuturbsoap, NULL, NULL, &input, &output);
+	if (rc == SOAP_OK) {
+		memcpy(dataout, output.GetInvariantResult->Vector3,
+			output.GetInvariantResult->__sizeVector3 * sizeof(float) * 3);
+		bzero(__turblib_err, TURB_ERROR_LENGTH);
+	}
+	else {
+		soap_sprint_fault(&__jhuturbsoap, __turblib_err, TURB_ERROR_LENGTH);
+		turblibHandleError();
+	}
+
+	soap_end(&__jhuturbsoap);  /* remove deserialized data and clean up */
+	soap_done(&__jhuturbsoap); /*  detach the gSOAP environment  */
+
+	__turblib_errno = rc;
+
 	return rc;
 }
 

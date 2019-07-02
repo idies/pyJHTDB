@@ -616,6 +616,19 @@ extern "C" {
 		int len_a, int len_d);
 
 	/* C */
+	int getInvariantSoap(char *authToken,
+		char *dataset, float time,
+		enum SpatialInterpolation spatial, enum TemporalInterpolation temporal,
+		int count, float datain[][3], float dataout[][2]);
+
+	/* Fortran */
+	int getinvariant_(char *authToken,
+		char *dataset, float *time,
+		int *spatial, int *temporal,
+		int *count, float datain[][3], float dataout[][2],
+		int len_a, int len_d);
+
+	/* C */
 	int getRawDensity(char *authToken,
 		char *dataset, int time_step,
 		int X, int Y, int Z, int Xwidth, int Ywidth, int Zwidth, char dataout[]);
