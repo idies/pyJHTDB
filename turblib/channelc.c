@@ -34,6 +34,7 @@ int main(int argc, char *argv[]) {
 
 	float points[N][3];    /* input of x,y,z */
 	float result1[N];      /* input of x,y,z */
+	float result2[N][2];   /* results of invariant */
 	float result3[N][3];   /* results of x,y,z */
 	float result4[N][4];   /* results of x,y,z,p */
 	float result6[N][6];   /* results from Pressure Hessian queries */
@@ -121,6 +122,12 @@ int main(int argc, char *argv[]) {
 		printf("%d: d2pdxdx=%13.6e, d2pdxdy=%13.6e, d2pdxdz=%13.6e, d2pdydy=%13.6e, d2pdydz=%13.6e, d2pdzdz=%13.6e\n", p,
 			result6[p][0], result6[p][1], result6[p][2], result6[p][3], result6[p][4], result6[p][5]);
 
+	}
+
+	printf("\nRequesting invariant at %d points...\n", N);
+	getInvariant(authtoken, dataset, time, FD4Lag4, temporalInterp, N, points, result2);
+	for (p = 0; p < N; p++) {
+		printf("%d: S2=%13.6e, O2=%13.6e\n", p, result2[p][0], result2[p][1]);
 	}
 
 	printf("\nRequesting threshold...\n");

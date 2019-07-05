@@ -79,6 +79,7 @@
     ! getposition method (Lagrangian integration time step)
     real(RP) :: points(3, 10)    ! input
     real(RP) :: dataout1(10)     ! p
+    real(RP) :: dataout2(2, 10)  ! results from invariant
     real(RP) :: dataout3(3, 10)  ! x,y,z
     real(RP) :: dataout4(4, 10)  ! x,y,z,p
     real(RP) :: dataout6(6, 10)  ! results from Pressure Hessian
@@ -104,9 +105,9 @@
     integer :: getmagneticfieldlaplacian, getmagneticfieldhessian
     integer :: getvectorpotential, getvectorpotentialgradient
     integer :: getvectorpotentiallaplacian, getvectorpotentialhessian
-    integer :: getpressuregradient, getpressurehessian
+    integer :: getpressure, getpressuregradient, getpressurehessian
+    integer :: getinvariant
     integer :: getposition
-    integer :: getpressure
     integer :: getthreshold
     ! If working with hdf5 cutout files, uncomment the lines below
     ! to load the file and use the functions locally:
@@ -457,6 +458,13 @@
             ', duydy=', dataout9(5,i), ', duydz=', dataout9(6,i),  &
             ', duzdx=', dataout9(7,i), ', duzdy=', dataout9(8,i),  &
             ', duzdz=', dataout9(9,i)
+    end do
+
+    write(*,*)
+    write(*,'(a)') 'Requesting invariant at 10 points...'
+    rc = getinvariant(authkey, dataset, time, FD4Lag4, NoTInt, 10, points, dataout2)
+    do i = 1, 10
+        write(*,format3) i, ': S2=', dataout2(1,i), ', O2=', dataout2(2,i)
     end do
 
     write(*,*)
