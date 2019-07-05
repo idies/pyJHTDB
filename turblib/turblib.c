@@ -366,7 +366,7 @@ int getDensityHessian(char *authToken,
 int getInvariant(char *authToken,
 	char *dataset, float time,
 	enum SpatialInterpolation spatial, enum TemporalInterpolation temporal,
-	int count, float datain[][3], float dataout[])
+	int count, float datain[][3], float dataout[][2])
 {
 		return getInvariantSoap(authToken, dataset, time, spatial, temporal, count, datain, dataout);
 }
@@ -1907,7 +1907,10 @@ int getInvariantSoap(char *authToken,
 	int count, float datain[][3], float dataout[][2])
 {
 	int rc;
-
+	float* full_InvariantOutput;
+	full_InvariantOutput = malloc(sizeof(float)*count*3);
+	//dataout = (float*) malloc(sizeof(float)*count);
+	
 	struct _turb1__GetInvariant input;
 	struct _turb1__GetInvariantResponse output;
 
@@ -1925,7 +1928,7 @@ int getInvariantSoap(char *authToken,
 
 	rc = soap_call___turb1__GetInvariant(&__jhuturbsoap, NULL, NULL, &input, &output);
 	if (rc == SOAP_OK) {
-		memcpy(dataout, output.GetInvariantResult->Vector3,
+		memcpy(full_InvariantOutput, output.GetInvariantResult->Vector3,
 			output.GetInvariantResult->__sizeVector3 * sizeof(float) * 3);
 		bzero(__turblib_err, TURB_ERROR_LENGTH);
 	}
@@ -1938,6 +1941,12 @@ int getInvariantSoap(char *authToken,
 	soap_done(&__jhuturbsoap); /*  detach the gSOAP environment  */
 
 	__turblib_errno = rc;
+
+	for ( int i=0; i<count; i++ )
+	{
+		dataout[i][0] = *(full_InvariantOutput+i*3+0);
+		dataout[i][1] = *(full_InvariantOutput+i*3+1);
+	}
 
 	return rc;
 }
@@ -2946,6 +2955,18 @@ int getmagneticfieldhessian_(char *authToken,
 	int len_a, int len_d)
 {
 	return getMagneticFieldHessian(authToken,
+		dataset, *time,
+		*spatial, *temporal,
+		*count, datain, dataout);
+}
+
+int getinvariant_(char *authToken,
+	char *dataset, float *time,
+	int *spatial, int *temporal,
+	int *count, float datain[][3], float dataout[][2],
+	int len_a, int len_d)
+{
+	return getInvariant(authToken,
 		dataset, *time,
 		*spatial, *temporal,
 		*count, datain, dataout);

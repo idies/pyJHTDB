@@ -621,6 +621,12 @@ extern "C" {
 		enum SpatialInterpolation spatial, enum TemporalInterpolation temporal,
 		int count, float datain[][3], float dataout[][2]);
 
+	/* C */
+	int getInvariant(char *authToken,
+		char *dataset, float time,
+		enum SpatialInterpolation spatial, enum TemporalInterpolation temporal,
+		int count, float datain[][3], float dataout[][2]);
+
 	/* Fortran */
 	int getinvariant_(char *authToken,
 		char *dataset, float *time,
