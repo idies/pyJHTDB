@@ -1906,7 +1906,7 @@ int getInvariantSoap(char *authToken,
 	enum SpatialInterpolation spatial, enum TemporalInterpolation temporal,
 	int count, float datain[][3], float dataout[][2])
 {
-	int rc;
+	int rc, i;
 	float* full_InvariantOutput;
 	full_InvariantOutput = malloc(sizeof(float)*count*3);
 	//dataout = (float*) malloc(sizeof(float)*count);
@@ -1942,7 +1942,7 @@ int getInvariantSoap(char *authToken,
 
 	__turblib_errno = rc;
 
-	for ( int i=0; i<count; i++ )
+	for (i=0; i<count; i++ )
 	{
 		dataout[i][0] = *(full_InvariantOutput+i*3+0);
 		dataout[i][1] = *(full_InvariantOutput+i*3+1);
