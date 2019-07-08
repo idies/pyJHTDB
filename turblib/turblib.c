@@ -1490,8 +1490,8 @@ int getRawVelocity(char *authToken,
 
 	rc = soap_call___turb1__GetRawVelocity(&__jhuturbsoap, NULL, NULL, &input, &output);
 	if (rc == SOAP_OK) {
-		memcpy(dataout, (&output.GetRawVelocityResult)->__ptr,
-			(&output.GetRawVelocityResult)->__size);
+		memcpy(dataout, output.GetRawVelocityResult->__ptr,
+			output.GetRawVelocityResult->__size);
 		bzero(__turblib_err, TURB_ERROR_LENGTH);
 	}
 	else {
@@ -1581,8 +1581,8 @@ int getRawMagneticField(char *authToken,
 
 	rc = soap_call___turb1__GetRawMagneticField(&__jhuturbsoap, NULL, NULL, &input, &output);
 	if (rc == SOAP_OK) {
-		memcpy(dataout, (&output.GetRawMagneticFieldResult)->__ptr,
-			(&output.GetRawMagneticFieldResult)->__size);
+		memcpy(dataout, output.GetRawMagneticFieldResult->__ptr,
+			output.GetRawMagneticFieldResult->__size);
 		bzero(__turblib_err, TURB_ERROR_LENGTH);
 	}
 	else {
@@ -1672,8 +1672,8 @@ int getRawVectorPotential(char *authToken,
 
 	rc = soap_call___turb1__GetRawVectorPotential(&__jhuturbsoap, NULL, NULL, &input, &output);
 	if (rc == SOAP_OK) {
-		memcpy(dataout, (&output.GetRawVectorPotentialResult)->__ptr,
-			(&output.GetRawVectorPotentialResult)->__size);
+		memcpy(dataout, output.GetRawVectorPotentialResult->__ptr,
+			output.GetRawVectorPotentialResult->__size);
 		bzero(__turblib_err, TURB_ERROR_LENGTH);
 	}
 	else {
@@ -1763,8 +1763,8 @@ int getRawPressure(char *authToken,
 
 	rc = soap_call___turb1__GetRawPressure(&__jhuturbsoap, NULL, NULL, &input, &output);
 	if (rc == SOAP_OK) {
-		memcpy(dataout, (&output.GetRawPressureResult)->__ptr,
-			(&output.GetRawPressureResult)->__size);
+		memcpy(dataout, output.GetRawPressureResult->__ptr,
+			output.GetRawPressureResult->__size);
 		bzero(__turblib_err, TURB_ERROR_LENGTH);
 	}
 	else {
@@ -1983,8 +1983,8 @@ int getRawDensity(char *authToken,
 
 	rc = soap_call___turb1__GetRawDensity(&__jhuturbsoap, NULL, NULL, &input, &output);
 	if (rc == SOAP_OK) {
-		memcpy(dataout, (&output.GetRawDensityResult)->__ptr,
-			(&output.GetRawDensityResult)->__size);
+		memcpy(dataout, output.GetRawDensityResult->__ptr,
+			output.GetRawDensityResult->__size);
 		bzero(__turblib_err, TURB_ERROR_LENGTH);
 	}
 	else {
@@ -2038,8 +2038,8 @@ int getCutout(char *authToken,
 
 	rc = soap_call___turb1__GetAnyCutoutWeb(&__jhuturbsoap, NULL, NULL, &input, &output);
 	if (rc == SOAP_OK) {
-		memcpy(dataout, (&output.GetAnyCutoutWebResult)->__ptr,
-			(&output.GetAnyCutoutWebResult)->__size);
+		memcpy(dataout, output.GetAnyCutoutWebResult->__ptr,
+			output.GetAnyCutoutWebResult->__size);
 		//memcpy(dataout, output.GetAnyCutoutWebResult->float_,
 		//	output.GetAnyCutoutWebResult->__sizefloat_ * sizeof(float));
 		bzero(__turblib_err, TURB_ERROR_LENGTH);

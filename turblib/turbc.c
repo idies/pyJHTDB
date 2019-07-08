@@ -75,77 +75,9 @@ int main(int argc, char *argv[]) {
 	/* Enable exit on error.  See README for details. */
 	turblibSetExitOnError(1);
 
-	/* If working with cutout files, CUTOUT_SUPPORT should be defined during compilation.
-	   Make sure to run make with the "CUTOUT_SUPPORT=1" option, e.g.:
-	   $ make turbc CUTOUT_SUPPORT=1
-	   Change the filename to the name of the downloaded cutout file or supply it at the command line.
-	   Detailed instructions and an example is provided below.
-	*/
-
 	/*
 	If selecting a dataset without time evolution (e.g. isotropic4096), certain getFunctions such as getPosition do not work.
 	*/
-#ifdef CUTOUT_SUPPORT
-	if (argc > 1)
-	{
-		turblibAddLocalSource(argv[1]);
-	}
-	//turblibAddLocalSource("isotropic1024coarse.h5");
-#endif
-
-  /* The client library implements all of the server-side functionality "locally" (except
-	 for particle tracking and filtering). Therefore, if an hdf5 file with cutout data is
-	 available and loaded as above all queries for data that are within the region defined
-	 in the file will be evaluated locally (without being sent to the server). An example
-	 is provided below.
-
-	 Please note that the use of this feature of the client library requires an hdf5
-	 installation. The standard approach of simply executing queries through the server
-	 does not require hdf5 or downloading any cutout data.
-
-	 For users that make frequent calls for data in a particular region and would like to
-	 download this data to their local machine the only change in their existing code
-	 will be to use the turblibAddLocalSource function to load the hdf5 file that they
-	 have downloaded. Each function call will determine whether the data is available
-	 locally and will evaluate the query locally if it is and will make a call to the
-	 Web-services on the server if it is not.
-
-	 The steps below can be followed to download data cutouts in hdf5 format and use the
-	 client library locally:
-	 1) Download an hdf5 file containing a cubic region of the velocity data at timestep 0
-		with the following download link:
-	http://turbulence.pha.jhu.edu/download.aspx/[authorization Token]/isotropic1024coarse/u/0,1/0,16/0,16/0,16/
-	 2) Compile this sample code with the "CUTOUT_SUPPORT=1" option, e.g.:
-		$ make turbc CUTOUT_SUPPORT=1
-	 3) Uncomment the line below to Load the hdf5 cutout file:
-  */
-
-  //  turblibAddLocalSource("isotropic1024coarse.h5");
-
-  /* 4) Uncomment the code below to restrict target locations to within the data region downloaded:
-  */
-
-  //  for (p = 0; p < N; p++) {
-  //    points[p][0] = (float)rand()/RAND_MAX*2*3.141592F/64.0F;
-  //    points[p][1] = (float)rand()/RAND_MAX*2*3.141592F/64.0F;
-  //    points[p][2] = (float)rand()/RAND_MAX*2*3.141592F/64.0F;
-  //  }
-
-  /*
-	5) Uncomment the code below to call getVelocity, which will be evaluated locally as
-	   the time chosen is 0.0, which corresponds to timestep 0 and no spatial or temporal
-	   interpolation is requested:
-   */
-
-   //  printf("\nRequesting velocity at %d points...\n", N);
-   //  getVelocity (authtoken, dataset, 0.0F, NoSInt, NoTInt, N, points, result3);
-   //  for (p = 0; p < N; p++) {
-   //    printf("%d: %13.6e, %13.6e, %13.6e\n", p, result3[p][0],  result3[p][1],  result3[p][2]);
-   //  }
-
-   /* In this sample code, the default time chosen is 0.364, so all of the function calls in the
-	  remainder of the sample code will be evaluated at the server.
-   */
 
 	for (p = 0; p < N; p++) {
 		points[p][0] = (float)rand() / RAND_MAX * 2 * 3.141592F;
