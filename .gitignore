@@ -4,18 +4,27 @@ dist/
 pyJHTDB.egg-info/
 MANIFEST.in
 .tox
+
 # turblib stuff
-turblib/
+##turblib/
+
 #compiled files
 *.pyc
 *.o
+
 #shared objects
 *.so
+
 #big files
 *.eps
 *.csv
 *.gz
+
 #temporary files
 .*.swp
+
 #ipython checkpoints
 .ipynb_checkpoints
+/.vscode
+*.h5
+*.xmf

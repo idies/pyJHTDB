@@ -101,10 +101,10 @@ isotropic4096 = {'name'   : 'isotropic4096'}
 isotropic4096['name'] = 'isotropic4096'
 
 for coord in ['x', 'y', 'z']:
-    isotropic4096[coord + 'nodes'] = (np.pi/512)*np.array(list(range(4096)), dtype = np.float32)
+    isotropic4096[coord + 'nodes'] = (np.pi/2048)*np.array(list(range(4096)), dtype = np.float32)
     isotropic4096['n' + coord] = 4096
     isotropic4096['l' + coord] = 2*np.pi
-    isotropic4096['d' + coord] = np.pi/512
+    isotropic4096['d' + coord] = np.pi/2048
     isotropic4096[coord + 'periodic'] = True
     isotropic4096[coord + 'uniform'] = True
 isotropic4096['diss'] = 1.4144
@@ -116,10 +116,10 @@ rotstrat4096 = {'name'   : 'rotstrat4096'}
 rotstrat4096['name'] = 'rotstrat4096'
 
 for coord in ['x', 'y', 'z']:
-    rotstrat4096[coord + 'nodes'] = (np.pi/512)*np.array(list(range(4096)), dtype = np.float32)
+    rotstrat4096[coord + 'nodes'] = (np.pi/2048)*np.array(list(range(4096)), dtype = np.float32)
     rotstrat4096['n' + coord] = 4096
     rotstrat4096['l' + coord] = 2*np.pi
-    rotstrat4096['d' + coord] = np.pi/512
+    rotstrat4096['d' + coord] = np.pi/2048
     rotstrat4096[coord + 'periodic'] = True
     rotstrat4096[coord + 'uniform'] = True
 rotstrat4096['diss'] = 0.0123
