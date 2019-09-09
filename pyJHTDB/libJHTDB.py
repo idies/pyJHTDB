@@ -566,6 +566,48 @@ class libJHTDB(object):
                  result_array.ctypes.data_as(ctypes.POINTER(ctypes.POINTER(ctypes.c_float))))
         return result_array
 
+    def getBoxFilterGradient(self,
+            time, point_coords,
+            data_set = 'isotropic1024coarse',
+            make_modulo = False,
+            field = 'velocity',
+            filter_width = 7*2*np.pi / 1024,
+            FD_spacing = 4*2*np.pi / 1024):
+        if not self.connection_on:
+            print('you didn\'t connect to the database')
+            sys.exit()
+        if not (point_coords.shape[-1] == 3):
+            print ('wrong number of values for coordinates in getBoxFilter')
+            sys.exit()
+            return None
+        if not (point_coords.dtype == np.float32):
+            print('point coordinates in getBoxFilter must be floats. stopping.')
+            sys.exit()
+            return None
+        npoints = point_coords.shape[0]
+        for i in range(1, len(point_coords.shape)-1):
+            npoints *= point_coords.shape[i]
+        if make_modulo:
+            pcoords = np.zeros(point_coords.shape, np.float64)
+            pcoords[:] = point_coords
+            np.mod(pcoords, 2*np.pi, point_coords)
+        field=field.lower()
+        if field in ['velocity', 'magnetic', 'vectorPotential']:
+            result_dim = 9
+        elif field in ['pressure', 'temperature']:
+            result_dim = 3
+        result_array = np.empty([npoints,result_dim], dtype=np.float32)
+        self.lib.getBoxFilterGradient(self.authToken,
+                 ctypes.c_char_p(data_set.encode('ascii')),
+                 ctypes.c_char_p(field.encode('ascii')),
+                 ctypes.c_float(time),
+                 ctypes.c_float(filter_width),
+                 ctypes.c_float(FD_spacing),
+                 ctypes.c_int(npoints),
+                 point_coords.ctypes.data_as(ctypes.POINTER(ctypes.POINTER(ctypes.c_float))),
+                 result_array.ctypes.data_as(ctypes.POINTER(ctypes.POINTER(ctypes.c_float))))
+        return result_array
+
     def getThreshold(
             self,
             data_set = 'isotropic1024coarse',
