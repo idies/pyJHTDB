@@ -37,62 +37,62 @@ OBJ =	soapC.o \
 	stdsoap2.o \
         turblib.o
 
-all: turbc turbf mhdc mhdf channelc channelf mixingc mixingf getCutoutc getCutoutf
+all: DEMO_turbc DEMO_turbf DEMO_mhdc DEMO_mhdf DEMO_channelc DEMO_channelf DEMO_mixingc DEMO_mixingf DEMO_getCutoutc DEMO_getCutoutf
 
-getCutoutc : $(OBJ) getCutoutc.o
-	$(CC) -o $@ $(OBJ) getCutoutc.o $(LDLIBS)
+DEMO_getCutoutc : $(OBJ) DEMO_getCutoutc.o
+	$(CC) -o $@ $(OBJ) DEMO_getCutoutc.o $(LDLIBS)
 
-getCutoutc.o : compiler_flags
+DEMO_getCutoutc.o : compiler_flags
 
-getCutoutf : $(OBJ) getCutoutf.o
-	 $(FC) -o $@ $(OBJ) getCutoutf.o $(LDLIBS)
+DEMO_getCutoutf : $(OBJ) DEMO_getCutoutf.o
+	 $(FC) -o $@ $(OBJ) DEMO_getCutoutf.o $(LDLIBS)
 
-getCutoutf.o : getCutoutf.f90
-	 $(FC) -c getCutoutf.f90
+DEMO_getCutoutf.o : DEMO_getCutoutf.f90
+	 $(FC) -c DEMO_getCutoutf.f90
 
-mhdc : $(OBJ) mhdc.o
-	 $(CC) -o $@ $(OBJ) mhdc.o $(LDLIBS)
+DEMO_mhdc : $(OBJ) DEMO_mhdc.o
+	 $(CC) -o $@ $(OBJ) DEMO_mhdc.o $(LDLIBS)
 
-mhdc.o: compiler_flags
+DEMO_mhdc.o: compiler_flags
 
-turbc : $(OBJ) turbc.o
-	 $(CC) -o $@ $(OBJ) turbc.o $(LDLIBS)
+DEMO_turbc : $(OBJ) DEMO_turbc.o
+	 $(CC) -o $@ $(OBJ) DEMO_turbc.o $(LDLIBS)
 
-turbc.o: compiler_flags
+DEMO_turbc.o: compiler_flags
 
-turbf : $(OBJ) turbf.o
-	 $(FC) -o $@ $(OBJ) turbf.o $(LDLIBS)
+DEMO_turbf : $(OBJ) DEMO_turbf.o
+	 $(FC) -o $@ $(OBJ) DEMO_turbf.o $(LDLIBS)
 
-turbf.o : turbf.f90
-	 $(FC) -c turbf.f90
+DEMO_turbf.o : DEMO_turbf.f90
+	 $(FC) -c DEMO_turbf.f90
 
-mhdf : $(OBJ) mhdf.o
-	 $(FC) -o $@ $(OBJ) mhdf.o $(LDLIBS)
+DEMO_mhdf : $(OBJ) DEMO_mhdf.o
+	 $(FC) -o $@ $(OBJ) DEMO_mhdf.o $(LDLIBS)
 
-mhdf.o : mhdf.f90
-	 $(FC) -c mhdf.f90
+DEMO_mhdf.o : DEMO_mhdf.f90
+	 $(FC) -c DEMO_mhdf.f90
 
-channelc : $(OBJ) channelc.o
-	 $(CC) -o $@ $(OBJ) channelc.o $(LDLIBS)
+DEMO_channelc : $(OBJ) DEMO_channelc.o
+	 $(CC) -o $@ $(OBJ) DEMO_channelc.o $(LDLIBS)
 
-channelc.o: compiler_flags
+DEMO_channelc.o: compiler_flags
 
-channelf : $(OBJ) channelf.o
-	 $(FC) -o $@ $(OBJ) channelf.o $(LDLIBS)
+DEMO_channelf : $(OBJ) DEMO_channelf.o
+	 $(FC) -o $@ $(OBJ) DEMO_channelf.o $(LDLIBS)
 
-channelf.o : channelf.f90
-	 $(FC) -c channelf.f90
+DEMO_channelf.o : DEMO_channelf.f90
+	 $(FC) -c DEMO_channelf.f90
 
-mixingc : $(OBJ) mixingc.o
-	 $(CC) -o $@ $(OBJ) mixingc.o $(LDLIBS)
+DEMO_mixingc : $(OBJ) DEMO_mixingc.o
+	 $(CC) -o $@ $(OBJ) DEMO_mixingc.o $(LDLIBS)
 
-mixingc.o: compiler_flags
+DEMO_mixingc.o: compiler_flags
 
-mixingf : $(OBJ) mixingf.o
-	 $(FC) -o $@ $(OBJ) mixingf.o $(LDLIBS)
+DEMO_mixingf : $(OBJ) DEMO_mixingf.o
+	 $(FC) -o $@ $(OBJ) DEMO_mixingf.o $(LDLIBS)
 
-mixingf.o : mixingf.f90
-	 $(FC) -c mixingf.f90
+DEMO_mixingf.o : DEMO_mixingf.f90
+	 $(FC) -c DEMO_mixingf.f90
 
 stdsoap2.o: stdsoap2.c
 	$(CC) $(CFLAGS) -c $<

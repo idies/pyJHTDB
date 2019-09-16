@@ -17,13 +17,13 @@ compiling, linking, and/or using OpenSSL is allowed.
 extern "C" {
 #endif
 
-SOAP_SOURCE_STAMP("@(#) soapClient.c ver 2.8.16 2019-07-08 22:09:49 GMT")
+SOAP_SOURCE_STAMP("@(#) soapClient.c ver 2.8.16 2019-09-16 16:23:18 GMT")
 
 
 SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__NullOp(struct soap *soap, const char *soap_endpoint, const char *soap_action, struct _turb1__NullOp *turb1__NullOp, struct _turb1__NullOpResponse *turb1__NullOpResponse)
 {	struct __turb1__NullOp soap_tmp___turb1__NullOp;
 	if (soap_endpoint == NULL)
-		soap_endpoint = "http://test.turbulence.pha.jhu.edu/service/turbulence.asmx";
+		soap_endpoint = "http://turbulence.pha.jhu.edu/service/turbulence.asmx";
 	if (soap_action == NULL)
 		soap_action = "http://turbulence.pha.jhu.edu/NullOp";
 	soap_begin(soap);
@@ -75,7 +75,7 @@ SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__NullOp(struct soap *soap, const cha
 SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetVelocity(struct soap *soap, const char *soap_endpoint, const char *soap_action, struct _turb1__GetVelocity *turb1__GetVelocity, struct _turb1__GetVelocityResponse *turb1__GetVelocityResponse)
 {	struct __turb1__GetVelocity soap_tmp___turb1__GetVelocity;
 	if (soap_endpoint == NULL)
-		soap_endpoint = "http://test.turbulence.pha.jhu.edu/service/turbulence.asmx";
+		soap_endpoint = "http://turbulence.pha.jhu.edu/service/turbulence.asmx";
 	if (soap_action == NULL)
 		soap_action = "http://turbulence.pha.jhu.edu/GetVelocity";
 	soap_begin(soap);
@@ -127,7 +127,7 @@ SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetVelocity(struct soap *soap, cons
 SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetMagneticField(struct soap *soap, const char *soap_endpoint, const char *soap_action, struct _turb1__GetMagneticField *turb1__GetMagneticField, struct _turb1__GetMagneticFieldResponse *turb1__GetMagneticFieldResponse)
 {	struct __turb1__GetMagneticField soap_tmp___turb1__GetMagneticField;
 	if (soap_endpoint == NULL)
-		soap_endpoint = "http://test.turbulence.pha.jhu.edu/service/turbulence.asmx";
+		soap_endpoint = "http://turbulence.pha.jhu.edu/service/turbulence.asmx";
 	if (soap_action == NULL)
 		soap_action = "http://turbulence.pha.jhu.edu/GetMagneticField";
 	soap_begin(soap);
@@ -179,7 +179,7 @@ SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetMagneticField(struct soap *soap,
 SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetVectorPotential(struct soap *soap, const char *soap_endpoint, const char *soap_action, struct _turb1__GetVectorPotential *turb1__GetVectorPotential, struct _turb1__GetVectorPotentialResponse *turb1__GetVectorPotentialResponse)
 {	struct __turb1__GetVectorPotential soap_tmp___turb1__GetVectorPotential;
 	if (soap_endpoint == NULL)
-		soap_endpoint = "http://test.turbulence.pha.jhu.edu/service/turbulence.asmx";
+		soap_endpoint = "http://turbulence.pha.jhu.edu/service/turbulence.asmx";
 	if (soap_action == NULL)
 		soap_action = "http://turbulence.pha.jhu.edu/GetVectorPotential";
 	soap_begin(soap);
@@ -231,7 +231,7 @@ SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetVectorPotential(struct soap *soa
 SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetPressure(struct soap *soap, const char *soap_endpoint, const char *soap_action, struct _turb1__GetPressure *turb1__GetPressure, struct _turb1__GetPressureResponse *turb1__GetPressureResponse)
 {	struct __turb1__GetPressure soap_tmp___turb1__GetPressure;
 	if (soap_endpoint == NULL)
-		soap_endpoint = "http://test.turbulence.pha.jhu.edu/service/turbulence.asmx";
+		soap_endpoint = "http://turbulence.pha.jhu.edu/service/turbulence.asmx";
 	if (soap_action == NULL)
 		soap_action = "http://turbulence.pha.jhu.edu/GetPressure";
 	soap_begin(soap);
@@ -283,7 +283,7 @@ SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetPressure(struct soap *soap, cons
 SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetDensity(struct soap *soap, const char *soap_endpoint, const char *soap_action, struct _turb1__GetDensity *turb1__GetDensity, struct _turb1__GetDensityResponse *turb1__GetDensityResponse)
 {	struct __turb1__GetDensity soap_tmp___turb1__GetDensity;
 	if (soap_endpoint == NULL)
-		soap_endpoint = "http://test.turbulence.pha.jhu.edu/service/turbulence.asmx";
+		soap_endpoint = "http://turbulence.pha.jhu.edu/service/turbulence.asmx";
 	if (soap_action == NULL)
 		soap_action = "http://turbulence.pha.jhu.edu/GetDensity";
 	soap_begin(soap);
@@ -335,7 +335,7 @@ SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetDensity(struct soap *soap, const
 SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetTemperature(struct soap *soap, const char *soap_endpoint, const char *soap_action, struct _turb1__GetTemperature *turb1__GetTemperature, struct _turb1__GetTemperatureResponse *turb1__GetTemperatureResponse)
 {	struct __turb1__GetTemperature soap_tmp___turb1__GetTemperature;
 	if (soap_endpoint == NULL)
-		soap_endpoint = "http://test.turbulence.pha.jhu.edu/service/turbulence.asmx";
+		soap_endpoint = "http://turbulence.pha.jhu.edu/service/turbulence.asmx";
 	if (soap_action == NULL)
 		soap_action = "http://turbulence.pha.jhu.edu/GetTemperature";
 	soap_begin(soap);
@@ -387,7 +387,7 @@ SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetTemperature(struct soap *soap, c
 SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetVelocityAndPressure(struct soap *soap, const char *soap_endpoint, const char *soap_action, struct _turb1__GetVelocityAndPressure *turb1__GetVelocityAndPressure, struct _turb1__GetVelocityAndPressureResponse *turb1__GetVelocityAndPressureResponse)
 {	struct __turb1__GetVelocityAndPressure soap_tmp___turb1__GetVelocityAndPressure;
 	if (soap_endpoint == NULL)
-		soap_endpoint = "http://test.turbulence.pha.jhu.edu/service/turbulence.asmx";
+		soap_endpoint = "http://turbulence.pha.jhu.edu/service/turbulence.asmx";
 	if (soap_action == NULL)
 		soap_action = "http://turbulence.pha.jhu.edu/GetVelocityAndPressure";
 	soap_begin(soap);
@@ -439,7 +439,7 @@ SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetVelocityAndPressure(struct soap 
 SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetVelocityAndTemperature(struct soap *soap, const char *soap_endpoint, const char *soap_action, struct _turb1__GetVelocityAndTemperature *turb1__GetVelocityAndTemperature, struct _turb1__GetVelocityAndTemperatureResponse *turb1__GetVelocityAndTemperatureResponse)
 {	struct __turb1__GetVelocityAndTemperature soap_tmp___turb1__GetVelocityAndTemperature;
 	if (soap_endpoint == NULL)
-		soap_endpoint = "http://test.turbulence.pha.jhu.edu/service/turbulence.asmx";
+		soap_endpoint = "http://turbulence.pha.jhu.edu/service/turbulence.asmx";
 	if (soap_action == NULL)
 		soap_action = "http://turbulence.pha.jhu.edu/GetVelocityAndTemperature";
 	soap_begin(soap);
@@ -491,7 +491,7 @@ SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetVelocityAndTemperature(struct so
 SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetVelocityGradient(struct soap *soap, const char *soap_endpoint, const char *soap_action, struct _turb1__GetVelocityGradient *turb1__GetVelocityGradient, struct _turb1__GetVelocityGradientResponse *turb1__GetVelocityGradientResponse)
 {	struct __turb1__GetVelocityGradient soap_tmp___turb1__GetVelocityGradient;
 	if (soap_endpoint == NULL)
-		soap_endpoint = "http://test.turbulence.pha.jhu.edu/service/turbulence.asmx";
+		soap_endpoint = "http://turbulence.pha.jhu.edu/service/turbulence.asmx";
 	if (soap_action == NULL)
 		soap_action = "http://turbulence.pha.jhu.edu/GetVelocityGradient";
 	soap_begin(soap);
@@ -543,7 +543,7 @@ SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetVelocityGradient(struct soap *so
 SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetMagneticFieldGradient(struct soap *soap, const char *soap_endpoint, const char *soap_action, struct _turb1__GetMagneticFieldGradient *turb1__GetMagneticFieldGradient, struct _turb1__GetMagneticFieldGradientResponse *turb1__GetMagneticFieldGradientResponse)
 {	struct __turb1__GetMagneticFieldGradient soap_tmp___turb1__GetMagneticFieldGradient;
 	if (soap_endpoint == NULL)
-		soap_endpoint = "http://test.turbulence.pha.jhu.edu/service/turbulence.asmx";
+		soap_endpoint = "http://turbulence.pha.jhu.edu/service/turbulence.asmx";
 	if (soap_action == NULL)
 		soap_action = "http://turbulence.pha.jhu.edu/GetMagneticFieldGradient";
 	soap_begin(soap);
@@ -595,7 +595,7 @@ SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetMagneticFieldGradient(struct soa
 SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetVectorPotentialGradient(struct soap *soap, const char *soap_endpoint, const char *soap_action, struct _turb1__GetVectorPotentialGradient *turb1__GetVectorPotentialGradient, struct _turb1__GetVectorPotentialGradientResponse *turb1__GetVectorPotentialGradientResponse)
 {	struct __turb1__GetVectorPotentialGradient soap_tmp___turb1__GetVectorPotentialGradient;
 	if (soap_endpoint == NULL)
-		soap_endpoint = "http://test.turbulence.pha.jhu.edu/service/turbulence.asmx";
+		soap_endpoint = "http://turbulence.pha.jhu.edu/service/turbulence.asmx";
 	if (soap_action == NULL)
 		soap_action = "http://turbulence.pha.jhu.edu/GetVectorPotentialGradient";
 	soap_begin(soap);
@@ -647,7 +647,7 @@ SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetVectorPotentialGradient(struct s
 SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetPressureGradient(struct soap *soap, const char *soap_endpoint, const char *soap_action, struct _turb1__GetPressureGradient *turb1__GetPressureGradient, struct _turb1__GetPressureGradientResponse *turb1__GetPressureGradientResponse)
 {	struct __turb1__GetPressureGradient soap_tmp___turb1__GetPressureGradient;
 	if (soap_endpoint == NULL)
-		soap_endpoint = "http://test.turbulence.pha.jhu.edu/service/turbulence.asmx";
+		soap_endpoint = "http://turbulence.pha.jhu.edu/service/turbulence.asmx";
 	if (soap_action == NULL)
 		soap_action = "http://turbulence.pha.jhu.edu/GetPressureGradient";
 	soap_begin(soap);
@@ -699,7 +699,7 @@ SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetPressureGradient(struct soap *so
 SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetDensityGradient(struct soap *soap, const char *soap_endpoint, const char *soap_action, struct _turb1__GetDensityGradient *turb1__GetDensityGradient, struct _turb1__GetDensityGradientResponse *turb1__GetDensityGradientResponse)
 {	struct __turb1__GetDensityGradient soap_tmp___turb1__GetDensityGradient;
 	if (soap_endpoint == NULL)
-		soap_endpoint = "http://test.turbulence.pha.jhu.edu/service/turbulence.asmx";
+		soap_endpoint = "http://turbulence.pha.jhu.edu/service/turbulence.asmx";
 	if (soap_action == NULL)
 		soap_action = "http://turbulence.pha.jhu.edu/GetDensityGradient";
 	soap_begin(soap);
@@ -751,7 +751,7 @@ SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetDensityGradient(struct soap *soa
 SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetTemperatureGradient(struct soap *soap, const char *soap_endpoint, const char *soap_action, struct _turb1__GetTemperatureGradient *turb1__GetTemperatureGradient, struct _turb1__GetTemperatureGradientResponse *turb1__GetTemperatureGradientResponse)
 {	struct __turb1__GetTemperatureGradient soap_tmp___turb1__GetTemperatureGradient;
 	if (soap_endpoint == NULL)
-		soap_endpoint = "http://test.turbulence.pha.jhu.edu/service/turbulence.asmx";
+		soap_endpoint = "http://turbulence.pha.jhu.edu/service/turbulence.asmx";
 	if (soap_action == NULL)
 		soap_action = "http://turbulence.pha.jhu.edu/GetTemperatureGradient";
 	soap_begin(soap);
@@ -803,7 +803,7 @@ SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetTemperatureGradient(struct soap 
 SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetVelocityHessian(struct soap *soap, const char *soap_endpoint, const char *soap_action, struct _turb1__GetVelocityHessian *turb1__GetVelocityHessian, struct _turb1__GetVelocityHessianResponse *turb1__GetVelocityHessianResponse)
 {	struct __turb1__GetVelocityHessian soap_tmp___turb1__GetVelocityHessian;
 	if (soap_endpoint == NULL)
-		soap_endpoint = "http://test.turbulence.pha.jhu.edu/service/turbulence.asmx";
+		soap_endpoint = "http://turbulence.pha.jhu.edu/service/turbulence.asmx";
 	if (soap_action == NULL)
 		soap_action = "http://turbulence.pha.jhu.edu/GetVelocityHessian";
 	soap_begin(soap);
@@ -855,7 +855,7 @@ SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetVelocityHessian(struct soap *soa
 SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetMagneticHessian(struct soap *soap, const char *soap_endpoint, const char *soap_action, struct _turb1__GetMagneticHessian *turb1__GetMagneticHessian, struct _turb1__GetMagneticHessianResponse *turb1__GetMagneticHessianResponse)
 {	struct __turb1__GetMagneticHessian soap_tmp___turb1__GetMagneticHessian;
 	if (soap_endpoint == NULL)
-		soap_endpoint = "http://test.turbulence.pha.jhu.edu/service/turbulence.asmx";
+		soap_endpoint = "http://turbulence.pha.jhu.edu/service/turbulence.asmx";
 	if (soap_action == NULL)
 		soap_action = "http://turbulence.pha.jhu.edu/GetMagneticHessian";
 	soap_begin(soap);
@@ -907,7 +907,7 @@ SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetMagneticHessian(struct soap *soa
 SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetVectorPotentialHessian(struct soap *soap, const char *soap_endpoint, const char *soap_action, struct _turb1__GetVectorPotentialHessian *turb1__GetVectorPotentialHessian, struct _turb1__GetVectorPotentialHessianResponse *turb1__GetVectorPotentialHessianResponse)
 {	struct __turb1__GetVectorPotentialHessian soap_tmp___turb1__GetVectorPotentialHessian;
 	if (soap_endpoint == NULL)
-		soap_endpoint = "http://test.turbulence.pha.jhu.edu/service/turbulence.asmx";
+		soap_endpoint = "http://turbulence.pha.jhu.edu/service/turbulence.asmx";
 	if (soap_action == NULL)
 		soap_action = "http://turbulence.pha.jhu.edu/GetVectorPotentialHessian";
 	soap_begin(soap);
@@ -959,7 +959,7 @@ SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetVectorPotentialHessian(struct so
 SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetPressureHessian(struct soap *soap, const char *soap_endpoint, const char *soap_action, struct _turb1__GetPressureHessian *turb1__GetPressureHessian, struct _turb1__GetPressureHessianResponse *turb1__GetPressureHessianResponse)
 {	struct __turb1__GetPressureHessian soap_tmp___turb1__GetPressureHessian;
 	if (soap_endpoint == NULL)
-		soap_endpoint = "http://test.turbulence.pha.jhu.edu/service/turbulence.asmx";
+		soap_endpoint = "http://turbulence.pha.jhu.edu/service/turbulence.asmx";
 	if (soap_action == NULL)
 		soap_action = "http://turbulence.pha.jhu.edu/GetPressureHessian";
 	soap_begin(soap);
@@ -1011,7 +1011,7 @@ SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetPressureHessian(struct soap *soa
 SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetDensityHessian(struct soap *soap, const char *soap_endpoint, const char *soap_action, struct _turb1__GetDensityHessian *turb1__GetDensityHessian, struct _turb1__GetDensityHessianResponse *turb1__GetDensityHessianResponse)
 {	struct __turb1__GetDensityHessian soap_tmp___turb1__GetDensityHessian;
 	if (soap_endpoint == NULL)
-		soap_endpoint = "http://test.turbulence.pha.jhu.edu/service/turbulence.asmx";
+		soap_endpoint = "http://turbulence.pha.jhu.edu/service/turbulence.asmx";
 	if (soap_action == NULL)
 		soap_action = "http://turbulence.pha.jhu.edu/GetDensityHessian";
 	soap_begin(soap);
@@ -1063,7 +1063,7 @@ SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetDensityHessian(struct soap *soap
 SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetTemperatureHessian(struct soap *soap, const char *soap_endpoint, const char *soap_action, struct _turb1__GetTemperatureHessian *turb1__GetTemperatureHessian, struct _turb1__GetTemperatureHessianResponse *turb1__GetTemperatureHessianResponse)
 {	struct __turb1__GetTemperatureHessian soap_tmp___turb1__GetTemperatureHessian;
 	if (soap_endpoint == NULL)
-		soap_endpoint = "http://test.turbulence.pha.jhu.edu/service/turbulence.asmx";
+		soap_endpoint = "http://turbulence.pha.jhu.edu/service/turbulence.asmx";
 	if (soap_action == NULL)
 		soap_action = "http://turbulence.pha.jhu.edu/GetTemperatureHessian";
 	soap_begin(soap);
@@ -1115,7 +1115,7 @@ SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetTemperatureHessian(struct soap *
 SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetVelocityLaplacian(struct soap *soap, const char *soap_endpoint, const char *soap_action, struct _turb1__GetVelocityLaplacian *turb1__GetVelocityLaplacian, struct _turb1__GetVelocityLaplacianResponse *turb1__GetVelocityLaplacianResponse)
 {	struct __turb1__GetVelocityLaplacian soap_tmp___turb1__GetVelocityLaplacian;
 	if (soap_endpoint == NULL)
-		soap_endpoint = "http://test.turbulence.pha.jhu.edu/service/turbulence.asmx";
+		soap_endpoint = "http://turbulence.pha.jhu.edu/service/turbulence.asmx";
 	if (soap_action == NULL)
 		soap_action = "http://turbulence.pha.jhu.edu/GetVelocityLaplacian";
 	soap_begin(soap);
@@ -1167,7 +1167,7 @@ SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetVelocityLaplacian(struct soap *s
 SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetMagneticFieldLaplacian(struct soap *soap, const char *soap_endpoint, const char *soap_action, struct _turb1__GetMagneticFieldLaplacian *turb1__GetMagneticFieldLaplacian, struct _turb1__GetMagneticFieldLaplacianResponse *turb1__GetMagneticFieldLaplacianResponse)
 {	struct __turb1__GetMagneticFieldLaplacian soap_tmp___turb1__GetMagneticFieldLaplacian;
 	if (soap_endpoint == NULL)
-		soap_endpoint = "http://test.turbulence.pha.jhu.edu/service/turbulence.asmx";
+		soap_endpoint = "http://turbulence.pha.jhu.edu/service/turbulence.asmx";
 	if (soap_action == NULL)
 		soap_action = "http://turbulence.pha.jhu.edu/GetMagneticFieldLaplacian";
 	soap_begin(soap);
@@ -1219,7 +1219,7 @@ SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetMagneticFieldLaplacian(struct so
 SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetVectorPotentialLaplacian(struct soap *soap, const char *soap_endpoint, const char *soap_action, struct _turb1__GetVectorPotentialLaplacian *turb1__GetVectorPotentialLaplacian, struct _turb1__GetVectorPotentialLaplacianResponse *turb1__GetVectorPotentialLaplacianResponse)
 {	struct __turb1__GetVectorPotentialLaplacian soap_tmp___turb1__GetVectorPotentialLaplacian;
 	if (soap_endpoint == NULL)
-		soap_endpoint = "http://test.turbulence.pha.jhu.edu/service/turbulence.asmx";
+		soap_endpoint = "http://turbulence.pha.jhu.edu/service/turbulence.asmx";
 	if (soap_action == NULL)
 		soap_action = "http://turbulence.pha.jhu.edu/GetVectorPotentialLaplacian";
 	soap_begin(soap);
@@ -1271,7 +1271,7 @@ SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetVectorPotentialLaplacian(struct 
 SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetPosition(struct soap *soap, const char *soap_endpoint, const char *soap_action, struct _turb1__GetPosition *turb1__GetPosition, struct _turb1__GetPositionResponse *turb1__GetPositionResponse)
 {	struct __turb1__GetPosition soap_tmp___turb1__GetPosition;
 	if (soap_endpoint == NULL)
-		soap_endpoint = "http://test.turbulence.pha.jhu.edu/service/turbulence.asmx";
+		soap_endpoint = "http://turbulence.pha.jhu.edu/service/turbulence.asmx";
 	if (soap_action == NULL)
 		soap_action = "http://turbulence.pha.jhu.edu/GetPosition";
 	soap_begin(soap);
@@ -1323,7 +1323,7 @@ SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetPosition(struct soap *soap, cons
 SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetThreshold(struct soap *soap, const char *soap_endpoint, const char *soap_action, struct _turb1__GetThreshold *turb1__GetThreshold, struct _turb1__GetThresholdResponse *turb1__GetThresholdResponse)
 {	struct __turb1__GetThreshold soap_tmp___turb1__GetThreshold;
 	if (soap_endpoint == NULL)
-		soap_endpoint = "http://test.turbulence.pha.jhu.edu/service/turbulence.asmx";
+		soap_endpoint = "http://turbulence.pha.jhu.edu/service/turbulence.asmx";
 	if (soap_action == NULL)
 		soap_action = "http://turbulence.pha.jhu.edu/GetThreshold";
 	soap_begin(soap);
@@ -1375,7 +1375,7 @@ SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetThreshold(struct soap *soap, con
 SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetForce(struct soap *soap, const char *soap_endpoint, const char *soap_action, struct _turb1__GetForce *turb1__GetForce, struct _turb1__GetForceResponse *turb1__GetForceResponse)
 {	struct __turb1__GetForce soap_tmp___turb1__GetForce;
 	if (soap_endpoint == NULL)
-		soap_endpoint = "http://test.turbulence.pha.jhu.edu/service/turbulence.asmx";
+		soap_endpoint = "http://turbulence.pha.jhu.edu/service/turbulence.asmx";
 	if (soap_action == NULL)
 		soap_action = "http://turbulence.pha.jhu.edu/GetForce";
 	soap_begin(soap);
@@ -1427,7 +1427,7 @@ SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetForce(struct soap *soap, const c
 SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetInvariant(struct soap *soap, const char *soap_endpoint, const char *soap_action, struct _turb1__GetInvariant *turb1__GetInvariant, struct _turb1__GetInvariantResponse *turb1__GetInvariantResponse)
 {	struct __turb1__GetInvariant soap_tmp___turb1__GetInvariant;
 	if (soap_endpoint == NULL)
-		soap_endpoint = "http://test.turbulence.pha.jhu.edu/service/turbulence.asmx";
+		soap_endpoint = "http://turbulence.pha.jhu.edu/service/turbulence.asmx";
 	if (soap_action == NULL)
 		soap_action = "http://turbulence.pha.jhu.edu/GetInvariant";
 	soap_begin(soap);
@@ -1479,7 +1479,7 @@ SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetInvariant(struct soap *soap, con
 SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetBoxFilter(struct soap *soap, const char *soap_endpoint, const char *soap_action, struct _turb1__GetBoxFilter *turb1__GetBoxFilter, struct _turb1__GetBoxFilterResponse *turb1__GetBoxFilterResponse)
 {	struct __turb1__GetBoxFilter soap_tmp___turb1__GetBoxFilter;
 	if (soap_endpoint == NULL)
-		soap_endpoint = "http://test.turbulence.pha.jhu.edu/service/turbulence.asmx";
+		soap_endpoint = "http://turbulence.pha.jhu.edu/service/turbulence.asmx";
 	if (soap_action == NULL)
 		soap_action = "http://turbulence.pha.jhu.edu/GetBoxFilter";
 	soap_begin(soap);
@@ -1531,7 +1531,7 @@ SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetBoxFilter(struct soap *soap, con
 SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetBoxFilterSGS(struct soap *soap, const char *soap_endpoint, const char *soap_action, struct _turb1__GetBoxFilterSGS *turb1__GetBoxFilterSGS, struct _turb1__GetBoxFilterSGSResponse *turb1__GetBoxFilterSGSResponse)
 {	struct __turb1__GetBoxFilterSGS soap_tmp___turb1__GetBoxFilterSGS;
 	if (soap_endpoint == NULL)
-		soap_endpoint = "http://test.turbulence.pha.jhu.edu/service/turbulence.asmx";
+		soap_endpoint = "http://turbulence.pha.jhu.edu/service/turbulence.asmx";
 	if (soap_action == NULL)
 		soap_action = "http://turbulence.pha.jhu.edu/GetBoxFilterSGS";
 	soap_begin(soap);
@@ -1583,7 +1583,7 @@ SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetBoxFilterSGS(struct soap *soap, 
 SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetBoxFilterSGSsymtensor(struct soap *soap, const char *soap_endpoint, const char *soap_action, struct _turb1__GetBoxFilterSGSsymtensor *turb1__GetBoxFilterSGSsymtensor, struct _turb1__GetBoxFilterSGSsymtensorResponse *turb1__GetBoxFilterSGSsymtensorResponse)
 {	struct __turb1__GetBoxFilterSGSsymtensor soap_tmp___turb1__GetBoxFilterSGSsymtensor;
 	if (soap_endpoint == NULL)
-		soap_endpoint = "http://test.turbulence.pha.jhu.edu/service/turbulence.asmx";
+		soap_endpoint = "http://turbulence.pha.jhu.edu/service/turbulence.asmx";
 	if (soap_action == NULL)
 		soap_action = "http://turbulence.pha.jhu.edu/GetBoxFilterSGSsymtensor";
 	soap_begin(soap);
@@ -1635,7 +1635,7 @@ SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetBoxFilterSGSsymtensor(struct soa
 SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetBoxFilterSGStensor(struct soap *soap, const char *soap_endpoint, const char *soap_action, struct _turb1__GetBoxFilterSGStensor *turb1__GetBoxFilterSGStensor, struct _turb1__GetBoxFilterSGStensorResponse *turb1__GetBoxFilterSGStensorResponse)
 {	struct __turb1__GetBoxFilterSGStensor soap_tmp___turb1__GetBoxFilterSGStensor;
 	if (soap_endpoint == NULL)
-		soap_endpoint = "http://test.turbulence.pha.jhu.edu/service/turbulence.asmx";
+		soap_endpoint = "http://turbulence.pha.jhu.edu/service/turbulence.asmx";
 	if (soap_action == NULL)
 		soap_action = "http://turbulence.pha.jhu.edu/GetBoxFilterSGStensor";
 	soap_begin(soap);
@@ -1687,7 +1687,7 @@ SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetBoxFilterSGStensor(struct soap *
 SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetBoxFilterSGSvector(struct soap *soap, const char *soap_endpoint, const char *soap_action, struct _turb1__GetBoxFilterSGSvector *turb1__GetBoxFilterSGSvector, struct _turb1__GetBoxFilterSGSvectorResponse *turb1__GetBoxFilterSGSvectorResponse)
 {	struct __turb1__GetBoxFilterSGSvector soap_tmp___turb1__GetBoxFilterSGSvector;
 	if (soap_endpoint == NULL)
-		soap_endpoint = "http://test.turbulence.pha.jhu.edu/service/turbulence.asmx";
+		soap_endpoint = "http://turbulence.pha.jhu.edu/service/turbulence.asmx";
 	if (soap_action == NULL)
 		soap_action = "http://turbulence.pha.jhu.edu/GetBoxFilterSGSvector";
 	soap_begin(soap);
@@ -1739,7 +1739,7 @@ SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetBoxFilterSGSvector(struct soap *
 SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetBoxFilterSGSscalar(struct soap *soap, const char *soap_endpoint, const char *soap_action, struct _turb1__GetBoxFilterSGSscalar *turb1__GetBoxFilterSGSscalar, struct _turb1__GetBoxFilterSGSscalarResponse *turb1__GetBoxFilterSGSscalarResponse)
 {	struct __turb1__GetBoxFilterSGSscalar soap_tmp___turb1__GetBoxFilterSGSscalar;
 	if (soap_endpoint == NULL)
-		soap_endpoint = "http://test.turbulence.pha.jhu.edu/service/turbulence.asmx";
+		soap_endpoint = "http://turbulence.pha.jhu.edu/service/turbulence.asmx";
 	if (soap_action == NULL)
 		soap_action = "http://turbulence.pha.jhu.edu/GetBoxFilterSGSscalar";
 	soap_begin(soap);
@@ -1791,7 +1791,7 @@ SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetBoxFilterSGSscalar(struct soap *
 SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetBoxFilterGradient(struct soap *soap, const char *soap_endpoint, const char *soap_action, struct _turb1__GetBoxFilterGradient *turb1__GetBoxFilterGradient, struct _turb1__GetBoxFilterGradientResponse *turb1__GetBoxFilterGradientResponse)
 {	struct __turb1__GetBoxFilterGradient soap_tmp___turb1__GetBoxFilterGradient;
 	if (soap_endpoint == NULL)
-		soap_endpoint = "http://test.turbulence.pha.jhu.edu/service/turbulence.asmx";
+		soap_endpoint = "http://turbulence.pha.jhu.edu/service/turbulence.asmx";
 	if (soap_action == NULL)
 		soap_action = "http://turbulence.pha.jhu.edu/GetBoxFilterGradient";
 	soap_begin(soap);
@@ -1843,7 +1843,7 @@ SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetBoxFilterGradient(struct soap *s
 SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetLaplacianOfGradient(struct soap *soap, const char *soap_endpoint, const char *soap_action, struct _turb1__GetLaplacianOfGradient *turb1__GetLaplacianOfGradient, struct _turb1__GetLaplacianOfGradientResponse *turb1__GetLaplacianOfGradientResponse)
 {	struct __turb1__GetLaplacianOfGradient soap_tmp___turb1__GetLaplacianOfGradient;
 	if (soap_endpoint == NULL)
-		soap_endpoint = "http://test.turbulence.pha.jhu.edu/service/turbulence.asmx";
+		soap_endpoint = "http://turbulence.pha.jhu.edu/service/turbulence.asmx";
 	if (soap_action == NULL)
 		soap_action = "http://turbulence.pha.jhu.edu/GetLaplacianOfGradient";
 	soap_begin(soap);
@@ -1895,7 +1895,7 @@ SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetLaplacianOfGradient(struct soap 
 SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetVelocityBatch(struct soap *soap, const char *soap_endpoint, const char *soap_action, struct _turb1__GetVelocityBatch *turb1__GetVelocityBatch, struct _turb1__GetVelocityBatchResponse *turb1__GetVelocityBatchResponse)
 {	struct __turb1__GetVelocityBatch soap_tmp___turb1__GetVelocityBatch;
 	if (soap_endpoint == NULL)
-		soap_endpoint = "http://test.turbulence.pha.jhu.edu/service/turbulence.asmx";
+		soap_endpoint = "http://turbulence.pha.jhu.edu/service/turbulence.asmx";
 	if (soap_action == NULL)
 		soap_action = "http://turbulence.pha.jhu.edu/GetVelocityBatch";
 	soap_begin(soap);
@@ -1947,7 +1947,7 @@ SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetVelocityBatch(struct soap *soap,
 SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetRawVelocity(struct soap *soap, const char *soap_endpoint, const char *soap_action, struct _turb1__GetRawVelocity *turb1__GetRawVelocity, struct _turb1__GetRawVelocityResponse *turb1__GetRawVelocityResponse)
 {	struct __turb1__GetRawVelocity soap_tmp___turb1__GetRawVelocity;
 	if (soap_endpoint == NULL)
-		soap_endpoint = "http://test.turbulence.pha.jhu.edu/service/turbulence.asmx";
+		soap_endpoint = "http://turbulence.pha.jhu.edu/service/turbulence.asmx";
 	if (soap_action == NULL)
 		soap_action = "http://turbulence.pha.jhu.edu/GetRawVelocity";
 	soap_begin(soap);
@@ -1999,7 +1999,7 @@ SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetRawVelocity(struct soap *soap, c
 SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetRawMagneticField(struct soap *soap, const char *soap_endpoint, const char *soap_action, struct _turb1__GetRawMagneticField *turb1__GetRawMagneticField, struct _turb1__GetRawMagneticFieldResponse *turb1__GetRawMagneticFieldResponse)
 {	struct __turb1__GetRawMagneticField soap_tmp___turb1__GetRawMagneticField;
 	if (soap_endpoint == NULL)
-		soap_endpoint = "http://test.turbulence.pha.jhu.edu/service/turbulence.asmx";
+		soap_endpoint = "http://turbulence.pha.jhu.edu/service/turbulence.asmx";
 	if (soap_action == NULL)
 		soap_action = "http://turbulence.pha.jhu.edu/GetRawMagneticField";
 	soap_begin(soap);
@@ -2051,7 +2051,7 @@ SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetRawMagneticField(struct soap *so
 SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetRawVectorPotential(struct soap *soap, const char *soap_endpoint, const char *soap_action, struct _turb1__GetRawVectorPotential *turb1__GetRawVectorPotential, struct _turb1__GetRawVectorPotentialResponse *turb1__GetRawVectorPotentialResponse)
 {	struct __turb1__GetRawVectorPotential soap_tmp___turb1__GetRawVectorPotential;
 	if (soap_endpoint == NULL)
-		soap_endpoint = "http://test.turbulence.pha.jhu.edu/service/turbulence.asmx";
+		soap_endpoint = "http://turbulence.pha.jhu.edu/service/turbulence.asmx";
 	if (soap_action == NULL)
 		soap_action = "http://turbulence.pha.jhu.edu/GetRawVectorPotential";
 	soap_begin(soap);
@@ -2103,7 +2103,7 @@ SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetRawVectorPotential(struct soap *
 SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetRawPressure(struct soap *soap, const char *soap_endpoint, const char *soap_action, struct _turb1__GetRawPressure *turb1__GetRawPressure, struct _turb1__GetRawPressureResponse *turb1__GetRawPressureResponse)
 {	struct __turb1__GetRawPressure soap_tmp___turb1__GetRawPressure;
 	if (soap_endpoint == NULL)
-		soap_endpoint = "http://test.turbulence.pha.jhu.edu/service/turbulence.asmx";
+		soap_endpoint = "http://turbulence.pha.jhu.edu/service/turbulence.asmx";
 	if (soap_action == NULL)
 		soap_action = "http://turbulence.pha.jhu.edu/GetRawPressure";
 	soap_begin(soap);
@@ -2155,7 +2155,7 @@ SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetRawPressure(struct soap *soap, c
 SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetRawDensity(struct soap *soap, const char *soap_endpoint, const char *soap_action, struct _turb1__GetRawDensity *turb1__GetRawDensity, struct _turb1__GetRawDensityResponse *turb1__GetRawDensityResponse)
 {	struct __turb1__GetRawDensity soap_tmp___turb1__GetRawDensity;
 	if (soap_endpoint == NULL)
-		soap_endpoint = "http://test.turbulence.pha.jhu.edu/service/turbulence.asmx";
+		soap_endpoint = "http://turbulence.pha.jhu.edu/service/turbulence.asmx";
 	if (soap_action == NULL)
 		soap_action = "http://turbulence.pha.jhu.edu/GetRawDensity";
 	soap_begin(soap);
@@ -2207,7 +2207,7 @@ SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetRawDensity(struct soap *soap, co
 SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetRawTemperature(struct soap *soap, const char *soap_endpoint, const char *soap_action, struct _turb1__GetRawTemperature *turb1__GetRawTemperature, struct _turb1__GetRawTemperatureResponse *turb1__GetRawTemperatureResponse)
 {	struct __turb1__GetRawTemperature soap_tmp___turb1__GetRawTemperature;
 	if (soap_endpoint == NULL)
-		soap_endpoint = "http://test.turbulence.pha.jhu.edu/service/turbulence.asmx";
+		soap_endpoint = "http://turbulence.pha.jhu.edu/service/turbulence.asmx";
 	if (soap_action == NULL)
 		soap_action = "http://turbulence.pha.jhu.edu/GetRawTemperature";
 	soap_begin(soap);
@@ -2259,7 +2259,7 @@ SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetRawTemperature(struct soap *soap
 SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetAnyCutoutWeb(struct soap *soap, const char *soap_endpoint, const char *soap_action, struct _turb1__GetAnyCutoutWeb *turb1__GetAnyCutoutWeb, struct _turb1__GetAnyCutoutWebResponse *turb1__GetAnyCutoutWebResponse)
 {	struct __turb1__GetAnyCutoutWeb soap_tmp___turb1__GetAnyCutoutWeb;
 	if (soap_endpoint == NULL)
-		soap_endpoint = "http://test.turbulence.pha.jhu.edu/service/turbulence.asmx";
+		soap_endpoint = "http://turbulence.pha.jhu.edu/service/turbulence.asmx";
 	if (soap_action == NULL)
 		soap_action = "http://turbulence.pha.jhu.edu/GetAnyCutoutWeb";
 	soap_begin(soap);
@@ -2311,7 +2311,7 @@ SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetAnyCutoutWeb(struct soap *soap, 
 SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__NullOp_(struct soap *soap, const char *soap_endpoint, const char *soap_action, struct _turb1__NullOp *turb1__NullOp, struct _turb1__NullOpResponse *turb1__NullOpResponse)
 {	struct __turb1__NullOp_ soap_tmp___turb1__NullOp_;
 	if (soap_endpoint == NULL)
-		soap_endpoint = "http://test.turbulence.pha.jhu.edu/service/turbulence.asmx";
+		soap_endpoint = "http://turbulence.pha.jhu.edu/service/turbulence.asmx";
 	if (soap_action == NULL)
 		soap_action = "http://turbulence.pha.jhu.edu/NullOp";
 	soap_begin(soap);
@@ -2363,7 +2363,7 @@ SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__NullOp_(struct soap *soap, const ch
 SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetVelocity_(struct soap *soap, const char *soap_endpoint, const char *soap_action, struct _turb1__GetVelocity *turb1__GetVelocity, struct _turb1__GetVelocityResponse *turb1__GetVelocityResponse)
 {	struct __turb1__GetVelocity_ soap_tmp___turb1__GetVelocity_;
 	if (soap_endpoint == NULL)
-		soap_endpoint = "http://test.turbulence.pha.jhu.edu/service/turbulence.asmx";
+		soap_endpoint = "http://turbulence.pha.jhu.edu/service/turbulence.asmx";
 	if (soap_action == NULL)
 		soap_action = "http://turbulence.pha.jhu.edu/GetVelocity";
 	soap_begin(soap);
@@ -2415,7 +2415,7 @@ SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetVelocity_(struct soap *soap, con
 SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetMagneticField_(struct soap *soap, const char *soap_endpoint, const char *soap_action, struct _turb1__GetMagneticField *turb1__GetMagneticField, struct _turb1__GetMagneticFieldResponse *turb1__GetMagneticFieldResponse)
 {	struct __turb1__GetMagneticField_ soap_tmp___turb1__GetMagneticField_;
 	if (soap_endpoint == NULL)
-		soap_endpoint = "http://test.turbulence.pha.jhu.edu/service/turbulence.asmx";
+		soap_endpoint = "http://turbulence.pha.jhu.edu/service/turbulence.asmx";
 	if (soap_action == NULL)
 		soap_action = "http://turbulence.pha.jhu.edu/GetMagneticField";
 	soap_begin(soap);
@@ -2467,7 +2467,7 @@ SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetMagneticField_(struct soap *soap
 SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetVectorPotential_(struct soap *soap, const char *soap_endpoint, const char *soap_action, struct _turb1__GetVectorPotential *turb1__GetVectorPotential, struct _turb1__GetVectorPotentialResponse *turb1__GetVectorPotentialResponse)
 {	struct __turb1__GetVectorPotential_ soap_tmp___turb1__GetVectorPotential_;
 	if (soap_endpoint == NULL)
-		soap_endpoint = "http://test.turbulence.pha.jhu.edu/service/turbulence.asmx";
+		soap_endpoint = "http://turbulence.pha.jhu.edu/service/turbulence.asmx";
 	if (soap_action == NULL)
 		soap_action = "http://turbulence.pha.jhu.edu/GetVectorPotential";
 	soap_begin(soap);
@@ -2519,7 +2519,7 @@ SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetVectorPotential_(struct soap *so
 SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetPressure_(struct soap *soap, const char *soap_endpoint, const char *soap_action, struct _turb1__GetPressure *turb1__GetPressure, struct _turb1__GetPressureResponse *turb1__GetPressureResponse)
 {	struct __turb1__GetPressure_ soap_tmp___turb1__GetPressure_;
 	if (soap_endpoint == NULL)
-		soap_endpoint = "http://test.turbulence.pha.jhu.edu/service/turbulence.asmx";
+		soap_endpoint = "http://turbulence.pha.jhu.edu/service/turbulence.asmx";
 	if (soap_action == NULL)
 		soap_action = "http://turbulence.pha.jhu.edu/GetPressure";
 	soap_begin(soap);
@@ -2571,7 +2571,7 @@ SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetPressure_(struct soap *soap, con
 SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetDensity_(struct soap *soap, const char *soap_endpoint, const char *soap_action, struct _turb1__GetDensity *turb1__GetDensity, struct _turb1__GetDensityResponse *turb1__GetDensityResponse)
 {	struct __turb1__GetDensity_ soap_tmp___turb1__GetDensity_;
 	if (soap_endpoint == NULL)
-		soap_endpoint = "http://test.turbulence.pha.jhu.edu/service/turbulence.asmx";
+		soap_endpoint = "http://turbulence.pha.jhu.edu/service/turbulence.asmx";
 	if (soap_action == NULL)
 		soap_action = "http://turbulence.pha.jhu.edu/GetDensity";
 	soap_begin(soap);
@@ -2623,7 +2623,7 @@ SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetDensity_(struct soap *soap, cons
 SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetTemperature_(struct soap *soap, const char *soap_endpoint, const char *soap_action, struct _turb1__GetTemperature *turb1__GetTemperature, struct _turb1__GetTemperatureResponse *turb1__GetTemperatureResponse)
 {	struct __turb1__GetTemperature_ soap_tmp___turb1__GetTemperature_;
 	if (soap_endpoint == NULL)
-		soap_endpoint = "http://test.turbulence.pha.jhu.edu/service/turbulence.asmx";
+		soap_endpoint = "http://turbulence.pha.jhu.edu/service/turbulence.asmx";
 	if (soap_action == NULL)
 		soap_action = "http://turbulence.pha.jhu.edu/GetTemperature";
 	soap_begin(soap);
@@ -2675,7 +2675,7 @@ SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetTemperature_(struct soap *soap, 
 SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetVelocityAndPressure_(struct soap *soap, const char *soap_endpoint, const char *soap_action, struct _turb1__GetVelocityAndPressure *turb1__GetVelocityAndPressure, struct _turb1__GetVelocityAndPressureResponse *turb1__GetVelocityAndPressureResponse)
 {	struct __turb1__GetVelocityAndPressure_ soap_tmp___turb1__GetVelocityAndPressure_;
 	if (soap_endpoint == NULL)
-		soap_endpoint = "http://test.turbulence.pha.jhu.edu/service/turbulence.asmx";
+		soap_endpoint = "http://turbulence.pha.jhu.edu/service/turbulence.asmx";
 	if (soap_action == NULL)
 		soap_action = "http://turbulence.pha.jhu.edu/GetVelocityAndPressure";
 	soap_begin(soap);
@@ -2727,7 +2727,7 @@ SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetVelocityAndPressure_(struct soap
 SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetVelocityAndTemperature_(struct soap *soap, const char *soap_endpoint, const char *soap_action, struct _turb1__GetVelocityAndTemperature *turb1__GetVelocityAndTemperature, struct _turb1__GetVelocityAndTemperatureResponse *turb1__GetVelocityAndTemperatureResponse)
 {	struct __turb1__GetVelocityAndTemperature_ soap_tmp___turb1__GetVelocityAndTemperature_;
 	if (soap_endpoint == NULL)
-		soap_endpoint = "http://test.turbulence.pha.jhu.edu/service/turbulence.asmx";
+		soap_endpoint = "http://turbulence.pha.jhu.edu/service/turbulence.asmx";
 	if (soap_action == NULL)
 		soap_action = "http://turbulence.pha.jhu.edu/GetVelocityAndTemperature";
 	soap_begin(soap);
@@ -2779,7 +2779,7 @@ SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetVelocityAndTemperature_(struct s
 SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetVelocityGradient_(struct soap *soap, const char *soap_endpoint, const char *soap_action, struct _turb1__GetVelocityGradient *turb1__GetVelocityGradient, struct _turb1__GetVelocityGradientResponse *turb1__GetVelocityGradientResponse)
 {	struct __turb1__GetVelocityGradient_ soap_tmp___turb1__GetVelocityGradient_;
 	if (soap_endpoint == NULL)
-		soap_endpoint = "http://test.turbulence.pha.jhu.edu/service/turbulence.asmx";
+		soap_endpoint = "http://turbulence.pha.jhu.edu/service/turbulence.asmx";
 	if (soap_action == NULL)
 		soap_action = "http://turbulence.pha.jhu.edu/GetVelocityGradient";
 	soap_begin(soap);
@@ -2831,7 +2831,7 @@ SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetVelocityGradient_(struct soap *s
 SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetMagneticFieldGradient_(struct soap *soap, const char *soap_endpoint, const char *soap_action, struct _turb1__GetMagneticFieldGradient *turb1__GetMagneticFieldGradient, struct _turb1__GetMagneticFieldGradientResponse *turb1__GetMagneticFieldGradientResponse)
 {	struct __turb1__GetMagneticFieldGradient_ soap_tmp___turb1__GetMagneticFieldGradient_;
 	if (soap_endpoint == NULL)
-		soap_endpoint = "http://test.turbulence.pha.jhu.edu/service/turbulence.asmx";
+		soap_endpoint = "http://turbulence.pha.jhu.edu/service/turbulence.asmx";
 	if (soap_action == NULL)
 		soap_action = "http://turbulence.pha.jhu.edu/GetMagneticFieldGradient";
 	soap_begin(soap);
@@ -2883,7 +2883,7 @@ SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetMagneticFieldGradient_(struct so
 SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetVectorPotentialGradient_(struct soap *soap, const char *soap_endpoint, const char *soap_action, struct _turb1__GetVectorPotentialGradient *turb1__GetVectorPotentialGradient, struct _turb1__GetVectorPotentialGradientResponse *turb1__GetVectorPotentialGradientResponse)
 {	struct __turb1__GetVectorPotentialGradient_ soap_tmp___turb1__GetVectorPotentialGradient_;
 	if (soap_endpoint == NULL)
-		soap_endpoint = "http://test.turbulence.pha.jhu.edu/service/turbulence.asmx";
+		soap_endpoint = "http://turbulence.pha.jhu.edu/service/turbulence.asmx";
 	if (soap_action == NULL)
 		soap_action = "http://turbulence.pha.jhu.edu/GetVectorPotentialGradient";
 	soap_begin(soap);
@@ -2935,7 +2935,7 @@ SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetVectorPotentialGradient_(struct 
 SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetPressureGradient_(struct soap *soap, const char *soap_endpoint, const char *soap_action, struct _turb1__GetPressureGradient *turb1__GetPressureGradient, struct _turb1__GetPressureGradientResponse *turb1__GetPressureGradientResponse)
 {	struct __turb1__GetPressureGradient_ soap_tmp___turb1__GetPressureGradient_;
 	if (soap_endpoint == NULL)
-		soap_endpoint = "http://test.turbulence.pha.jhu.edu/service/turbulence.asmx";
+		soap_endpoint = "http://turbulence.pha.jhu.edu/service/turbulence.asmx";
 	if (soap_action == NULL)
 		soap_action = "http://turbulence.pha.jhu.edu/GetPressureGradient";
 	soap_begin(soap);
@@ -2987,7 +2987,7 @@ SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetPressureGradient_(struct soap *s
 SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetDensityGradient_(struct soap *soap, const char *soap_endpoint, const char *soap_action, struct _turb1__GetDensityGradient *turb1__GetDensityGradient, struct _turb1__GetDensityGradientResponse *turb1__GetDensityGradientResponse)
 {	struct __turb1__GetDensityGradient_ soap_tmp___turb1__GetDensityGradient_;
 	if (soap_endpoint == NULL)
-		soap_endpoint = "http://test.turbulence.pha.jhu.edu/service/turbulence.asmx";
+		soap_endpoint = "http://turbulence.pha.jhu.edu/service/turbulence.asmx";
 	if (soap_action == NULL)
 		soap_action = "http://turbulence.pha.jhu.edu/GetDensityGradient";
 	soap_begin(soap);
@@ -3039,7 +3039,7 @@ SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetDensityGradient_(struct soap *so
 SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetTemperatureGradient_(struct soap *soap, const char *soap_endpoint, const char *soap_action, struct _turb1__GetTemperatureGradient *turb1__GetTemperatureGradient, struct _turb1__GetTemperatureGradientResponse *turb1__GetTemperatureGradientResponse)
 {	struct __turb1__GetTemperatureGradient_ soap_tmp___turb1__GetTemperatureGradient_;
 	if (soap_endpoint == NULL)
-		soap_endpoint = "http://test.turbulence.pha.jhu.edu/service/turbulence.asmx";
+		soap_endpoint = "http://turbulence.pha.jhu.edu/service/turbulence.asmx";
 	if (soap_action == NULL)
 		soap_action = "http://turbulence.pha.jhu.edu/GetTemperatureGradient";
 	soap_begin(soap);
@@ -3091,7 +3091,7 @@ SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetTemperatureGradient_(struct soap
 SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetVelocityHessian_(struct soap *soap, const char *soap_endpoint, const char *soap_action, struct _turb1__GetVelocityHessian *turb1__GetVelocityHessian, struct _turb1__GetVelocityHessianResponse *turb1__GetVelocityHessianResponse)
 {	struct __turb1__GetVelocityHessian_ soap_tmp___turb1__GetVelocityHessian_;
 	if (soap_endpoint == NULL)
-		soap_endpoint = "http://test.turbulence.pha.jhu.edu/service/turbulence.asmx";
+		soap_endpoint = "http://turbulence.pha.jhu.edu/service/turbulence.asmx";
 	if (soap_action == NULL)
 		soap_action = "http://turbulence.pha.jhu.edu/GetVelocityHessian";
 	soap_begin(soap);
@@ -3143,7 +3143,7 @@ SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetVelocityHessian_(struct soap *so
 SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetMagneticHessian_(struct soap *soap, const char *soap_endpoint, const char *soap_action, struct _turb1__GetMagneticHessian *turb1__GetMagneticHessian, struct _turb1__GetMagneticHessianResponse *turb1__GetMagneticHessianResponse)
 {	struct __turb1__GetMagneticHessian_ soap_tmp___turb1__GetMagneticHessian_;
 	if (soap_endpoint == NULL)
-		soap_endpoint = "http://test.turbulence.pha.jhu.edu/service/turbulence.asmx";
+		soap_endpoint = "http://turbulence.pha.jhu.edu/service/turbulence.asmx";
 	if (soap_action == NULL)
 		soap_action = "http://turbulence.pha.jhu.edu/GetMagneticHessian";
 	soap_begin(soap);
@@ -3195,7 +3195,7 @@ SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetMagneticHessian_(struct soap *so
 SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetVectorPotentialHessian_(struct soap *soap, const char *soap_endpoint, const char *soap_action, struct _turb1__GetVectorPotentialHessian *turb1__GetVectorPotentialHessian, struct _turb1__GetVectorPotentialHessianResponse *turb1__GetVectorPotentialHessianResponse)
 {	struct __turb1__GetVectorPotentialHessian_ soap_tmp___turb1__GetVectorPotentialHessian_;
 	if (soap_endpoint == NULL)
-		soap_endpoint = "http://test.turbulence.pha.jhu.edu/service/turbulence.asmx";
+		soap_endpoint = "http://turbulence.pha.jhu.edu/service/turbulence.asmx";
 	if (soap_action == NULL)
 		soap_action = "http://turbulence.pha.jhu.edu/GetVectorPotentialHessian";
 	soap_begin(soap);
@@ -3247,7 +3247,7 @@ SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetVectorPotentialHessian_(struct s
 SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetPressureHessian_(struct soap *soap, const char *soap_endpoint, const char *soap_action, struct _turb1__GetPressureHessian *turb1__GetPressureHessian, struct _turb1__GetPressureHessianResponse *turb1__GetPressureHessianResponse)
 {	struct __turb1__GetPressureHessian_ soap_tmp___turb1__GetPressureHessian_;
 	if (soap_endpoint == NULL)
-		soap_endpoint = "http://test.turbulence.pha.jhu.edu/service/turbulence.asmx";
+		soap_endpoint = "http://turbulence.pha.jhu.edu/service/turbulence.asmx";
 	if (soap_action == NULL)
 		soap_action = "http://turbulence.pha.jhu.edu/GetPressureHessian";
 	soap_begin(soap);
@@ -3299,7 +3299,7 @@ SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetPressureHessian_(struct soap *so
 SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetDensityHessian_(struct soap *soap, const char *soap_endpoint, const char *soap_action, struct _turb1__GetDensityHessian *turb1__GetDensityHessian, struct _turb1__GetDensityHessianResponse *turb1__GetDensityHessianResponse)
 {	struct __turb1__GetDensityHessian_ soap_tmp___turb1__GetDensityHessian_;
 	if (soap_endpoint == NULL)
-		soap_endpoint = "http://test.turbulence.pha.jhu.edu/service/turbulence.asmx";
+		soap_endpoint = "http://turbulence.pha.jhu.edu/service/turbulence.asmx";
 	if (soap_action == NULL)
 		soap_action = "http://turbulence.pha.jhu.edu/GetDensityHessian";
 	soap_begin(soap);
@@ -3351,7 +3351,7 @@ SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetDensityHessian_(struct soap *soa
 SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetTemperatureHessian_(struct soap *soap, const char *soap_endpoint, const char *soap_action, struct _turb1__GetTemperatureHessian *turb1__GetTemperatureHessian, struct _turb1__GetTemperatureHessianResponse *turb1__GetTemperatureHessianResponse)
 {	struct __turb1__GetTemperatureHessian_ soap_tmp___turb1__GetTemperatureHessian_;
 	if (soap_endpoint == NULL)
-		soap_endpoint = "http://test.turbulence.pha.jhu.edu/service/turbulence.asmx";
+		soap_endpoint = "http://turbulence.pha.jhu.edu/service/turbulence.asmx";
 	if (soap_action == NULL)
 		soap_action = "http://turbulence.pha.jhu.edu/GetTemperatureHessian";
 	soap_begin(soap);
@@ -3403,7 +3403,7 @@ SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetTemperatureHessian_(struct soap 
 SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetVelocityLaplacian_(struct soap *soap, const char *soap_endpoint, const char *soap_action, struct _turb1__GetVelocityLaplacian *turb1__GetVelocityLaplacian, struct _turb1__GetVelocityLaplacianResponse *turb1__GetVelocityLaplacianResponse)
 {	struct __turb1__GetVelocityLaplacian_ soap_tmp___turb1__GetVelocityLaplacian_;
 	if (soap_endpoint == NULL)
-		soap_endpoint = "http://test.turbulence.pha.jhu.edu/service/turbulence.asmx";
+		soap_endpoint = "http://turbulence.pha.jhu.edu/service/turbulence.asmx";
 	if (soap_action == NULL)
 		soap_action = "http://turbulence.pha.jhu.edu/GetVelocityLaplacian";
 	soap_begin(soap);
@@ -3455,7 +3455,7 @@ SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetVelocityLaplacian_(struct soap *
 SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetMagneticFieldLaplacian_(struct soap *soap, const char *soap_endpoint, const char *soap_action, struct _turb1__GetMagneticFieldLaplacian *turb1__GetMagneticFieldLaplacian, struct _turb1__GetMagneticFieldLaplacianResponse *turb1__GetMagneticFieldLaplacianResponse)
 {	struct __turb1__GetMagneticFieldLaplacian_ soap_tmp___turb1__GetMagneticFieldLaplacian_;
 	if (soap_endpoint == NULL)
-		soap_endpoint = "http://test.turbulence.pha.jhu.edu/service/turbulence.asmx";
+		soap_endpoint = "http://turbulence.pha.jhu.edu/service/turbulence.asmx";
 	if (soap_action == NULL)
 		soap_action = "http://turbulence.pha.jhu.edu/GetMagneticFieldLaplacian";
 	soap_begin(soap);
@@ -3507,7 +3507,7 @@ SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetMagneticFieldLaplacian_(struct s
 SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetVectorPotentialLaplacian_(struct soap *soap, const char *soap_endpoint, const char *soap_action, struct _turb1__GetVectorPotentialLaplacian *turb1__GetVectorPotentialLaplacian, struct _turb1__GetVectorPotentialLaplacianResponse *turb1__GetVectorPotentialLaplacianResponse)
 {	struct __turb1__GetVectorPotentialLaplacian_ soap_tmp___turb1__GetVectorPotentialLaplacian_;
 	if (soap_endpoint == NULL)
-		soap_endpoint = "http://test.turbulence.pha.jhu.edu/service/turbulence.asmx";
+		soap_endpoint = "http://turbulence.pha.jhu.edu/service/turbulence.asmx";
 	if (soap_action == NULL)
 		soap_action = "http://turbulence.pha.jhu.edu/GetVectorPotentialLaplacian";
 	soap_begin(soap);
@@ -3559,7 +3559,7 @@ SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetVectorPotentialLaplacian_(struct
 SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetPosition_(struct soap *soap, const char *soap_endpoint, const char *soap_action, struct _turb1__GetPosition *turb1__GetPosition, struct _turb1__GetPositionResponse *turb1__GetPositionResponse)
 {	struct __turb1__GetPosition_ soap_tmp___turb1__GetPosition_;
 	if (soap_endpoint == NULL)
-		soap_endpoint = "http://test.turbulence.pha.jhu.edu/service/turbulence.asmx";
+		soap_endpoint = "http://turbulence.pha.jhu.edu/service/turbulence.asmx";
 	if (soap_action == NULL)
 		soap_action = "http://turbulence.pha.jhu.edu/GetPosition";
 	soap_begin(soap);
@@ -3611,7 +3611,7 @@ SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetPosition_(struct soap *soap, con
 SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetThreshold_(struct soap *soap, const char *soap_endpoint, const char *soap_action, struct _turb1__GetThreshold *turb1__GetThreshold, struct _turb1__GetThresholdResponse *turb1__GetThresholdResponse)
 {	struct __turb1__GetThreshold_ soap_tmp___turb1__GetThreshold_;
 	if (soap_endpoint == NULL)
-		soap_endpoint = "http://test.turbulence.pha.jhu.edu/service/turbulence.asmx";
+		soap_endpoint = "http://turbulence.pha.jhu.edu/service/turbulence.asmx";
 	if (soap_action == NULL)
 		soap_action = "http://turbulence.pha.jhu.edu/GetThreshold";
 	soap_begin(soap);
@@ -3663,7 +3663,7 @@ SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetThreshold_(struct soap *soap, co
 SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetForce_(struct soap *soap, const char *soap_endpoint, const char *soap_action, struct _turb1__GetForce *turb1__GetForce, struct _turb1__GetForceResponse *turb1__GetForceResponse)
 {	struct __turb1__GetForce_ soap_tmp___turb1__GetForce_;
 	if (soap_endpoint == NULL)
-		soap_endpoint = "http://test.turbulence.pha.jhu.edu/service/turbulence.asmx";
+		soap_endpoint = "http://turbulence.pha.jhu.edu/service/turbulence.asmx";
 	if (soap_action == NULL)
 		soap_action = "http://turbulence.pha.jhu.edu/GetForce";
 	soap_begin(soap);
@@ -3715,7 +3715,7 @@ SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetForce_(struct soap *soap, const 
 SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetInvariant_(struct soap *soap, const char *soap_endpoint, const char *soap_action, struct _turb1__GetInvariant *turb1__GetInvariant, struct _turb1__GetInvariantResponse *turb1__GetInvariantResponse)
 {	struct __turb1__GetInvariant_ soap_tmp___turb1__GetInvariant_;
 	if (soap_endpoint == NULL)
-		soap_endpoint = "http://test.turbulence.pha.jhu.edu/service/turbulence.asmx";
+		soap_endpoint = "http://turbulence.pha.jhu.edu/service/turbulence.asmx";
 	if (soap_action == NULL)
 		soap_action = "http://turbulence.pha.jhu.edu/GetInvariant";
 	soap_begin(soap);
@@ -3767,7 +3767,7 @@ SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetInvariant_(struct soap *soap, co
 SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetBoxFilter_(struct soap *soap, const char *soap_endpoint, const char *soap_action, struct _turb1__GetBoxFilter *turb1__GetBoxFilter, struct _turb1__GetBoxFilterResponse *turb1__GetBoxFilterResponse)
 {	struct __turb1__GetBoxFilter_ soap_tmp___turb1__GetBoxFilter_;
 	if (soap_endpoint == NULL)
-		soap_endpoint = "http://test.turbulence.pha.jhu.edu/service/turbulence.asmx";
+		soap_endpoint = "http://turbulence.pha.jhu.edu/service/turbulence.asmx";
 	if (soap_action == NULL)
 		soap_action = "http://turbulence.pha.jhu.edu/GetBoxFilter";
 	soap_begin(soap);
@@ -3819,7 +3819,7 @@ SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetBoxFilter_(struct soap *soap, co
 SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetBoxFilterSGS_(struct soap *soap, const char *soap_endpoint, const char *soap_action, struct _turb1__GetBoxFilterSGS *turb1__GetBoxFilterSGS, struct _turb1__GetBoxFilterSGSResponse *turb1__GetBoxFilterSGSResponse)
 {	struct __turb1__GetBoxFilterSGS_ soap_tmp___turb1__GetBoxFilterSGS_;
 	if (soap_endpoint == NULL)
-		soap_endpoint = "http://test.turbulence.pha.jhu.edu/service/turbulence.asmx";
+		soap_endpoint = "http://turbulence.pha.jhu.edu/service/turbulence.asmx";
 	if (soap_action == NULL)
 		soap_action = "http://turbulence.pha.jhu.edu/GetBoxFilterSGS";
 	soap_begin(soap);
@@ -3871,7 +3871,7 @@ SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetBoxFilterSGS_(struct soap *soap,
 SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetBoxFilterSGSsymtensor_(struct soap *soap, const char *soap_endpoint, const char *soap_action, struct _turb1__GetBoxFilterSGSsymtensor *turb1__GetBoxFilterSGSsymtensor, struct _turb1__GetBoxFilterSGSsymtensorResponse *turb1__GetBoxFilterSGSsymtensorResponse)
 {	struct __turb1__GetBoxFilterSGSsymtensor_ soap_tmp___turb1__GetBoxFilterSGSsymtensor_;
 	if (soap_endpoint == NULL)
-		soap_endpoint = "http://test.turbulence.pha.jhu.edu/service/turbulence.asmx";
+		soap_endpoint = "http://turbulence.pha.jhu.edu/service/turbulence.asmx";
 	if (soap_action == NULL)
 		soap_action = "http://turbulence.pha.jhu.edu/GetBoxFilterSGSsymtensor";
 	soap_begin(soap);
@@ -3923,7 +3923,7 @@ SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetBoxFilterSGSsymtensor_(struct so
 SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetBoxFilterSGStensor_(struct soap *soap, const char *soap_endpoint, const char *soap_action, struct _turb1__GetBoxFilterSGStensor *turb1__GetBoxFilterSGStensor, struct _turb1__GetBoxFilterSGStensorResponse *turb1__GetBoxFilterSGStensorResponse)
 {	struct __turb1__GetBoxFilterSGStensor_ soap_tmp___turb1__GetBoxFilterSGStensor_;
 	if (soap_endpoint == NULL)
-		soap_endpoint = "http://test.turbulence.pha.jhu.edu/service/turbulence.asmx";
+		soap_endpoint = "http://turbulence.pha.jhu.edu/service/turbulence.asmx";
 	if (soap_action == NULL)
 		soap_action = "http://turbulence.pha.jhu.edu/GetBoxFilterSGStensor";
 	soap_begin(soap);
@@ -3975,7 +3975,7 @@ SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetBoxFilterSGStensor_(struct soap 
 SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetBoxFilterSGSvector_(struct soap *soap, const char *soap_endpoint, const char *soap_action, struct _turb1__GetBoxFilterSGSvector *turb1__GetBoxFilterSGSvector, struct _turb1__GetBoxFilterSGSvectorResponse *turb1__GetBoxFilterSGSvectorResponse)
 {	struct __turb1__GetBoxFilterSGSvector_ soap_tmp___turb1__GetBoxFilterSGSvector_;
 	if (soap_endpoint == NULL)
-		soap_endpoint = "http://test.turbulence.pha.jhu.edu/service/turbulence.asmx";
+		soap_endpoint = "http://turbulence.pha.jhu.edu/service/turbulence.asmx";
 	if (soap_action == NULL)
 		soap_action = "http://turbulence.pha.jhu.edu/GetBoxFilterSGSvector";
 	soap_begin(soap);
@@ -4027,7 +4027,7 @@ SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetBoxFilterSGSvector_(struct soap 
 SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetBoxFilterSGSscalar_(struct soap *soap, const char *soap_endpoint, const char *soap_action, struct _turb1__GetBoxFilterSGSscalar *turb1__GetBoxFilterSGSscalar, struct _turb1__GetBoxFilterSGSscalarResponse *turb1__GetBoxFilterSGSscalarResponse)
 {	struct __turb1__GetBoxFilterSGSscalar_ soap_tmp___turb1__GetBoxFilterSGSscalar_;
 	if (soap_endpoint == NULL)
-		soap_endpoint = "http://test.turbulence.pha.jhu.edu/service/turbulence.asmx";
+		soap_endpoint = "http://turbulence.pha.jhu.edu/service/turbulence.asmx";
 	if (soap_action == NULL)
 		soap_action = "http://turbulence.pha.jhu.edu/GetBoxFilterSGSscalar";
 	soap_begin(soap);
@@ -4079,7 +4079,7 @@ SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetBoxFilterSGSscalar_(struct soap 
 SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetBoxFilterGradient_(struct soap *soap, const char *soap_endpoint, const char *soap_action, struct _turb1__GetBoxFilterGradient *turb1__GetBoxFilterGradient, struct _turb1__GetBoxFilterGradientResponse *turb1__GetBoxFilterGradientResponse)
 {	struct __turb1__GetBoxFilterGradient_ soap_tmp___turb1__GetBoxFilterGradient_;
 	if (soap_endpoint == NULL)
-		soap_endpoint = "http://test.turbulence.pha.jhu.edu/service/turbulence.asmx";
+		soap_endpoint = "http://turbulence.pha.jhu.edu/service/turbulence.asmx";
 	if (soap_action == NULL)
 		soap_action = "http://turbulence.pha.jhu.edu/GetBoxFilterGradient";
 	soap_begin(soap);
@@ -4131,7 +4131,7 @@ SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetBoxFilterGradient_(struct soap *
 SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetLaplacianOfGradient_(struct soap *soap, const char *soap_endpoint, const char *soap_action, struct _turb1__GetLaplacianOfGradient *turb1__GetLaplacianOfGradient, struct _turb1__GetLaplacianOfGradientResponse *turb1__GetLaplacianOfGradientResponse)
 {	struct __turb1__GetLaplacianOfGradient_ soap_tmp___turb1__GetLaplacianOfGradient_;
 	if (soap_endpoint == NULL)
-		soap_endpoint = "http://test.turbulence.pha.jhu.edu/service/turbulence.asmx";
+		soap_endpoint = "http://turbulence.pha.jhu.edu/service/turbulence.asmx";
 	if (soap_action == NULL)
 		soap_action = "http://turbulence.pha.jhu.edu/GetLaplacianOfGradient";
 	soap_begin(soap);
@@ -4183,7 +4183,7 @@ SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetLaplacianOfGradient_(struct soap
 SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetVelocityBatch_(struct soap *soap, const char *soap_endpoint, const char *soap_action, struct _turb1__GetVelocityBatch *turb1__GetVelocityBatch, struct _turb1__GetVelocityBatchResponse *turb1__GetVelocityBatchResponse)
 {	struct __turb1__GetVelocityBatch_ soap_tmp___turb1__GetVelocityBatch_;
 	if (soap_endpoint == NULL)
-		soap_endpoint = "http://test.turbulence.pha.jhu.edu/service/turbulence.asmx";
+		soap_endpoint = "http://turbulence.pha.jhu.edu/service/turbulence.asmx";
 	if (soap_action == NULL)
 		soap_action = "http://turbulence.pha.jhu.edu/GetVelocityBatch";
 	soap_begin(soap);
@@ -4235,7 +4235,7 @@ SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetVelocityBatch_(struct soap *soap
 SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetRawVelocity_(struct soap *soap, const char *soap_endpoint, const char *soap_action, struct _turb1__GetRawVelocity *turb1__GetRawVelocity, struct _turb1__GetRawVelocityResponse *turb1__GetRawVelocityResponse)
 {	struct __turb1__GetRawVelocity_ soap_tmp___turb1__GetRawVelocity_;
 	if (soap_endpoint == NULL)
-		soap_endpoint = "http://test.turbulence.pha.jhu.edu/service/turbulence.asmx";
+		soap_endpoint = "http://turbulence.pha.jhu.edu/service/turbulence.asmx";
 	if (soap_action == NULL)
 		soap_action = "http://turbulence.pha.jhu.edu/GetRawVelocity";
 	soap_begin(soap);
@@ -4287,7 +4287,7 @@ SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetRawVelocity_(struct soap *soap, 
 SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetRawMagneticField_(struct soap *soap, const char *soap_endpoint, const char *soap_action, struct _turb1__GetRawMagneticField *turb1__GetRawMagneticField, struct _turb1__GetRawMagneticFieldResponse *turb1__GetRawMagneticFieldResponse)
 {	struct __turb1__GetRawMagneticField_ soap_tmp___turb1__GetRawMagneticField_;
 	if (soap_endpoint == NULL)
-		soap_endpoint = "http://test.turbulence.pha.jhu.edu/service/turbulence.asmx";
+		soap_endpoint = "http://turbulence.pha.jhu.edu/service/turbulence.asmx";
 	if (soap_action == NULL)
 		soap_action = "http://turbulence.pha.jhu.edu/GetRawMagneticField";
 	soap_begin(soap);
@@ -4339,7 +4339,7 @@ SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetRawMagneticField_(struct soap *s
 SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetRawVectorPotential_(struct soap *soap, const char *soap_endpoint, const char *soap_action, struct _turb1__GetRawVectorPotential *turb1__GetRawVectorPotential, struct _turb1__GetRawVectorPotentialResponse *turb1__GetRawVectorPotentialResponse)
 {	struct __turb1__GetRawVectorPotential_ soap_tmp___turb1__GetRawVectorPotential_;
 	if (soap_endpoint == NULL)
-		soap_endpoint = "http://test.turbulence.pha.jhu.edu/service/turbulence.asmx";
+		soap_endpoint = "http://turbulence.pha.jhu.edu/service/turbulence.asmx";
 	if (soap_action == NULL)
 		soap_action = "http://turbulence.pha.jhu.edu/GetRawVectorPotential";
 	soap_begin(soap);
@@ -4391,7 +4391,7 @@ SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetRawVectorPotential_(struct soap 
 SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetRawPressure_(struct soap *soap, const char *soap_endpoint, const char *soap_action, struct _turb1__GetRawPressure *turb1__GetRawPressure, struct _turb1__GetRawPressureResponse *turb1__GetRawPressureResponse)
 {	struct __turb1__GetRawPressure_ soap_tmp___turb1__GetRawPressure_;
 	if (soap_endpoint == NULL)
-		soap_endpoint = "http://test.turbulence.pha.jhu.edu/service/turbulence.asmx";
+		soap_endpoint = "http://turbulence.pha.jhu.edu/service/turbulence.asmx";
 	if (soap_action == NULL)
 		soap_action = "http://turbulence.pha.jhu.edu/GetRawPressure";
 	soap_begin(soap);
@@ -4443,7 +4443,7 @@ SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetRawPressure_(struct soap *soap, 
 SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetRawDensity_(struct soap *soap, const char *soap_endpoint, const char *soap_action, struct _turb1__GetRawDensity *turb1__GetRawDensity, struct _turb1__GetRawDensityResponse *turb1__GetRawDensityResponse)
 {	struct __turb1__GetRawDensity_ soap_tmp___turb1__GetRawDensity_;
 	if (soap_endpoint == NULL)
-		soap_endpoint = "http://test.turbulence.pha.jhu.edu/service/turbulence.asmx";
+		soap_endpoint = "http://turbulence.pha.jhu.edu/service/turbulence.asmx";
 	if (soap_action == NULL)
 		soap_action = "http://turbulence.pha.jhu.edu/GetRawDensity";
 	soap_begin(soap);
@@ -4495,7 +4495,7 @@ SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetRawDensity_(struct soap *soap, c
 SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetRawTemperature_(struct soap *soap, const char *soap_endpoint, const char *soap_action, struct _turb1__GetRawTemperature *turb1__GetRawTemperature, struct _turb1__GetRawTemperatureResponse *turb1__GetRawTemperatureResponse)
 {	struct __turb1__GetRawTemperature_ soap_tmp___turb1__GetRawTemperature_;
 	if (soap_endpoint == NULL)
-		soap_endpoint = "http://test.turbulence.pha.jhu.edu/service/turbulence.asmx";
+		soap_endpoint = "http://turbulence.pha.jhu.edu/service/turbulence.asmx";
 	if (soap_action == NULL)
 		soap_action = "http://turbulence.pha.jhu.edu/GetRawTemperature";
 	soap_begin(soap);
@@ -4547,7 +4547,7 @@ SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetRawTemperature_(struct soap *soa
 SOAP_FMAC5 int SOAP_FMAC6 soap_call___turb1__GetAnyCutoutWeb_(struct soap *soap, const char *soap_endpoint, const char *soap_action, struct _turb1__GetAnyCutoutWeb *turb1__GetAnyCutoutWeb, struct _turb1__GetAnyCutoutWebResponse *turb1__GetAnyCutoutWebResponse)
 {	struct __turb1__GetAnyCutoutWeb_ soap_tmp___turb1__GetAnyCutoutWeb_;
 	if (soap_endpoint == NULL)
-		soap_endpoint = "http://test.turbulence.pha.jhu.edu/service/turbulence.asmx";
+		soap_endpoint = "http://turbulence.pha.jhu.edu/service/turbulence.asmx";
 	if (soap_action == NULL)
 		soap_action = "http://turbulence.pha.jhu.edu/GetAnyCutoutWeb";
 	soap_begin(soap);

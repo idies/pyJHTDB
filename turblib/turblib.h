@@ -174,10 +174,12 @@ extern "C" {
 	} dataKernel;
 
 	/* C */
+	char *getVersion();
 	void soapinit(void);
 	void soapdestroy(void);
 
 	/* Fortran */
+	char *getVersion_();
 	void soapinit_(void);
 	void soapdestroy_(void);
 

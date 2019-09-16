@@ -1,13 +1,13 @@
 #!/bin/bash
 
-./channelc &> test_output.txt && echo "PASSED: channelc" || echo "FAILED: channelc"
-./channelf &> test_output.txt && echo "PASSED: channelf" || echo "FAILED: channelf"
-./getCutoutc &> test_output.txt && echo "PASSED: getCutoutc" || echo "FAILED: getCutoutc"
-./getCutoutf &> test_output.txt && echo "PASSED: getCutoutf" || echo "FAILED: getCutoutf"
-./mhdc &> test_output.txt && echo "PASSED: mhdc" || echo "FAILED: mhdc"
-./mhdf &> test_output.txt && echo "PASSED: mhdf" || echo "FAILED: mhdf"
-./mixingc &> test_output.txt && echo "PASSED: mixingc" || echo "FAILED: mixingc"
-./mixingf &> test_output.txt && echo "PASSED: mixingf" || echo "FAILED: mixingf"
-./turbc &> test_output.txt && echo "PASSED: turbc" || echo "FAILED: turbc"
-./turbf &> test_output.txt && echo "PASSED: turbf" || echo "FAILED: turbf"
+./DEMO_channelc &> test_output.txt && echo "PASSED: DEMO_channelc" || echo "FAILED: DEMO_channelc"
+./DEMO_channelf &> test_output.txt && echo "PASSED: DEMO_channelf" || echo "FAILED: DEMO_channelf"
+./DEMO_getCutoutc &> test_output.txt && echo "PASSED: DEMO_getCutoutc" || echo "FAILED: DEMO_getCutoutc"
+./DEMO_getCutoutf &> test_output.txt && echo "PASSED: DEMO_getCutoutf" || echo "FAILED: DEMO_getCutoutf"
+./DEMO_mhdc &> test_output.txt && echo "PASSED: DEMO_mhdc" || echo "FAILED: DEMO_mhdc"
+./DEMO_mhdf &> test_output.txt && echo "PASSED: DEMO_mhdf" || echo "FAILED: DEMO_mhdf"
+./DEMO_mixingc &> test_output.txt && echo "PASSED: DEMO_mixingc" || echo "FAILED: DEMO_mixingc"
+./DEMO_mixingf &> test_output.txt && echo "PASSED: DEMO_mixingf" || echo "FAILED: DEMO_mixingf"
+./DEMO_turbc &> test_output.txt && echo "PASSED: DEMO_turbc" || echo "FAILED: DEMO_turbc"
+./DEMO_turbf &> test_output.txt && echo "PASSED: DEMO_turbf" || echo "FAILED: DEMO_turbf"
 rm test_output.txt

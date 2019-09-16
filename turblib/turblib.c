@@ -27,6 +27,8 @@
  */
 struct soap __jhuturbsoap;
 
+char * __version_info = "20190916";
+
 /* Error reporting - C */
 char __turblib_err[TURB_ERROR_LENGTH];
 int __turblib_errno = 0;
@@ -191,6 +193,15 @@ enum turb1__TemporalInterpolation TemporalIntToEnum(enum TemporalInterpolation t
 		return turb1__TemporalInterpolation__PCHIP;
 	}
 	return -1;
+}
+
+/* Get turblib version */
+char * getVersion_() {
+	getVersion();
+}
+
+char * getVersion() {
+	return __version_info;
 }
 
 /* Intialize the gSOAP runtime environment */
