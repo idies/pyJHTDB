@@ -118,7 +118,7 @@ setup(
 
         #### package description stuff goes here
         description = 'Python wrapper for the Johns Hopkins turbulence database library',
-        long_description = open('README.rst', 'r').read(),
+        long_description = open('README.md', 'r').read(),
         author = AUTHOR,
         author_email = AUTHOR_EMAIL,
         license = 'Apache Version 2.0',

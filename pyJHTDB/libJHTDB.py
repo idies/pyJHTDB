@@ -423,7 +423,7 @@ class libJHTDB(object):
             zcoor=idx_z*dx
 
         #filename=data_set
-        fh = h5py.File(filename+'.h5', driver='core', block_size=16, backing_store=True)
+        fh = h5py.File(filename+'.h5', 'x', driver='core', block_size=16, backing_store=True)
         fh.attrs["dataset"] = np.string_(data_set)
         #fh.attrs["timeStep"] = time_step
         fh.attrs["t_start"] = t_start
