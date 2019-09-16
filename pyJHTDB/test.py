@@ -38,7 +38,6 @@ else:
 
 if pyJHTDB.found_h5py:
     import h5py
-    import pyJHTDB.cutout
 else:
     print('h5py is needed for working with cutouts.')
 
@@ -280,7 +279,7 @@ if pyJHTDB.found_matplotlib:
             field_2D,
             dpi = 100,
             figname = 'tst',
-            cmap = cm.jet,
+            cmap = cm.get_cmap("jet"),
             img_type = 'pdf'):
         fig = plt.figure(
                     figsize=(field_2D.shape[1]*1./dpi,
@@ -306,35 +305,6 @@ if pyJHTDB.found_matplotlib:
                       info = pyJHTDB.dbinfo.channel)
         #finalize webservices
         lJHTDB.finalize()
-        return None
-
-if pyJHTDB.found_h5py:
-
-    def test_cutout():
-        pyJHTDB.cutout.get_big_cutout(
-                t0 = 0, tl = 2,
-                x0 = 243, xl = 32,
-                y0 = 48, yl = 30,
-                z0 = 48, zl = 26,
-                chunk_xdim = 16,
-                chunk_ydim = 15,
-                chunk_zdim = 13,
-                data_set = 'mhd1024',
-                data_type = 'ub',
-                filename = 'tmp')
-        data = h5py.File('tmp.h5', mode = 'r')
-        energy = (data['u00000'][0, :, :, 0]**2
-                + data['u00000'][0, :, :, 1]**2
-                + data['u00000'][0, :, :, 2]**2)
-        clean_2D_field(energy, figname = 'tst_0yx')
-        energy = (data['u00000'][:, 0, :, 0]**2
-                + data['u00000'][:, 0, :, 1]**2
-                + data['u00000'][:, 0, :, 2]**2)
-        clean_2D_field(energy, figname = 'tst_z0x')
-        energy = (data['u00000'][:, :, 0, 0]**2
-                + data['u00000'][:, :, 0, 1]**2
-                + data['u00000'][:, :, 0, 2]**2)
-        clean_2D_field(energy, figname = 'tst_zy0')
         return None
 
 def test_rawData(
@@ -852,7 +822,7 @@ class LocalInterpTest:
                 self.yindices = range(self.ynodes[0] + self.y0buffer,
                                       self.ynodes[1] - self.buffer_size)
             self.p = numpy.random.random(
-                size = (npoints, self.yindices.shape[0], 3)).astype(numpy.float32)
+                size = (npoints, self.yindices.count, 3)).astype(numpy.float32)
             if self.info['yperiodic']:
                 self.p[..., 1] *= self.info['dy']
             else:

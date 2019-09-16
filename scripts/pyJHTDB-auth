@@ -1,0 +1,22 @@
+#!/usr/bin/env python
+"""
+This script simply asks a user for his or her auth token and stores it in
+`~/.config/JHTDB/auth_token.txt`.
+"""
+
+import os
+import sys
+if sys.version_info[0] == 2:
+    input = raw_input
+
+default_token = "edu.jhu.pha.turbulence.testing-201406"
+
+if __name__ == "__main__":
+    token = (input("Enter your JHTDB authorization token[{0}]: ".format(
+                       default_token)) or default_token)
+    with open(os.path.join(os.path.expanduser("~"),
+                           ".config",
+                           "JHTDB",
+                           "auth_token.txt"), "w") as f:
+        f.write(token)
+

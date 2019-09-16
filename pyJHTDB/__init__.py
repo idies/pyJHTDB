@@ -66,7 +66,7 @@ else:
 auth_token = 'edu.jhu.pha.turbulence.testing-201406'
 homefolder = os.path.expanduser('~')
 lib_folder = os.path.join(homefolder, '.config/', 'JHTDB/')
-version_info = 20190829.0
+version_info = "20190916.0"
 version = str(version_info)
 
 # check if .config/JHTDB folder exists, create it if not
@@ -106,5 +106,3 @@ if pyJHTDB.found_matplotlib:
     from .test import test_misc
 from .test import test_interp_1D as test_interpolator
 from .generic_splines import main0 as test_gs
-if found_h5py:
-    from .test import test_cutout
