@@ -31,7 +31,7 @@ If you're running unix (i.e. some MacOS or GNU/Linux variant), you will probably
 git clone https://github.com/idies/pyJHTDB.git
 cd pyJHTDB
 python update_turblib.py
-pip install --upgrade --force-reinstall ./
+pip install --upgrade ./
 ```
 
 ## Basic usage
