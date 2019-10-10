@@ -17,7 +17,9 @@ Please go to [SciServer](http://turbulence.pha.jhu.edu/) for more information on
 
 ## Use pyJHTDB on local computers
 
-### Installing pypi version (RECOMMENDED)
+Prerequisites: numpy>=1.15.0, scipy>=1.1.0, sympy>=1.2, h5py>=2.8.0, matplotlib>=3.0.0
+
+### Installing pypi version (Linux and Windows)
 
 If you have *pip*, you can simply do this:
 ```
@@ -25,7 +27,7 @@ pip install pyJHTDB
 ```
 If you're running unix (i.e. some MacOS or GNU/Linux variant), you will probably need to have a `sudo` in front of the `pip` command. If you don't have `pip` on your system, it is quite easy to get it following the instructions at [http://pip.readthedocs.org/en/latest/installing.html](http://pip.readthedocs.org/en/latest/installing.html).
 
-### Installing from source
+### Installing from source (Linux and Windows)
 
 ```
 git clone https://github.com/idies/pyJHTDB.git
@@ -33,6 +35,10 @@ cd pyJHTDB
 python update_turblib.py
 pip install --upgrade ./
 ```
+
+### In Windows
+
+We notice the compilation error in Windows, and provide a temperary workaround in `examples\Use_JHTDB_in_windows.ipynb`. This method use [zeep](https://python-zeep.readthedocs.io/en/master/) package. Should be as convient as pyJHTDB.
 
 ## Basic usage
 
