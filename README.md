@@ -19,7 +19,7 @@ Please go to [SciServer](http://turbulence.pha.jhu.edu/) for more information on
 
 Prerequisites: numpy>=1.15.0, scipy>=1.1.0, sympy>=1.2, h5py>=2.8.0, matplotlib>=3.0.0
 
-### Installing pypi version (Linux and Windows)
+### Installing pypi version (Linux and MacOS)
 
 If you have *pip*, you can simply do this:
 ```
@@ -27,7 +27,7 @@ pip install pyJHTDB
 ```
 If you're running unix (i.e. some MacOS or GNU/Linux variant), you will probably need to have a `sudo` in front of the `pip` command. If you don't have `pip` on your system, it is quite easy to get it following the instructions at [http://pip.readthedocs.org/en/latest/installing.html](http://pip.readthedocs.org/en/latest/installing.html).
 
-### Installing from source (Linux and Windows)
+### Installing from source (Linux and MacOS)
 
 ```
 git clone https://github.com/idies/pyJHTDB.git
