@@ -417,6 +417,8 @@ class libJHTDB(object):
                 dx=2.0*np.pi/1024.0
             elif data_set in ["isotropic4096", "rotstrat4096"]:
                 dx=2.0*np.pi/4096.0
+            elif data_set in ["isotropic8192"]:
+                dx=2.0*np.pi/8192.0
                 
             xcoor=idx_x*dx
             ycoor=idx_y*dx
