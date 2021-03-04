@@ -17,7 +17,8 @@ Please go to [SciServer](http://turbulence.pha.jhu.edu/) for more information on
 
 ## Use pyJHTDB on local computers
 
-Prerequisites: numpy>=1.15.0, scipy>=1.1.0, sympy>=1.2, h5py>=2.8.0, matplotlib>=3.0.0
+Prerequisites: numpy>=1.15.0, scipy>=1.1.0, sympy>=1.2, h5py>=2.8.0, matplotlib>=3.0.0, 
+More prerequisites since 01/08/2021: wurlitzer>=2.0.2 
 
 ### Installing pypi version (Linux and MacOS)
 

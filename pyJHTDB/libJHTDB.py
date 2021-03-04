@@ -25,6 +25,8 @@ import numpy as np
 import ctypes
 import inspect
 import h5py
+from wurlitzer import pipes, STDOUT
+import io
 
 import pyJHTDB
 from pyJHTDB.dbinfo import interpolation_code
@@ -226,7 +228,9 @@ class libJHTDB(object):
         getFunction = 'getCutout'
         get_data = getattr(self.lib, getFunction)
         result_array = np.empty(tuple(list(real_size[::-1]) + [result_dim]), dtype=np.float32)
-        try:
+        stdout = io.StringIO()
+        stderr = io.StringIO()
+        with pipes(stdout=stdout, stderr=stderr):
             get_data(self.authToken,
                  ctypes.c_char_p(data_set.encode('ascii')),
                  ctypes.c_char_p(field.encode('ascii')),
@@ -243,9 +247,9 @@ class libJHTDB(object):
                  ctypes.c_int(filter_width),
                  result_array.ctypes.data_as(ctypes.POINTER(ctypes.c_char)))
             
-        except Exception as es:
-            print(es)
-            raise
+        if (len(stderr.getvalue())>0):
+            print(stderr.getvalue(), file=sys.stderr)
+            return None
 
         return result_array
 
@@ -351,13 +355,21 @@ class libJHTDB(object):
                     xyze0 = np.unravel_index(tmp[t][-1,-1,-1], (nnx,nny,nnz))
                     xyzs1 = (idx_x[xyzs0[0]], idx_y[xyzs0[1]], idx_z[xyzs0[2]])
                     xyze1 = (idx_x[xyze0[0]], idx_y[xyze0[1]], idx_z[xyze0[2]])
-            
+                
+                    
                     temp = self.getCutout(
                         data_set=data_set, field=field, time_step=time_step,
                         start=np.array(xyzs1, dtype = np.int),
                         end=np.array(xyze1, dtype = np.int),
                         step=np.array(step, dtype = np.int),
                         filter_width=filter_width)
+                    
+                    if temp is None:
+                        if (hdf5_output):
+                            os.remove(filename+'.h5')
+                            os.remove(filename+'.xmf')
+                        sys.exit()
+                        raise Exception()
             
                     result[xyzs0[2]:xyze0[2]+1, xyzs0[1]:xyze0[1]+1, xyzs0[0]:xyze0[0]+1,:] = temp
 

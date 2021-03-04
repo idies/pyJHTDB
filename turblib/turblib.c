@@ -27,7 +27,7 @@
  */
 struct soap __jhuturbsoap;
 
-char * __version_info = "20200904";
+char * __version_info = "20210108";
 
 /* Error reporting - C */
 char __turblib_err[TURB_ERROR_LENGTH];
@@ -100,8 +100,8 @@ void turblibsetexitonerror_(int *v) {
 
 /* Determine appropriate error behavior */
 void turblibHandleError() {
+    turblibPrintError();
 	if (__turblib_exit_on_error) {
-		turblibPrintError();
 		exit(1);
 	}
 }
