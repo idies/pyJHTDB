@@ -112,6 +112,21 @@ isotropic4096['nu']   = 1.732e-4
 isotropic4096['time']   = [0]
 
 
+isotropic8192 = {'name'   : 'isotropic8192'}
+isotropic8192['name'] = 'isotropic8192'
+
+for coord in ['x', 'y', 'z']:
+    isotropic8192[coord + 'nodes'] = (np.pi/4096)*np.array(list(range(8192)), dtype = np.float32)
+    isotropic8192['n' + coord] = 8192
+    isotropic8192['l' + coord] = 2*np.pi
+    isotropic8192['d' + coord] = np.pi/4096
+    isotropic8192[coord + 'periodic'] = True
+    isotropic8192[coord + 'uniform'] = True
+isotropic8192['diss'] = 1.3668
+isotropic8192['nu']   = 4.385e-5
+isotropic8192['time']   = [0]
+
+
 rotstrat4096 = {'name'   : 'rotstrat4096'}
 rotstrat4096['name'] = 'rotstrat4096'
 
