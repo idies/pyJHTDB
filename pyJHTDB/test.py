@@ -311,8 +311,8 @@ def test_rawData(
         info = pyJHTDB.dbinfo.channel,
         npoints = 256):
 
-    start = numpy.array([0, 0, 0], dtype = numpy.int)
-    width = numpy.array([npoints, npoints, 1], dtype = numpy.int)
+    start = numpy.array([0, 0, 0], dtype = int)
+    width = numpy.array([npoints, npoints, 1], dtype = int)
 
     xg = info['xnodes'][0:width[0]]
     yg = info['ynodes'][0:width[1]]
@@ -357,8 +357,8 @@ def test_interp_1D(
         q = 4,
         npoints = 256):
 
-    start = numpy.array([0, 0, 0], dtype = numpy.int)
-    width = numpy.array([51+q, 37+q, 17+q], dtype = numpy.int)
+    start = numpy.array([0, 0, 0], dtype = int)
+    width = numpy.array([51+q, 37+q, 17+q], dtype = int)
 
     i = pyJHTDB.interpolator.spline_interpolator(
             info = info,
@@ -473,8 +473,8 @@ def test_interp_2D(
         q = 4,
         npoints = 256):
 
-    start = numpy.array([0, 0, 0], dtype = numpy.int)
-    width = numpy.array([91, 67, 11], dtype = numpy.int)
+    start = numpy.array([0, 0, 0], dtype = int)
+    width = numpy.array([91, 67, 11], dtype = int)
 
     i = pyJHTDB.interpolator.spline_interpolator(
             info = info,
@@ -595,8 +595,8 @@ def test_divfree(
         npoints = 256,
         dbinterp = 44):
 
-    start = numpy.array([0, 0, 0], dtype = numpy.int)
-    width = numpy.array([91, 67, 31], dtype = numpy.int)
+    start = numpy.array([0, 0, 0], dtype = int)
+    width = numpy.array([91, 67, 31], dtype = int)
 
     i = pyJHTDB.interpolator.spline_interpolator(
             info = info,
@@ -675,8 +675,8 @@ def test_local_vs_db_interp(
         q = 4,
         npoints = 256,
         dbinterp = [8, 44],
-        start = numpy.array([0, 0, 0], dtype = numpy.int),
-        width = numpy.array([91, 67, 31], dtype = numpy.int),
+        start = numpy.array([0, 0, 0], dtype = int),
+        width = numpy.array([91, 67, 31], dtype = int),
         messages_on = False,
         token = "edu.jhu.pha.turbulence.testing-201311"):
 

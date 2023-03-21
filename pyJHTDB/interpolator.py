@@ -144,19 +144,19 @@ class spline_interpolator:
         if (not self.initialized):
             self.initialize()
         field_points = np.zeros((points.shape[0], 2*self.nz+2, 2*self.ny+2, 2*self.nx+2, 3), dtype = np.float32)
-        xgrid = np.floor(points[:, 0] / self.info['dx']).astype(np.int) % self.info['nx']
+        xgrid = np.floor(points[:, 0] / self.info['dx']).astype(int) % self.info['nx']
         xfrac = (points[:, 0] - self.info['xnodes'][xgrid])/self.info['dx']
         for p in range(points.shape[0]):
             field_points[p, :, :, :, 0] = (self.info['xnodes'][xgrid[p]]
                     + np.array(list(range(-self.nx, self.nx+2)))*self.info['dx'])[np.newaxis, np.newaxis, :]
         if self.info['yperiodic']:
-            ygrid = np.floor(points[:, 1] / self.info['dy']).astype(np.int) % self.info['ny']
+            ygrid = np.floor(points[:, 1] / self.info['dy']).astype(int) % self.info['ny']
             yfrac = (points[:, 1] - self.info['ynodes'][ygrid])/self.info['dy']
             for p in range(points.shape[0]):
                 field_points[p, :, :, :, 1] = (self.info['ynodes'][ygrid[p]]
                         + np.array(list(range(-self.ny, self.ny+2)))*self.info['dy'])[np.newaxis, :, np.newaxis]
         else:
-            ygrid = np.searchsorted(self.info['ynodes'], points[:, 1]).astype(np.int) - 1
+            ygrid = np.searchsorted(self.info['ynodes'], points[:, 1]).astype(int) - 1
             yfrac = (points[:, 1] - self.info['ynodes'][ygrid])/self.info['dy'][ygrid]
             for p in range(points.shape[0]):
                 if ygrid[p] < 0 or ygrid[p] > self.info['ny'] - 1:
@@ -167,7 +167,7 @@ class spline_interpolator:
                     field_points[p, :, :2*self.ny+1, :, 1] = self.info['ynodes'][np.newaxis, self.info['ny'] - (2*self.ny+1):, np.newaxis]
                 else:
                     field_points[p, :, :, :, 1] = self.info['ynodes'][np.newaxis, ygrid[p]-self.ny:ygrid[p]+self.ny+2, np.newaxis]
-        zgrid = np.floor(points[:, 2] / self.info['dz']).astype(np.int) % self.info['nz']
+        zgrid = np.floor(points[:, 2] / self.info['dz']).astype(np.int32) % self.info['nz']
         zfrac = (points[:, 2] - self.info['znodes'][zgrid])/self.info['dz']
         for p in range(points.shape[0]):
             field_points[p, :, :, :, 2] = (self.info['znodes'][zgrid[p]]
