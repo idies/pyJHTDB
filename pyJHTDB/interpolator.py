@@ -167,7 +167,7 @@ class spline_interpolator:
                     field_points[p, :, :2*self.ny+1, :, 1] = self.info['ynodes'][np.newaxis, self.info['ny'] - (2*self.ny+1):, np.newaxis]
                 else:
                     field_points[p, :, :, :, 1] = self.info['ynodes'][np.newaxis, ygrid[p]-self.ny:ygrid[p]+self.ny+2, np.newaxis]
-        zgrid = np.floor(points[:, 2] / self.info['dz']).astype(np.int32) % self.info['nz']
+        zgrid = np.floor(points[:, 2] / self.info['dz']).astype(int) % self.info['nz']
         zfrac = (points[:, 2] - self.info['znodes'][zgrid])/self.info['dz']
         for p in range(points.shape[0]):
             field_points[p, :, :, :, 2] = (self.info['znodes'][zgrid[p]]
