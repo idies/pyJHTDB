@@ -112,7 +112,7 @@ setup(
                                     'data/channel5200_ygrid.npy',
                                     'data/transition_bl_ygrid.npy']},
         python_requires='>3.6',
-        install_requires = ['numpy>=1.15.0', 'scipy>=1.1.0', 'sympy>=1.2', 'h5py>=2.8.0', 'matplotlib>=3.0.0'],
+        install_requires = ['numpy>=1.15.0', 'scipy>=1.1.0', 'sympy>=1.2', 'h5py>=2.8.0', 'matplotlib>=3.0.0', 'wurlitzer>=2.0.2'],
         ext_modules = [libJHTDB],
         test_suite = 'tests',
 

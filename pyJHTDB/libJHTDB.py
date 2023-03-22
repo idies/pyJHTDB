@@ -158,8 +158,8 @@ class libJHTDB(object):
     def getRawData(
             self,
             time=0,
-            start=np.array([0, 0, 0], dtype=np.int),
-            size=np.array([8, 8, 8], dtype=np.int),
+            start=np.array([0, 0, 0], dtype=int),
+            size=np.array([8, 8, 8], dtype=int),
             data_set='channel',
             getFunction='Velocity'):
 
@@ -201,9 +201,9 @@ class libJHTDB(object):
             data_set='isotropic1024coarse',
             field='u',
             time_step=int(0),
-            start=np.array([1, 1, 1], dtype=np.int),
-            end=np.array([8, 8, 8], dtype=np.int),
-            step=np.array([1, 1, 1], dtype=np.int),
+            start=np.array([1, 1, 1], dtype=int),
+            end=np.array([8, 8, 8], dtype=int),
+            step=np.array([1, 1, 1], dtype=int),
             filter_width=1):
         if not self.connection_on:
             print('you didn\'t connect to the database')
@@ -223,7 +223,7 @@ class libJHTDB(object):
         tempa=np.arange(start[0], end[0]+1, step[0])
         tempb=np.arange(start[1], end[1]+1, step[1])
         tempc=np.arange(start[2], end[2]+1, step[2])
-        real_size=np.array([np.size(tempa), np.size(tempb), np.size(tempc)], dtype=np.int)
+        real_size=np.array([np.size(tempa), np.size(tempb), np.size(tempc)], dtype=int)
         
         getFunction = 'getCutout'
         get_data = getattr(self.lib, getFunction)
@@ -260,9 +260,9 @@ class libJHTDB(object):
             t_start=int(1),
             t_end=int(1),
             t_step=int(1),
-            start=np.array([1, 1, 1], dtype=np.int),
-            end=np.array([8, 8, 8], dtype=np.int),
-            step=np.array([1, 1, 1], dtype=np.int),
+            start=np.array([1, 1, 1], dtype=int),
+            end=np.array([8, 8, 8], dtype=int),
+            step=np.array([1, 1, 1], dtype=int),
             filter_width=1,
             filename='N/A'):
             #hdf5_output=True):
@@ -359,9 +359,9 @@ class libJHTDB(object):
                     
                     temp = self.getCutout(
                         data_set=data_set, field=field, time_step=time_step,
-                        start=np.array(xyzs1, dtype = np.int),
-                        end=np.array(xyze1, dtype = np.int),
-                        step=np.array(step, dtype = np.int),
+                        start=np.array(xyzs1, dtype = int),
+                        end=np.array(xyze1, dtype = int),
+                        step=np.array(step, dtype = int),
                         filter_width=filter_width)
                     
                     if temp is None:
