@@ -158,8 +158,8 @@ class libJHTDB(object):
     def getRawData(
             self,
             time=0,
-            start=np.array([0, 0, 0], dtype=int),
-            size=np.array([8, 8, 8], dtype=int),
+            start=np.array([0, 0, 0], dtype=np.int32),
+            size=np.array([8, 8, 8], dtype=np.int32),
             data_set='channel',
             getFunction='Velocity'):
 
@@ -359,9 +359,9 @@ class libJHTDB(object):
                     
                     temp = self.getCutout(
                         data_set=data_set, field=field, time_step=time_step,
-                        start=np.array(xyzs1, dtype = int),
-                        end=np.array(xyze1, dtype = int),
-                        step=np.array(step, dtype = int),
+                        start=np.array(xyzs1, dtype = np.int32),
+                        end=np.array(xyze1, dtype = np.int32),
+                        step=np.array(step, dtype = np.int32),
                         filter_width=filter_width)
                     
                     if temp is None:
