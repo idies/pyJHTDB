@@ -121,11 +121,12 @@ class libJHTDB(object):
                            'getMagneticFieldLaplacian',
                            'getVectorPotentialLaplacian',
                            'getPressureGradient',
-                           'getTemperatureGradient']:
+                           'getTemperatureGradient',
+                           'getDensityGradient']:
             result_dim = 3
         elif getFunction in ['getVelocityAndPressure', 'getVelocityAndTemperature']:
             result_dim = 4
-        elif getFunction in ['getPressureHessian', 'getTemperatureHessian']:
+        elif getFunction in ['getPressureHessian', 'getTemperatureHessian', 'getDensityHessian']:
             result_dim = 6
         elif getFunction in ['getVelocityGradient',
                              'getMagneticFieldGradient',
@@ -135,7 +136,7 @@ class libJHTDB(object):
                              'getMagneticFieldHessian',
                              'getVectorPotentialHessian']:
             result_dim = 18
-        elif getFunction in ['getPressure', 'getTemperature']:
+        elif getFunction in ['getPressure', 'getTemperature', 'getDensity']:
             result_dim = 1
         elif getFunction in ['getInvariant']:
             result_dim = 2

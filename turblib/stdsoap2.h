@@ -1362,7 +1362,7 @@ extern "C" {
 
 /* maximum number of array or container elements, must be greater than zero (0) */
 #ifndef SOAP_MAXOCCURS
-# define SOAP_MAXOCCURS (100000)
+# define SOAP_MAXOCCURS (2000000)
 #endif
 
 #ifdef VXWORKS
