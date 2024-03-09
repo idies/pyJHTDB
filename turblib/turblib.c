@@ -101,9 +101,9 @@ void turblibsetexitonerror_(int *v) {
 /* Determine appropriate error behavior */
 void turblibHandleError() {
     turblibPrintError();
-	if (__turblib_exit_on_error) {
-		exit(1);
-	}
+	// if (__turblib_exit_on_error) {
+	// 	exit(1);
+	// }
 }
 
 

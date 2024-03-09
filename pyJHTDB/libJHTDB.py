@@ -93,7 +93,7 @@ class libJHTDB(object):
             sys.exit()
             return None
         if not (point_coords.dtype == np.float32):
-            print('point coordinates in getData must be floats. stopping.')
+            print('point coordinates in getData must be single-precision floats. stopping.')
             sys.exit()
             return None
         if (type(sinterp) == str):
@@ -147,7 +147,7 @@ class libJHTDB(object):
             return None
         newshape = list(point_coords.shape[0:len(point_coords.shape) - 1])
         newshape.append(result_dim)
-        result_array = np.empty(newshape, dtype=np.float32)
+        result_array = np.full(newshape, fill_value = -999.9, dtype = 'f')
         get_data(self.authToken,
                  ctypes.c_char_p(data_set.encode('ascii')),
                  ctypes.c_float(time),
