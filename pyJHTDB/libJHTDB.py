@@ -349,7 +349,7 @@ class libJHTDB(object):
 
             for time_step in np.arange(t_start, t_end+1, t_step):
 
-                result=np.zeros((nnz,nny,nnx,dim),dtype='float32')
+                result = np.full((nnz,nny,nnx,dim), fill_value = -999.9, dtype = 'f')
 
                 for t in range(split_no):
                     xyzs0 = np.unravel_index(tmp[t][0,0,0], (nnx,nny,nnz))
