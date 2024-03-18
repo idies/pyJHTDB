@@ -616,6 +616,45 @@ extern "C" {
 		int *spatial, int *temporal,
 		int *count, float datain[][3], float dataout[][6],
 		int len_a, int len_d);
+    
+	/* C */
+	int getTemperatureSoap(char *authToken,
+		char *dataset, float time,
+		enum SpatialInterpolation spatial, enum TemporalInterpolation temporal,
+		int count, float datain[][3], float dataout[]);
+
+	/* Fortran */
+	int gettemperature_(char *authToken,
+		char *dataset, float *time,
+		int *spatial, int *temporal,
+		int *count, float datain[][3], float dataout[],
+		int len_a, int len_d);
+
+	/* C */
+	int getTemperatureGradientSoap(char *authToken,
+		char *dataset, float time,
+		enum SpatialInterpolation spatial, enum TemporalInterpolation temporal,
+		int count, float datain[][3], float dataout[][3]);
+
+	/* Fortran */
+	int gettemperaturegradient_(char *authToken,
+		char *dataset, float *time,
+		int *spatial, int *temporal,
+		int *count, float datain[][3], float dataout[][3],
+		int len_a, int len_d);
+
+	/* C */
+	int getTemperatureHessianSoap(char *authToken,
+		char *dataset, float time,
+		enum SpatialInterpolation spatial, enum TemporalInterpolation temporal,
+		int count, float datain[][3], float dataout[][6]);
+
+	/* Fortran */
+	int gettemperaturehessian_(char *authToken,
+		char *dataset, float *time,
+		int *spatial, int *temporal,
+		int *count, float datain[][3], float dataout[][6],
+		int len_a, int len_d);
 
 	/* C */
 	int getInvariantSoap(char *authToken,
@@ -643,6 +682,16 @@ extern "C" {
 
 	/* Fortran */
 	int getrawdensity_(char *authToken,
+		char *dataset, int *time_step,
+		int *X, int *Y, int *Z, int *Xwidth, int *Ywidth, int *Zwidth, float dataout[]);
+    
+	/* C */
+	int getRawTemperature(char *authToken,
+		char *dataset, int time_step,
+		int X, int Y, int Z, int Xwidth, int Ywidth, int Zwidth, char dataout[]);
+
+	/* Fortran */
+	int getrawtemperature_(char *authToken,
 		char *dataset, int *time_step,
 		int *X, int *Y, int *Z, int *Xwidth, int *Ywidth, int *Zwidth, float dataout[]);
 
@@ -718,6 +767,14 @@ extern "C" {
 		int count, float datain[][3], float dataout[][3]);
 
 	int getDensityHessianLocal(TurbDataset dataset, float time,
+		enum SpatialInterpolation spatial, enum TemporalInterpolation temporal,
+		int count, float datain[][3], float dataout[][6]);
+    
+	int getTemperatureGradientLocal(TurbDataset dataset, float time,
+		enum SpatialInterpolation spatial, enum TemporalInterpolation temporal,
+		int count, float datain[][3], float dataout[][3]);
+
+	int getTemperatureHessianLocal(TurbDataset dataset, float time,
 		enum SpatialInterpolation spatial, enum TemporalInterpolation temporal,
 		int count, float datain[][3], float dataout[][6]);
 
@@ -838,6 +895,21 @@ int getDensityGradient(char *authToken,
 	int count, float datain[][3], float dataout[][3]);
 
 int getDensityHessian(char *authToken,
+	char *dataset, float time,
+	enum SpatialInterpolation spatial, enum TemporalInterpolation temporal,
+	int count, float datain[][3], float dataout[][6]);
+
+int getTemperature(char *authToken,
+	char *dataset, float time,
+	enum SpatialInterpolation spatial, enum TemporalInterpolation temporal,
+	int count, float datain[][3], float dataout[]);
+
+int getTemperatureGradient(char *authToken,
+	char *dataset, float time,
+	enum SpatialInterpolation spatial, enum TemporalInterpolation temporal,
+	int count, float datain[][3], float dataout[][3]);
+
+int getTemperatureHessian(char *authToken,
 	char *dataset, float time,
 	enum SpatialInterpolation spatial, enum TemporalInterpolation temporal,
 	int count, float datain[][3], float dataout[][6]);

@@ -101,9 +101,9 @@ void turblibsetexitonerror_(int *v) {
 /* Determine appropriate error behavior */
 void turblibHandleError() {
     turblibPrintError();
-	if (__turblib_exit_on_error) {
-		exit(1);
-	}
+	// if (__turblib_exit_on_error) {
+	// 	exit(1);
+	// }
 }
 
 
@@ -372,6 +372,30 @@ int getDensityHessian(char *authToken,
 	int count, float datain[][3], float dataout[][6])
 {
 		return getDensityHessianSoap(authToken, dataset, time, spatial, temporal, count, datain, dataout);
+}
+
+int getTemperature(char *authToken,
+	char *dataset, float time,
+	enum SpatialInterpolation spatial, enum TemporalInterpolation temporal,
+	int count, float datain[][3], float dataout[])
+{
+		return getTemperatureSoap(authToken, dataset, time, spatial, temporal, count, datain, dataout);
+}
+
+int getTemperatureGradient(char *authToken,
+	char *dataset, float time,
+	enum SpatialInterpolation spatial, enum TemporalInterpolation temporal,
+	int count, float datain[][3], float dataout[][3])
+{
+		return getTemperatureGradientSoap(authToken, dataset, time, spatial, temporal, count, datain, dataout);
+}
+
+int getTemperatureHessian(char *authToken,
+	char *dataset, float time,
+	enum SpatialInterpolation spatial, enum TemporalInterpolation temporal,
+	int count, float datain[][3], float dataout[][6])
+{
+		return getTemperatureHessianSoap(authToken, dataset, time, spatial, temporal, count, datain, dataout);
 }
 
 int getInvariant(char *authToken,
@@ -1912,6 +1936,127 @@ int getDensityHessianSoap(char *authToken,
 	return rc;
 }
 
+int getTemperatureSoap(char *authToken,
+	char *dataset, float time,
+	enum SpatialInterpolation spatial, enum TemporalInterpolation temporal,
+	int count, float datain[][3], float dataout[])
+{
+	int rc;
+
+	struct _turb1__GetTemperature input;
+	struct _turb1__GetTemperatureResponse output;
+
+	input.authToken = authToken;
+	input.dataset = dataset;
+	input.time = time;
+	input.spatialInterpolation = SpatialIntToEnum(spatial);
+	input.temporalInterpolation = TemporalIntToEnum(temporal);
+
+	struct turb1__ArrayOfPoint3 pointArray;
+	pointArray.__sizePoint3 = count;
+	pointArray.Point3 = (void *)datain;
+	input.points = &pointArray;
+	input.addr = NULL;
+
+	rc = soap_call___turb1__GetTemperature(&__jhuturbsoap, NULL, NULL, &input, &output);
+	if (rc == SOAP_OK) {
+		memcpy(dataout, output.GetTemperatureResult->Pressure,
+			output.GetTemperatureResult->__sizePressure * sizeof(float));
+		bzero(__turblib_err, TURB_ERROR_LENGTH);
+	}
+	else {
+		soap_sprint_fault(&__jhuturbsoap, __turblib_err, TURB_ERROR_LENGTH);
+		turblibHandleError();
+	}
+
+	soap_end(&__jhuturbsoap);  // remove deserialized data and clean up
+	soap_done(&__jhuturbsoap); // detach the gSOAP environment
+
+	__turblib_errno = rc;
+
+	return rc;
+}
+
+int getTemperatureGradientSoap(char *authToken,
+	char *dataset, float time,
+	enum SpatialInterpolation spatial, enum TemporalInterpolation temporal,
+	int count, float datain[][3], float dataout[][3])
+{
+	int rc;
+
+	struct _turb1__GetTemperatureGradient input;
+	struct _turb1__GetTemperatureGradientResponse output;
+
+	input.authToken = authToken;
+	input.dataset = dataset;
+	input.time = time;
+	input.spatialInterpolation = SpatialIntToEnum(spatial);
+	input.temporalInterpolation = TemporalIntToEnum(temporal);
+
+	struct turb1__ArrayOfPoint3 pointArray;
+	pointArray.__sizePoint3 = count;
+	pointArray.Point3 = (void *)datain;
+	input.points = &pointArray;
+	input.addr = NULL;
+
+	rc = soap_call___turb1__GetTemperatureGradient(&__jhuturbsoap, NULL, NULL, &input, &output);
+	if (rc == SOAP_OK) {
+		memcpy(dataout, output.GetTemperatureGradientResult->Vector3,
+			output.GetTemperatureGradientResult->__sizeVector3 * sizeof(float) * 3);
+		bzero(__turblib_err, TURB_ERROR_LENGTH);
+	}
+	else {
+		soap_sprint_fault(&__jhuturbsoap, __turblib_err, TURB_ERROR_LENGTH);
+		turblibHandleError();
+	}
+
+	soap_end(&__jhuturbsoap);  /* remove deserialized data and clean up */
+	soap_done(&__jhuturbsoap); /*  detach the gSOAP environment  */
+
+	__turblib_errno = rc;
+	return rc;
+}
+
+int getTemperatureHessianSoap(char *authToken,
+	char *dataset, float time,
+	enum SpatialInterpolation spatial, enum TemporalInterpolation temporal,
+	int count, float datain[][3], float dataout[][6])
+{
+	int rc;
+
+	struct _turb1__GetTemperatureHessian input;
+	struct _turb1__GetTemperatureHessianResponse output;
+
+	input.authToken = authToken;
+	input.dataset = dataset;
+	input.time = time;
+	input.spatialInterpolation = SpatialIntToEnum(spatial);
+	input.temporalInterpolation = TemporalIntToEnum(temporal);
+
+	struct turb1__ArrayOfPoint3 pointArray;
+	pointArray.__sizePoint3 = count;
+	pointArray.Point3 = (void *)datain;
+	input.points = &pointArray;
+	input.addr = NULL;
+
+	rc = soap_call___turb1__GetTemperatureHessian(&__jhuturbsoap, NULL, NULL, &input, &output);
+	if (rc == SOAP_OK) {
+		memcpy(dataout, output.GetTemperatureHessianResult->PressureHessian,
+			output.GetTemperatureHessianResult->__sizePressureHessian * sizeof(float) * 6);
+		bzero(__turblib_err, TURB_ERROR_LENGTH);
+	}
+	else {
+		soap_sprint_fault(&__jhuturbsoap, __turblib_err, TURB_ERROR_LENGTH);
+		turblibHandleError();
+	}
+
+	soap_end(&__jhuturbsoap);  /* remove deserialized data and clean up */
+	soap_done(&__jhuturbsoap); /*  detach the gSOAP environment  */
+
+	__turblib_errno = rc;
+	return rc;
+}
+
 int getInvariantSoap(char *authToken,
 	char *dataset, float time,
 	enum SpatialInterpolation spatial, enum TemporalInterpolation temporal,
@@ -1996,6 +2141,55 @@ int getRawDensity(char *authToken,
 	if (rc == SOAP_OK) {
 		memcpy(dataout, output.GetRawDensityResult.__ptr,
 			output.GetRawDensityResult.__size);
+		bzero(__turblib_err, TURB_ERROR_LENGTH);
+	}
+	else {
+		soap_sprint_fault(&__jhuturbsoap, __turblib_err, TURB_ERROR_LENGTH);
+		turblibHandleError();
+	}
+
+	soap_end(&__jhuturbsoap);  // remove deserialized data and clean up
+	soap_done(&__jhuturbsoap); // detach the gSOAP environment
+
+	__turblib_errno = rc;
+
+	return rc;
+}
+
+int getrawtemperature_(char *authToken, char *dataset, int *time_step,
+	int *X, int *Y, int *Z, int *Xwidth, int *Ywidth, int *Zwidth,
+	float dataout[])
+{
+	return getRawTemperature(authToken, dataset, *time_step, *X, *Y, *Z,
+		*Xwidth, *Ywidth, *Zwidth, (char*)dataout);
+}
+
+int getRawTemperature(char *authToken,
+	char *dataset, int time_step,
+	int X, int Y, int Z, int Xwidth, int Ywidth, int Zwidth, char dataout[])
+{
+	fprintf(stderr, "%s\n", "******getRawTemperature has been deprecated. Please use getCutout instead******");
+	return -999;
+	int rc;
+
+	struct _turb1__GetRawTemperature input;
+	struct _turb1__GetRawTemperatureResponse output;
+
+	input.authToken = authToken;
+	input.dataset = dataset;
+	input.T = time_step;
+	input.X = X;
+	input.Y = Y;
+	input.Z = Z;
+	input.Xwidth = Xwidth;
+	input.Ywidth = Ywidth;
+	input.Zwidth = Zwidth;
+	input.addr = NULL;
+
+	rc = soap_call___turb1__GetRawTemperature(&__jhuturbsoap, NULL, NULL, &input, &output);
+	if (rc == SOAP_OK) {
+		memcpy(dataout, output.GetRawTemperatureResult.__ptr,
+			output.GetRawTemperatureResult.__size);
 		bzero(__turblib_err, TURB_ERROR_LENGTH);
 	}
 	else {
@@ -2894,6 +3088,42 @@ int getdensity_(char *authToken,
 	int len_a, int len_d)
 {
 	return getDensity(authToken,
+		dataset, *time,
+		*spatial, *temporal,
+		*count, datain, dataout);
+}
+
+int gettemperaturehessian_(char *authToken,
+	char *dataset, float *time,
+	int *spatial, int *temporal,
+	int *count, float datain[][3], float dataout[][6],
+	int len_a, int len_d)
+{
+	return getTemperatureHessian(authToken,
+		dataset, *time,
+		*spatial, *temporal,
+		*count, datain, dataout);
+}
+
+int gettemperaturegradient_(char *authToken,
+	char *dataset, float *time,
+	int *spatial, int *temporal,
+	int *count, float datain[][3], float dataout[][3],
+	int len_a, int len_d)
+{
+	return getTemperatureGradient(authToken,
+		dataset, *time,
+		*spatial, *temporal,
+		*count, datain, dataout);
+}
+
+int gettemperature_(char *authToken,
+	char *dataset, float *time,
+	int *spatial, int *temporal,
+	int *count, float datain[][3], float dataout[],
+	int len_a, int len_d)
+{
+	return getTemperature(authToken,
 		dataset, *time,
 		*spatial, *temporal,
 		*count, datain, dataout);

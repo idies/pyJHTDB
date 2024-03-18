@@ -93,7 +93,7 @@ class libJHTDB(object):
             sys.exit()
             return None
         if not (point_coords.dtype == np.float32):
-            print('point coordinates in getData must be floats. stopping.')
+            print('point coordinates in getData must be single-precision floats. stopping.')
             sys.exit()
             return None
         if (type(sinterp) == str):
@@ -121,11 +121,12 @@ class libJHTDB(object):
                            'getMagneticFieldLaplacian',
                            'getVectorPotentialLaplacian',
                            'getPressureGradient',
-                           'getTemperatureGradient']:
+                           'getTemperatureGradient',
+                           'getDensityGradient']:
             result_dim = 3
         elif getFunction in ['getVelocityAndPressure', 'getVelocityAndTemperature']:
             result_dim = 4
-        elif getFunction in ['getPressureHessian', 'getTemperatureHessian']:
+        elif getFunction in ['getPressureHessian', 'getTemperatureHessian', 'getDensityHessian']:
             result_dim = 6
         elif getFunction in ['getVelocityGradient',
                              'getMagneticFieldGradient',
@@ -135,7 +136,7 @@ class libJHTDB(object):
                              'getMagneticFieldHessian',
                              'getVectorPotentialHessian']:
             result_dim = 18
-        elif getFunction in ['getPressure', 'getTemperature']:
+        elif getFunction in ['getPressure', 'getTemperature', 'getDensity']:
             result_dim = 1
         elif getFunction in ['getInvariant']:
             result_dim = 2
@@ -146,7 +147,7 @@ class libJHTDB(object):
             return None
         newshape = list(point_coords.shape[0:len(point_coords.shape) - 1])
         newshape.append(result_dim)
-        result_array = np.empty(newshape, dtype=np.float32)
+        result_array = np.full(newshape, fill_value = -999.9, dtype = 'f')
         get_data(self.authToken,
                  ctypes.c_char_p(data_set.encode('ascii')),
                  ctypes.c_float(time),
@@ -348,7 +349,7 @@ class libJHTDB(object):
 
             for time_step in np.arange(t_start, t_end+1, t_step):
 
-                result=np.zeros((nnz,nny,nnx,dim),dtype='float32')
+                result = np.full((nnz,nny,nnx,dim), fill_value = -999.9, dtype = 'f')
 
                 for t in range(split_no):
                     xyzs0 = np.unravel_index(tmp[t][0,0,0], (nnx,nny,nnz))
